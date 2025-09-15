@@ -115,4 +115,24 @@
     <val lang="zh_CN">\n[FND]目前沒有開啟的Text模式編輯器。</val>
     <val lang="zh_TW">\n[FND]目前沒有開啟的Text模式編輯器。</val>
   </key>
+  <key value="ft.parse.model.label">
+    <val lang="en_US">Parsing model:</val>
+    <val lang="zh_CN">解析參照模型：</val>
+    <val lang="zh_TW">解析參照模型：</val>
+  </key>
+  <key value="ft.detect.model.label">
+    <val lang="en_US">Detection model:</val>
+    <val lang="zh_CN">偵測參照模型：</val>
+    <val lang="zh_TW">偵測參照模型：</val>
+  </key>
+  <key value="api.key.label">
+    <val lang="en_US">API Key*: </val>
+    <val lang="zh_CN">API 金鑰*： </val>
+    <val lang="zh_TW">API 金鑰*： </val>
+  </key>
+  <key value="options.panel.title">
+    <val lang="en_US">DILA AI Markup Assistant Settings</val>
+    <val lang="zh_CN">DILA AI 標記助手設定</val>
+    <val lang="zh_TW">DILA AI 標記助手設定</val>
+  </key>
 </translation>

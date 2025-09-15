@@ -99,15 +99,32 @@ function applicationStarted(pluginWorkspaceAccess) {
                     resultArea.setLineWrap(true);
                     resultArea.setWrapStyleWord(true);
                     resultArea.setEditable(false);
+
+                    var JButton = Packages.javax.swing.JButton;
+                    var buttonPanel = new JPanel();
+                    var replaceButton = new JButton(i18nFn("replace.button")); // "Replace in Document"
+                    buttonPanel.add(replaceButton);
+                    buttonPanel.setComponentOrientation(Packages.java.awt.ComponentOrientation.RIGHT_TO_LEFT);
+                    buttonPanel.setVisible(false);
+
+                    // Create a panel to hold the result area and the button panel
+                    var bottomPanel = new JPanel(new BorderLayout());
+                    bottomPanel.add(new JScrollPane(resultArea), BorderLayout.CENTER);
+                    bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
                     
                     var splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, 
                                                    new JScrollPane(infoArea), 
-                                                   new JScrollPane(resultArea));
+                                                   bottomPanel);
                     splitPane.setDividerLocation(0.5);
                     splitPane.setResizeWeight(0.5);
 
                     // Create options panel with model and API key configuration
                     var optionsPanel = new JPanel();
+                    var BorderFactory = Packages.javax.swing.BorderFactory;
+                    var TitledBorder = Packages.javax.swing.border.TitledBorder;
+                    var titledBorder = BorderFactory.createTitledBorder(i18nFn("options.panel.title"));
+                    titledBorder.setTitlePosition(TitledBorder.BELOW_TOP);
+                    optionsPanel.setBorder(titledBorder);
                     var GridBagLayout = Packages.java.awt.GridBagLayout;
                     var GridBagConstraints = Packages.java.awt.GridBagConstraints;
                     var JLabel = Packages.javax.swing.JLabel;
@@ -119,44 +136,35 @@ function applicationStarted(pluginWorkspaceAccess) {
                     gbc.insets = new Insets(5, 5, 5, 5);
                     gbc.anchor = GridBagConstraints.WEST;
 
-                    // Model 1 configuration
+                    // ft parse model configuration
                     gbc.gridx = 0; gbc.gridy = 0;
-                    optionsPanel.add(new JLabel(i18nFn("model1.label")), gbc);
+                    optionsPanel.add(new JLabel(i18nFn("ft.parse.model.label")), gbc); // "解析參照用預訓練模型"
                     gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
                     var model1Field = new JTextField(20);
                     optionsPanel.add(model1Field, gbc);
 
-                    // Model 2 configuration
+                    // ft detect model configuration
                     gbc.gridx = 0; gbc.gridy = 1; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
-                    optionsPanel.add(new JLabel(i18nFn("model2.label")), gbc);
+                    optionsPanel.add(new JLabel(i18nFn("ft.detect.model.label")), gbc); // "偵測參照用預訓練模型"
                     gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
                     var model2Field = new JTextField(20);
                     optionsPanel.add(model2Field, gbc);
 
                     // API Key configuration
                     gbc.gridx = 0; gbc.gridy = 2; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
-                    optionsPanel.add(new JLabel(i18nFn("api.key.label")), gbc);
+                    optionsPanel.add(new JLabel(i18nFn("api.key.label")), gbc); // "API Key"
                     gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-                    var apiKeyField = new JTextField(20);
+                    var JPasswordField = Packages.javax.swing.JPasswordField;
+                    var apiKeyField = new JPasswordField(40);
                     optionsPanel.add(apiKeyField, gbc);
 
-                    // Initially hide the options panel
-                    // optionsPanel.setVisible(true);
+                    // Add a filler panel to push everything to the top
+                    gbc.gridy = 3;
+                    gbc.weighty = 1.0;
+                    gbc.fill = GridBagConstraints.VERTICAL;
+                    optionsPanel.add(new JPanel(), gbc);
+
                     
-                    mainPanel.add(splitPane, BorderLayout.CENTER);
-
-                    var JButton = Packages.javax.swing.JButton;
-                    var buttonPanel = new JPanel();
-                    var replaceButton = new JButton(i18nFn("replace.button")); // "Replace in Document"
-                    buttonPanel.add(replaceButton);
-                    buttonPanel.setComponentOrientation(Packages.java.awt.ComponentOrientation.RIGHT_TO_LEFT);
-                    mainPanel.add(buttonPanel, BorderLayout.SOUTH);
-                    buttonPanel.setVisible(false);
-
-                    // Set the component and title for the view
-                    viewInfo.setComponent(mainPanel);
-                    viewInfo.setTitle(i18nFn("view.title")); // "DILA AI Markup Assistant"
-
                     // Create a container that can switch between splitPane and optionsPanel
                     var CardLayout = Packages.java.awt.CardLayout;
                     var cardPanel = new JPanel(new CardLayout());
@@ -165,18 +173,19 @@ function applicationStarted(pluginWorkspaceAccess) {
                     
                     var cardLayout = cardPanel.getLayout();
 
+                    mainPanel.add(cardPanel, BorderLayout.CENTER);
+
+                    // Set the component and title for the view
+                    viewInfo.setComponent(mainPanel);
+                    viewInfo.setTitle(i18nFn("view.title")); // "DILA AI Markup Assistant"
+
+
                     // Add action listeners to menu items
                     menuItemActionAIMarkup.addActionListener(function(e) {
                         logDebug("AI Markup action triggered");
 
-                                                // Switch back to main view if options panel is currently showing
-                        if (optionsPanel.isVisible()) {
-                            cardLayout.show(cardPanel, "MAIN");
-                            mainPanel.remove(cardPanel);
-                            mainPanel.add(splitPane, BorderLayout.CENTER);
-                            mainPanel.revalidate();
-                            mainPanel.repaint();
-                        }
+                        // Switch back to main view if options panel is currently showing
+                        cardLayout.show(cardPanel, "MAIN");
 
                         infoArea.setText(i18nFn("action.ai.markup.selected"));
                         var selectedText = fetchAndDisplaySelectedText(infoArea);
@@ -334,13 +343,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                         logDebug("Tag Removal action triggered");
 
                         // Switch back to main view if options panel is currently showing
-                        if (optionsPanel.isVisible()) {
-                            cardLayout.show(cardPanel, "MAIN");
-                            mainPanel.remove(cardPanel);
-                            mainPanel.add(splitPane, BorderLayout.CENTER);
-                            mainPanel.revalidate();
-                            mainPanel.repaint();
-                        }
+                        cardLayout.show(cardPanel, "MAIN");
 
                         infoArea.setText(i18nFn("action.tag.removal.selected"));
                         var selectedText = fetchAndDisplaySelectedText(infoArea);
@@ -356,19 +359,10 @@ function applicationStarted(pluginWorkspaceAccess) {
                     });
                     menuItemOption.addActionListener(function(e) {
                         logDebug("Settings option triggered");
-                        // infoArea.setText(i18nFn("action.settings.selected"));
-                        // pluginWorkspaceAccess.showOptionsDialog("DILA AI Markup Assistant Settings", "dila.ai.markup.assistant");
                         buttonPanel.setVisible(false);
 
-                        // Switch to options view only if main panel is currently shown
-                        if (!optionsPanel.isVisible()) {
-                            cardLayout.show(cardPanel, "OPTIONS");
-                            mainPanel.remove(splitPane);
-                            mainPanel.add(cardPanel, BorderLayout.CENTER);
-                            mainPanel.revalidate();
-                            mainPanel.repaint();
-                        }
-
+                        // Switch to options view
+                        cardLayout.show(cardPanel, "OPTIONS");
                    });
                 }
             }
