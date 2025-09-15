@@ -1,0 +1,30 @@
+<!DOCTYPE plugin PUBLIC "-//Oxygen Plugin" "../plugin.dtd">
+<plugin 
+    id="com.dila.modified.view"
+    name="DILA modified View"
+    version="0.0.1"
+    vendor="DILA"
+    class="ro.sync.exml.plugin.Plugin" 
+    classLoaderType="preferReferencedResources">
+
+    <description>
+        This plugin provides an AI-powered markup assistant for editing XML documents.
+    </description>
+    
+    <extension 
+        type="WorkspaceAccessJS" 
+        href="dila-modified-view.js"/>
+
+     <!-- <extension 
+        type="ro.sync.exml.plugin.options.page"
+        class="com.dila.options.MyOptionsPage"
+        id="dila.ai.markup.assistant"/> -->
+   
+    <view 
+        id="dila.modified.view"
+        initialSide="WEST"
+        initialState="docked"/>
+
+    <!-- <license>dila-license.txt</license> -->
+
+</plugin>

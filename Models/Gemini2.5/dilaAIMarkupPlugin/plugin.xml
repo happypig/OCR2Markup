@@ -1,0 +1,33 @@
+<!DOCTYPE plugin PUBLIC "-//Oxygen Plugin" "../plugin.dtd">
+<plugin 
+    id="com.dila.ai.markup"
+    name="DILA AI Markup"
+    version="0.1"
+    vendor="DILA"
+    class="ro.sync.exml.plugin.Plugin" 
+    classLoaderType="preferReferencedResources">
+
+    <description>
+        This plugin provides an AI-empowered markup assistant for editing XML documents.
+
+        Features:
+        - AI-driven markup for unmarked reference
+        - TEI tag removal
+    </description>
+    
+    <extension 
+        type="WorkspaceAccessJS" 
+        href="dila-ai-markup.js"/>
+
+    <!-- <extension 
+        type="AdditionalUITranslation" 
+        href="translation.xml"/> -->
+   
+    <view 
+        id="dila.ai.markup.view"
+        initialSide="WEST"
+        initialState="docked"/>
+
+    <!-- <license>dila-license.txt</license> -->
+
+</plugin>

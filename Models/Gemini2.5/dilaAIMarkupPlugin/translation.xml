@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<translation>
+  <key value="actions.menu">
+    <val lang="en_US">Actions</val>
+    <val lang="zh_TW">Actions</val>
+  </key>
+  <key value="ai.markup.action">
+    <val lang="en_US">AI Markup</val>
+    <val lang="zh_TW">AI Markup</val>
+  </key>
+  <key value="tag.removal.action">
+    <val lang="en_US">Tag Removal</val>
+    <val lang="zh_TW">Tag Removal</val>
+  </key>
+  <key value="options.menu">
+    <val lang="en_US">Options</val>
+    <val lang="zh_TW">Options</val>
+  </key>
+  <key value="settings.action">
+    <val lang="en_US">Settings</val>
+    <val lang="zh_TW">Settings</val>
+  </key>
+  <key value="initial.info">
+    <val lang="en_US">Please select a function from the Actions menu, or select Settings from the Options menu to configure parameters.</val>
+    <val lang="zh_TW">請從Actions菜單選擇功能，或從Options菜單選擇Settings以設定參數。</val>
+  </key>
+  <key value="replace.button">
+    <val lang="en_US">Replace</val>
+    <val lang="zh_TW">Replace</val>
+  </key>
+  <key value="view.title">
+    <val lang="en_US">DILA AI Markup Assistant</val>
+    <val lang="zh_TW">DILA AI Markup Assistant</val>
+  </key>
+  <key value="action.ai.markup.selected">
+    <val lang="en_US">Action selected: AI Markup (Use AI for reference tagging)\n</val>
+    <val lang="zh_TW">選取Action: AI Markup (用 AI 作參照標記)\n</val>
+  </key>
+  <key value="system.prompt.ai.markup">
+    <val lang="en_US">Please add XML tags for all sutra, volume, page, column, and line references related to "sutra references" in the selected text.</val>
+    <val lang="zh_TW">請將選取文字中，只要與「藏經參照」相關的藏經、冊、頁、欄、行等均標上 XML 標籤。</val>
+  </key>
+  <key value="llm.error">
+    <val lang="en_US">Error calling language model: </val>
+    <val lang="zh_TW">呼叫語言模型發生錯誤: </val>
+  </key>
+  <key value="text.replaced">
+    <val lang="en_US">Selected text has been replaced.</val>
+    <val lang="zh_TW">\n選取文字已替換。</val>
+  </key>
+  <key value="text.mode.not.active.for.replace">
+    <val lang="en_US">Text mode editor is not open. Please switch to text mode to use this feature.</val>
+    <val lang="zh_TW">\n文字模式編輯器未開啟，請切換到文字模式再使用。</val>
+  </key>
+  <key value="error.replacing.text">
+    <val lang="en_US">Error during text replacement: </val>
+    <val lang="zh_TW">\n替換文字時發生錯誤: </val>
+  </key>
+  <key value="text.editor.not.open">
+    <val lang="en_US">Text mode editor is not open.</val>
+    <val lang="zh_TW">Text 模式編輯器未開啟。</val>
+  </key>
+  <key value="no.text.to.replace">
+    <val lang="en_US">No text to replace.</val>
+    <val lang="zh_TW">無文字可替換。</val>
+  </key>
+  <key value="action.tag.removal.selected">
+    <val lang="en_US">Action selected: Tag Removal (Remove tags from selected text).\n</val>
+    <val lang="zh_TW">選取Action: Tag Removal (移除選取文字的標記)。\n</val>
+  </key>
+  <key value="action.settings.selected">
+    <val lang="en_US">Option selected: Settings (Configure parameters).\n\nThis feature is pending implementation.</val>
+    <val lang="zh_TW">選取 Option: Settings (設定參數)。\n\n此為待完成功能</val>
+  </key>
+  <key value="selected.text.label">
+    <val lang="en_US">\nSelected text: </val>
+    <val lang="zh_TW">\n選取文字: </val>
+  </key>
+  <key value="no.text.selected">
+    <val lang="en_US">[FND]No text selected in the editor.</val>
+    <val lang="zh_TW">[FND]編輯器內未選取文字.</val>
+  </key>
+  <key value="not.text.mode">
+    <val lang="en_US">[FND]Current page is not a Text mode editor.</val>
+    <val lang="zh_TW">[FND]當前頁面不是Text模式編輯器。</val>
+  </key>
+  <key value="no.editor.open">
+    <val lang="en_US">[FND]No open Text mode editor.</val>
+    <val lang="zh_TW">[FND]目前沒有開啟的Text模式編輯器。</val>
+  </key>
+</translation>
