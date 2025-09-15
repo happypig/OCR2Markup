@@ -1,0 +1,60 @@
+[
+    {
+        "id": "ref.markup.optimized.v2",
+        "title": "ref markup opt v2",
+        "input-type": "markup",
+        "type": "replace-selection-with-fragment",
+        "description": "markup the selected citation string with custom TEI P5 standard xml tags",
+        "context": "${contextInfo} You are an experienced Buddhist Tripitaka expert and XML markup editor. The selected string is an in-text citation from a paper in a Japanese Buddhist Research periodical, referencing the specific location of  the cited Buddhist Tripitaka. You must identify and segment the key semantical elements of the citation with the following labels by the following procedures: \n1) Correct the three exceptions caused by OCR if exists: \n1a) Replace the first character with 'T' if it is 't'. \n1b)  the first three characters with 'ChT' if they are 'cht' or 'chT'. \n1c) Replace 'no' with 'No' when it precedes a work number.\n2) It is CRITICAL that you do not modify, add, or remove any characters, words, spaces, or punctuation from the original string. You are only allowed to segment the string based on the specified labels below. \n3) label the semantical key elements of citation by the following custom labels, also demonstrated in the examples: \n4a) `<canon>` for the abbreviations of the Buddhist Tripitaka cited (Tripitaka code only, e.g., `T`, `ChT`, `大`, `大正`, `大正藏`, `卍続`); \n4b) `<v>` for the volume of the Buddhist Tripitaka cited(Chinese and English numbers only, representing the volumn number or between field indicator '第' and '卷' in Chinese); \n4c) `<w>` for the work of the Buddhist Tripitaka cited(Chinese and English numbers only, typically the sutra serial number after field indicator 'No.'), \n4d) `<p>` for the page of the volume of the Buddhist Tripitaka cited(Chinese and English numbers only,  preceded by field indicator 'p', 'pp' or '頁'), \n4e) `<c>` for the column of the page cited(column code only, e.g., `a`, `b`, `c`; `上`, `中`, `下` or `左上`, `左下`, `右上`, `右下`  followed by field indicator `段` in Chinese), \n4f) `<l>` for the line number within the column cited(Chinese and English numbers only); \n5) Option rules:\n5a) Sometimes, only the volume or work may be present, which is acceptable and unique; \n5b) Combinations of `<p>`, `<c>`, and `<l>` together with separator like `-` , `;`, `,`, `、` etc., are used to represent range of citations; \n6) Label all other field indicators(`No.`, `no.`, `第`, `卷`, `p`, `pp`,  `頁`,  `段`), extra chars or punctuation(before or after for separator) between the previous semantical key elements with`str` ; \n",
+        "examples": [
+            {
+                "prompt": "t.22,761a21-29",
+                "completion": {
+                    "tags": ["canon", "str", "v", "str", "p", "c", "l", "str", "l"],
+                    "values": ["T", ".", "22", ",", "761", "a", "21", "-", "29"]
+                }
+            },
+            {
+                "prompt": "t.23,926b29-c12",
+                "completion": {
+                    "tags": ["canon", "str", "v", "str", "p", "c", "l", "str", "c", "l"],
+                    "values": ["T", ".", "23", ",", "926", "b", "29", "-", "c", "12"]
+                }
+            },
+            {
+                "prompt": "t.43,295c1-296a19",
+                "completion": {
+                    "tags": ["canon", "str", "v", "str", "p", "c", "l", "str", "p", "c", "l"],
+                    "values": ["T", ".", "43", ",", "295", "c", "1", "-", "296", "a", "19"]
+                }
+            },
+            {
+                "prompt": "t.31,757a15-17;924c10-12",
+                "completion": {
+                    "tags": ["canon", "str", "v", "str", "p", "c", "l", "str", "l", "str", "p", "c", "l", "str", "l"],
+                    "values": ["T", ".", "31", ",", "757", "a", "15", "-", "17", ";", "924", "c", "10", "-", "12"]
+                }
+            },
+            {
+                "prompt": "cht.2,p.69c5-9",
+                "completion": {
+                    "tags": ["canon", "str", "v", "str", "p", "c", "l", "str", "l"],
+                    "values": ["ChT", ".", "2", ",p.", "69", "c", "5", "-", "9"]
+                }
+            },
+            {
+                "prompt": "大正18 no.865 p.216.b.4-12",
+                "completion": {
+                    "tags": ["canon", "v", "str", "w", "str", "p", "str", "c", "str", "l", "str", "l"],
+                    "values": ["大正", "18", "No.", "865", "p.", "216", ".", "b", ".", "4", "-", "12"]                }
+            },
+            {
+                "prompt": "『大正藏』45卷111頁上段",
+                "completion": {
+                    "tags": ["str", "canon", "str", "v", "str", "p", "str", "c", "str"],
+                    "values": ["『", "大正藏", "』", "45", "卷", "111", "頁", "上", "段"]
+                }
+            }
+        ]
+    }
+]

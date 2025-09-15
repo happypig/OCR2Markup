@@ -1,0 +1,40 @@
+[
+    {
+        "id": "ref.segment.small.llm.v1",
+        "title": "Buddhist Citation Segmentation for Small LLM",
+        "input-type": "segmentation",
+        "type": "replace-selection-with-fragment",
+        "description": "Segment Buddhist Tripitaka citations into semantic components",
+        "context": "You are a citation parser. Segment the Buddhist citation into parts using these labels:\n\n**Labels:**\n- canon: Tripitaka code (T, ChT, 大正, etc.)\n- v: volume number\n- w: work/sutra number\n- p: page number\n- c: column (a,b,c or 上,中,下)\n- l: line number\n- str: separators and indicators\n\n**Rules:**\n1. Fix OCR: 't'→'T', 'cht'→'ChT', 'no'→'No'\n2. Keep ALL original characters\n3. Only segment, don't modify\n\n**Output format:**\n{\"tags\": [\"canon\", \"str\", \"v\", ...], \"values\": [\"T\", \".\", \"22\", ...]}\n\n**Examples:**",
+        "examples": [
+            {
+                "prompt": "t.22,761a21",
+                "completion": {
+                    "tags": ["canon", "str", "v", "str", "p", "c", "l"],
+                    "values": ["T", ".", "22", ",", "761", "a", "21"]
+                }
+            },
+            {
+                "prompt": "T.23,926b29-c12",
+                "completion": {
+                    "tags": ["canon", "str", "v", "str", "p", "c", "l", "str", "c", "l"],
+                    "values": ["T", ".", "23", ",", "926", "b", "29", "-", "c", "12"]
+                }
+            },
+            {
+                "prompt": "大正18 No.865",
+                "completion": {
+                    "tags": ["canon", "v", "str", "w"],
+                    "values": ["大正", "18", "No.", "865"]
+                }
+            },
+            {
+                "prompt": "ChT.2,p.69c5",
+                "completion": {
+                    "tags": ["canon", "str", "v", "str", "p", "c", "l"],
+                    "values": ["ChT", ".", "2", ",p.", "69", "c", "5"]
+                }
+            }
+        ]
+    }
+]

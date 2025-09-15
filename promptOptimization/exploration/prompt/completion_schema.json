@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Buddhist Citation Completion Schema",
+  "type": "object",
+  "required": ["tags", "values"],
+  "properties": {
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["canon", "v", "w", "p", "c", "l", "str"]
+      },
+      "minItems": 1
+    },
+    "values": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false,  "custom_validation": {
+    "description": "Tags and values arrays must have equal length - validate programmatically"
+  }
+}
