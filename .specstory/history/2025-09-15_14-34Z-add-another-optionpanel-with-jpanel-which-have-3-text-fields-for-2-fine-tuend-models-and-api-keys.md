@@ -14,3 +14,412 @@ _**Assistant**_
 
 ---
 
+_**User (2025-09-15 16:40Z)**_
+
+@workspace /explain 
+
+---
+
+_**Assistant**_
+
+This code snippet sets up a user interface container that can switch between two different views, much like flipping through a deck of cards. It uses the `CardLayout` manager from Java's AWT library to achieve this effect.
+
+The `CardLayout` manager allows you to place multiple components (in this case, `JPanel`s) in the same space, but only one is visible at a time. Think of it as a stack of panels where you can choose which one is on top. This is a common pattern for things like settings dialogs or wizards, where you want to swap out the entire content of a window area without creating a new window.
+
+Let's break down the code line by line:
+1.  A new `JPanel` named `cardPanel` is created. Its layout manager is immediately set to be a new instance of `CardLayout`. This tells the `cardPanel` to manage its children as a stack of "cards".
+2.  The `splitPane` component is added to the `cardPanel` and is given the string identifier `"MAIN"`. This is the name you'll use to show this specific "card".
+3.  Similarly, the `optionsPanel` is added with the identifier `"OPTIONS"`.
+4.  Finally, `cardPanel.getLayout()` retrieves the `CardLayout` manager instance associated with the panel. This `cardLayout` object is what you will use later to programmatically switch between the visible cards, for example, by calling `cardLayout.show(cardPanel, "OPTIONS")`.
+
+---
+
+_**User (2025-09-15 17:00Z)**_
+
+why do I have the following error:
+
+The application detected an error that is not automatically handled. It is possible that this error is not critical and the application may continue to work normally but our recommendation is to report the error and restart the application. If the application has become unstable and cannot be closed normally, you can use the Force Quit button from this dialog. Be aware that by doing this you will lose all unsaved changes in the opened documents.
+
+Here are the error details:
+
+[ AWT-EventQueue-0 ]  -  org.mozilla.javascript.WrappedException: Wrapped java.lang.IllegalArgumentException: cannot add to layout: unknown constraint: South (file:/C:/Users/jeffw/AppData/Roaming/com.oxygenxml/extensions/v27.1/plugins/com.dila.ai.markup/dilaAIMarkupPlugin/dila-ai-markup.js#117)
+org.mozilla.javascript.WrappedException: Wrapped java.lang.IllegalArgumentException: cannot add to layout: unknown constraint: South (file:/C:/Users/jeffw/AppData/Roaming/com.oxygenxml/extensions/v27.1/plugins/com.dila.ai.markup/dilaAIMarkupPlugin/dila-ai-markup.js#117)
+	at org.mozilla.javascript.Context.throwAsScriptRuntimeEx(Context.java:1825)
+	at org.mozilla.javascript.MemberBox.invoke(MemberBox.java:227)
+	at org.mozilla.javascript.NativeJavaMethod.call(NativeJavaMethod.java:211)
+	at org.mozilla.javascript.optimizer.OptRuntime.call2(OptRuntime.java:46)
+	at org.mozilla.javascript.gen.file__C__Users_jeffw_AppData_Roaming_com_oxygenxml_extensions_v27_1_plugins_com_dila_ai_markup_dilaAIMarkupPlugin_dila_ai_markup_js_1._c_anonymous_5(file:/C:/Users/jeffw/AppData/Roaming/com.oxygenxml/extensions/v27.1/plugins/com.dila.ai.markup/dilaAIMarkupPlugin/dila-ai-markup.js:117)
+	at org.mozilla.javascript.gen.file__C__Users_jeffw_AppData_Roaming_com_oxygenxml_extensions_v27_1_plugins_com_dila_ai_markup_dilaAIMarkupPlugin_dila_ai_markup_js_1.call(file:/C:/Users/jeffw/AppData/Roaming/com.oxygenxml/extensions/v27.1/plugins/com.dila.ai.markup/dilaAIMarkupPlugin/dila-ai-markup.js)
+	at org.mozilla.javascript.ContextFactory.doTopCall(ContextFactory.java:380)
+	at org.mozilla.javascript.ScriptRuntime.doTopCall(ScriptRuntime.java:3868)
+	at org.mozilla.javascript.gen.file__C__Users_jeffw_AppData_Roaming_com_oxygenxml_extensions_v27_1_plugins_com_dila_ai_markup_dilaAIMarkupPlugin_dila_ai_markup_js_1.call(file:/C:/Users/jeffw/AppData/Roaming/com.oxygenxml/extensions/v27.1/plugins/com.dila.ai.markup/dilaAIMarkupPlugin/dila-ai-markup.js)
+	at org.mozilla.javascript.JavaAdapter.doCall(JavaAdapter.java:614)
+	at org.mozilla.javascript.JavaAdapter.lambda$callMethod$0(JavaAdapter.java:597)
+	at org.mozilla.javascript.Context.call(Context.java:535)
+	at org.mozilla.javascript.ContextFactory.call(ContextFactory.java:472)
+	at org.mozilla.javascript.JavaAdapter.callMethod(JavaAdapter.java:597)
+	at adapter1.customizeView(<adapter>)
+	at ro.sync.exml.layout.c.f(Unknown Source)
+	at ro.sync.exml.layout.i$3.create(Unknown Source)
+	at ro.sync.exml.layout.c.g(Unknown Source)
+	at ro.sync.exml.layout.i.o(Unknown Source)
+	at ro.sync.exml.layout.i.m(Unknown Source)
+	at ro.sync.exml.layout.i.ub(Unknown Source)
+	at ro.sync.exml.layout.i.l(Unknown Source)
+	at ro.sync.exml.m.f(Unknown Source)
+	at ro.sync.exml.m.b(Unknown Source)
+	at ro.sync.exml.MainFrame$38.run(Unknown Source)
+	at ro.sync.ui.we$_b.run(Unknown Source)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:308)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:773)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:720)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:714)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:86)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:742)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+Caused by: java.lang.IllegalArgumentException: cannot add to layout: unknown constraint: South
+	at java.desktop/javax.swing.plaf.basic.BasicSplitPaneUI$BasicHorizontalLayoutManager.addLayoutComponent(BasicSplitPaneUI.java:1529)
+	at java.desktop/javax.swing.plaf.basic.BasicSplitPaneUI$BasicHorizontalLayoutManager.addLayoutComponent(BasicSplitPaneUI.java:1630)
+	at java.desktop/java.awt.Container.addImpl(Container.java:1156)
+	at java.desktop/javax.swing.JSplitPane.addImpl(JSplitPane.java:1015)
+	at java.desktop/java.awt.Container.add(Container.java:1001)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.mozilla.javascript.MemberBox.invoke(MemberBox.java:206)
+	... 37 common frames omitted
+
+
+---
+
+_**Assistant**_
+
+You are trying to add a button panel to a `JSplitPane` using a `BorderLayout` constraint, which is not supported; instead, you should create a new `JPanel` with a `BorderLayout` to contain both the result area and the button panel, and then set this new panel as the bottom component of the `JSplitPane`.
+
+
+
+---
+
+_**User (2025-09-15 17:02Z)**_
+
+how to fix it as your suggestion?
+
+---
+
+_**Assistant**_
+
+Of course. You need to wrap the `resultArea` and the `buttonPanel` inside another `JPanel` that uses a `BorderLayout`, and then place that new panel into the `JSplitPane`.
+
+Here are the code changes to fix the issue:
+
+````javascript
+// ...existing code...
+                    var resultArea = new JTextArea("", 8, 0);
+                    resultArea.setLineWrap(true);
+                    resultArea.setWrapStyleWord(true);
+                    resultArea.setEditable(false);
+
+                    var JButton = Packages.javax.swing.JButton;
+                    var buttonPanel = new JPanel();
+                    var replaceButton = new JButton(i18nFn("replace.button")); // "Replace in Document"
+                    buttonPanel.add(replaceButton);
+                    buttonPanel.setComponentOrientation(Packages.java.awt.ComponentOrientation.RIGHT_TO_LEFT);
+                    buttonPanel.setVisible(false);
+
+                    // Create a panel to hold the result area and the button panel
+                    var bottomPanel = new JPanel(new BorderLayout());
+                    bottomPanel.add(new JScrollPane(resultArea), BorderLayout.CENTER);
+                    bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
+                    
+                    var splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, 
+                                                   new JScrollPane(infoArea), 
+                                                   bottomPanel);
+                    splitPane.setDividerLocation(0.5);
+                    splitPane.setResizeWeight(0.5);
+
+                    // mainPanel.add(splitPane, BorderLayout.CENTER);
+
+                    // Create options panel with model and API key configuration
+                    var optionsPanel = new JPanel();
+// ...existing code...
+````
+
+---
+
+_**User (2025-09-15 17:06Z)**_
+
+why do I have empty panel under the menubar?
+
+---
+
+_**Assistant**_
+
+Based on the code you've provided, the empty panel appears because you are adding the `splitPane` to the `mainPanel` but later, in the action listeners for the menu items, you are removing it and adding the `cardPanel` instead. However, the initial setup doesn't add the `cardPanel` to the `mainPanel`, which leads to an inconsistent state.
+
+The `mainPanel` is created with a `BorderLayout`, and the `menuBar` is added to the `NORTH` position. The center area is initially empty. You create a `cardPanel` to switch between your main view (`splitPane`) and your options view (`optionsPanel`), which is the correct approach. The problem is that you add the `splitPane` directly to the `mainPanel` instead of the `cardPanel` which should be holding it.
+
+To fix this, you should add the `cardPanel` to the center of the `mainPanel` from the beginning and let it manage which view is visible.
+
+Here are the required changes:
+
+````javascript
+// ...existing code...
+                    var cardPanel = new JPanel(new CardLayout());
+                    cardPanel.add(splitPane, "MAIN");
+                    cardPanel.add(optionsPanel, "OPTIONS");
+                    
+                    var cardLayout = cardPanel.getLayout();
+
+                    mainPanel.add(cardPanel, BorderLayout.CENTER);
+
+                    // Set the component and title for the view
+                    viewInfo.setComponent(mainPanel);
+                    viewInfo.setTitle(i18nFn("view.title")); // "DILA AI Markup Assistant"
+// ...existing code...
+````
+
+---
+
+_**User (2025-09-15 17:14Z)**_
+
+fix it since main card will not show after 2 menuitems had been selected right after the shown option card
+
+---
+
+_**Assistant**_
+
+I've identified the issue in your code. The logic for switching between the main view and the options panel is unnecessarily complex and incorrectly manipulates the UI components. You are manually removing and adding panels, which disrupts the `CardLayout` manager's ability to control which view is visible.
+
+The fix is to simplify the action listeners for your menu items. You should only use `cardLayout.show()` to switch between the "MAIN" and "OPTIONS" cards and let the `CardLayout` handle the visibility of the panels. You should not manually add or remove `cardPanel` or `splitPane` from `mainPanel` after the initial setup.
+
+Here are the corrected code blocks for the action listeners in `dila-ai-markup.js`:
+
+````javascript
+// ...existing code...
+                    // Add action listeners to menu items
+                    menuItemActionAIMarkup.addActionListener(function(e) {
+                        logDebug("AI Markup action triggered");
+
+                        // Switch back to main view if options panel is currently showing
+                        cardLayout.show(cardPanel, "MAIN");
+
+                        infoArea.setText(i18nFn("action.ai.markup.selected"));
+                        var selectedText = fetchAndDisplaySelectedText(infoArea);
+// ...existing code...
+// ...existing code...
+                        }
+                    });
+
+                    menuItemActionTagRemoval.addActionListener(function(e) {
+                        logDebug("Tag Removal action triggered");
+
+                        // Switch back to main view if options panel is currently showing
+                        cardLayout.show(cardPanel, "MAIN");
+
+                        infoArea.setText(i18nFn("action.tag.removal.selected"));
+                        var selectedText = fetchAndDisplaySelectedText(infoArea);
+                        if (selectedText && selectedText.length() > 0) {
+// ...existing code...
+                            buttonPanel.setVisible(false);
+                        }
+                    });
+                    menuItemOption.addActionListener(function(e) {
+                        logDebug("Settings option triggered");
+                        buttonPanel.setVisible(false);
+
+                        // Switch to options view
+                        cardLayout.show(cardPanel, "OPTIONS");
+                   });
+                }
+            }
+        }
+// ...existing code...
+````
+
+---
+
+_**User (2025-09-15 17:18Z)**_
+
+align the 3 configuation on the top
+
+---
+
+_**Assistant**_
+
+Of course. To align the configuration options to the top of the panel, you can add a "filler" component that will take up all the remaining vertical space. This is a common technique with `GridBagLayout`. By giving this filler component a vertical weight (`weighty`), you cause it to expand and push all other components upwards.
+
+Here are the changes for `dila-ai-markup.js`:
+
+````javascript
+// ...existing code...
+                    gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+                    var JPasswordField = Packages.javax.swing.JPasswordField;
+                    var apiKeyField = new JPasswordField(40);
+                    optionsPanel.add(apiKeyField, gbc);
+
+                    // Add a filler panel to push everything to the top
+                    gbc.gridy = 3;
+                    gbc.weighty = 1.0;
+                    gbc.fill = GridBagConstraints.VERTICAL;
+                    optionsPanel.add(new JPanel(), gbc);
+
+                    // Initially hide the options panel
+                    // optionsPanel.setVisible(true);
+                    
+// ...existing code...
+````
+
+---
+
+_**User (2025-09-15 17:22Z)**_
+
+update translation.xml with the 3 new messages
+
+---
+
+_**Assistant**_
+
+Of course. I will add the new translation keys to your `translation.xml` file.
+
+````xml
+// ...existing code...
+  <key value="no.editor.open">
+    <val lang="en_US">\n[FND]No open Text mode editor.</val>
+    <val lang="zh_CN">\n[FND]目前沒有開啟的Text模式編輯器。</val>
+    <val lang="zh_TW">\n[FND]目前沒有開啟的Text模式編輯器。</val>
+  </key>
+  <key value="model1.label">
+    <val lang="en_US">Finetuned Model for Reference Parsing</val>
+    <val lang="zh_CN">解析參照用預訓練模型</val>
+    <val lang="zh_TW">解析參照用預訓練模型</val>
+  </key>
+  <key value="model2.label">
+    <val lang="en_US">Finetuned Model for Reference Detection</val>
+    <val lang="zh_CN">偵測參照用預訓練模型</val>
+    <val lang="zh_TW">偵測參照用預訓練模型</val>
+  </key>
+  <key value="api.key.label">
+    <val lang="en_US">API Key</val>
+    <val lang="zh_CN">API 金鑰</val>
+    <val lang="zh_TW">API 金鑰</val>
+  </key>
+</translation>
+````
+
+---
+
+_**User (2025-09-15 17:38Z)**_
+
+add key for options.panel.title
+
+---
+
+_**Assistant**_
+
+Of course. Here are the changes for `translation.xml`.
+
+````xml
+// ...existing code...
+  <key value="api.key.label">
+    <val lang="en_US">API Key</val>
+    <val lang="zh_CN">API 金鑰</val>
+    <val lang="zh_TW">API 金鑰</val>
+  </key>
+  <key value="options.panel.title">
+    <val lang="en_US">Model and API Key Configuration</val>
+    <val lang="zh_CN">模型与金钥设定</val>
+    <val lang="zh_TW">模型與金鑰設定</val>
+  </key>
+</translation>
+````
+
+---
+
+_**User (2025-09-15 17:47Z)**_
+
+adjust the position of TitleBoarder in avoiding overlap with the border
+
+---
+
+_**Assistant**_
+
+Of course. To prevent the title from overlapping with the border of the panel, you can adjust the title's position. By setting the `TitledBorder` position to `ABOVE_TOP`, the title will be rendered entirely above the border.
+
+Here are the necessary changes for `dila-ai-markup.js`:
+
+````javascript
+// ...existing code...
+                    // Create options panel with model and API key configuration
+                    var optionsPanel = new JPanel();
+                    var BorderFactory = Packages.javax.swing.BorderFactory;
+                    var TitledBorder = Packages.javax.swing.border.TitledBorder;
+                    var titledBorder = BorderFactory.createTitledBorder(i18nFn("options.panel.title"));
+                    titledBorder.setTitlePosition(TitledBorder.ABOVE_TOP);
+                    optionsPanel.setBorder(titledBorder);
+                    var GridBagLayout = Packages.java.awt.GridBagLayout;
+                    var GridBagConstraints = Packages.java.awt.GridBagConstraints;
+                    var JLabel = Packages.javax.swing.JLabel;
+// ...existing code...
+````
+
+---
+
+_**User (2025-09-15 17:51Z)**_
+
+set the titleBorder is unde the top of the border
+
+---
+
+_**Assistant**_
+
+Of course. To place the title on the top edge of the border instead of above it, you can change the `TitledBorder` position.
+
+Here is the change for `dila-ai-markup.js`:
+
+````javascript
+// ...existing code...
+                    var BorderFactory = Packages.javax.swing.BorderFactory;
+                    var TitledBorder = Packages.javax.swing.border.TitledBorder;
+                    var titledBorder = BorderFactory.createTitledBorder(i18nFn("options.panel.title"));
+                    titledBorder.setTitlePosition(TitledBorder.TOP);
+                    optionsPanel.setBorder(titledBorder);
+                    var GridBagLayout = Packages.java.awt.GridBagLayout;
+                    var GridBagConstraints = Packages.java.awt.GridBagConstraints;
+// ...existing code...
+````
+
+---
+
+_**User (2025-09-15 17:54Z)**_
+
+adjust the positon of title right under the border without overlap 
+
+---
+
+_**Assistant**_
+
+Of course. To position the title just below the top border line, you should set the `TitledBorder` position to `BELOW_TOP`. This will place the text inside the bordered area, directly under the top line, preventing any overlap.
+
+Here is the change for `dila-ai-markup.js`:
+
+````javascript
+// ...existing code...
+                    var BorderFactory = Packages.javax.swing.BorderFactory;
+                    var TitledBorder = Packages.javax.swing.border.TitledBorder;
+                    var titledBorder = BorderFactory.createTitledBorder(i18nFn("options.panel.title"));
+                    titledBorder.setTitlePosition(TitledBorder.BELOW_TOP);
+                    optionsPanel.setBorder(titledBorder);
+                    var GridBagLayout = Packages.java.awt.GridBagLayout;
+                    var GridBagConstraints = Packages.java.awt.GridBagConstraints;
+// ...existing code...
+````
+
+---
+
