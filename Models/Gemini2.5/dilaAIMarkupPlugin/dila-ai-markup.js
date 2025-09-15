@@ -4,9 +4,6 @@ function applicationStarted(pluginWorkspaceAccess) {
     // Global variable for our logger instance.
     var UTF8PrintStream = null;
     var DEBUG = false; // default value
-    Packages.java.lang.System.err.println("entering dila-ai-markup.js");
-    Packages.java.lang.System.err.println("debug mode: " + getDebugMode());
-    getDebugMode()
 
     // Function to determine debug mode from environment variable or system property
     function getDebugMode() {
@@ -37,7 +34,6 @@ function applicationStarted(pluginWorkspaceAccess) {
      * @param {string} message The message to log.
      */
     function logDebug(message) {
-        DEBUG = true
         if (DEBUG) {
             if (UTF8PrintStream === null) {
                 // Initialize the stream.
@@ -48,48 +44,16 @@ function applicationStarted(pluginWorkspaceAccess) {
         }
     }
 
+    getDebugMode()
 
-    // // Get the plugin descriptor for your plugin by its ID
-    // var pluginDescriptor = pluginWorkspaceAccess.getPluginResourceResolver().getPluginDescriptor("com.dila.ai.markup");
+    logDebug("Starting DILA AI markup plugin");
+    logDebug("debug mode: " + getDebugMode());
 
-    // // Get the plugin directory as a Java File object
-    // var pluginDir = pluginDescriptor.getBaseDir();
+    var resources = pluginWorkspaceAccess.getResourceBundle();
 
-    // // Convert to a string path if needed
-    // var pluginDirPath = pluginDir.getAbsolutePath();
-
-    // // Load translation.xml
-    // var File = Packages.java.io.File;
-    // // var translationFile = new File(pluginDirPath, "translation.xml");
-    // var translationFile = new File("C:\\Users\\jeffw\\AppData\\Roaming\\com.oxygenxml\\extensions\\v27.1\\plugins\\com.dila.ai.markup\\dilaAIMarkupPlugin\\translation.xml");
-    // var DocumentBuilderFactory = Packages.javax.xml.parsers.DocumentBuilderFactory;
-    // var dbFactory = DocumentBuilderFactory.newInstance();
-    // var dBuilder = dbFactory.newDocumentBuilder();
-    // var doc = dBuilder.parse(translationFile);
-
-    // // Get current language (e.g., "en_US")
-    // logDebug("Options Storage: " + pluginWorkspaceAccess.getOptionsStorage());
-    // logDebug("options.language: " + pluginWorkspaceAccess.getOptionsStorage().getOption("options.language"));
-    // var lang = pluginWorkspaceAccess.getOptionsStorage().getOption("options.language");
-
-    // // Function to get translation by key
-    // function i18nFn(key) {
-    //     // Use the 'lang' variable from the outer scope
-    //     var keys = doc.getElementsByTagName("key");
-    //     for (var i = 0; i < keys.getLength(); i++) {
-    //         var keyElem = keys.item(i);
-    //         if (keyElem.getAttribute("value") == key) {
-    //             var vals = keyElem.getElementsByTagName("val");
-    //             for (var j = 0; j < vals.getLength(); j++) {
-    //                 var valElem = vals.item(j);
-    //                 if (valElem.getAttribute("lang") == lang) {
-    //                     return valElem.getTextContent();
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return key; // fallback: return key if not found
-    // }
+    function i18nFn(key) {
+        return resources.getMessage(key);
+    }
 
     // Add a view component customizer
     pluginWorkspaceAccess.addViewComponentCustomizer(new JavaAdapter(
@@ -102,11 +66,11 @@ function applicationStarted(pluginWorkspaceAccess) {
                     var JMenu = Packages.javax.swing.JMenu;
                     var JMenuItem = Packages.javax.swing.JMenuItem;
                     var menuBar = new JMenuBar();
-                    var menuActions = new JMenu("Actions");
-                    var menuItemActionAIMarkup = new JMenuItem("AI markup"); // load action from local
-                    var menuItemActionTagRemoval = new JMenuItem("Tag removal"); // load action from local
-                    var menuOptions = new JMenu("Options");
-                    var menuItemOption = new JMenuItem("Settings"); // go to options dialog
+                    var menuActions = new JMenu(i18nFn("actions.menu")); // "Actions"
+                    var menuItemActionAIMarkup = new JMenuItem(i18nFn("ai.markup.action")); // load action from local
+                    var menuItemActionTagRemoval = new JMenuItem(i18nFn("tag.removal.action")); // load action from local
+                    var menuOptions = new JMenu(i18nFn("options.menu")); // "Options"
+                    var menuItemOption = new JMenuItem(i18nFn("preferences.action")); // go to options dialog
 
                     // Assemble the menu bar
                     menuBar.add(menuActions);
@@ -126,12 +90,12 @@ function applicationStarted(pluginWorkspaceAccess) {
                     var JScrollPane = Packages.javax.swing.JScrollPane;
                     var JSplitPane = Packages.javax.swing.JSplitPane;
 
-                    var infoArea = new JTextArea("請從Actions菜單選擇功能，或從Options菜單選擇Settings以設定參數", 4, 0);
+                    var infoArea = new JTextArea(i18nFn("initial.info"), 4, 0);
                     infoArea.setLineWrap(true);
                     infoArea.setWrapStyleWord(true);
                     infoArea.setEditable(false);
-                    
-                    var resultArea = new JTextArea("",8, 0);
+
+                    var resultArea = new JTextArea("", 8, 0);
                     resultArea.setLineWrap(true);
                     resultArea.setWrapStyleWord(true);
                     resultArea.setEditable(false);
@@ -141,12 +105,49 @@ function applicationStarted(pluginWorkspaceAccess) {
                                                    new JScrollPane(resultArea));
                     splitPane.setDividerLocation(0.5);
                     splitPane.setResizeWeight(0.5);
+
+                    // Create options panel with model and API key configuration
+                    var optionsPanel = new JPanel();
+                    var GridBagLayout = Packages.java.awt.GridBagLayout;
+                    var GridBagConstraints = Packages.java.awt.GridBagConstraints;
+                    var JLabel = Packages.javax.swing.JLabel;
+                    var JTextField = Packages.javax.swing.JTextField;
+                    var Insets = Packages.java.awt.Insets;
+
+                    optionsPanel.setLayout(new GridBagLayout());
+                    var gbc = new GridBagConstraints();
+                    gbc.insets = new Insets(5, 5, 5, 5);
+                    gbc.anchor = GridBagConstraints.WEST;
+
+                    // Model 1 configuration
+                    gbc.gridx = 0; gbc.gridy = 0;
+                    optionsPanel.add(new JLabel(i18nFn("model1.label")), gbc);
+                    gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+                    var model1Field = new JTextField(20);
+                    optionsPanel.add(model1Field, gbc);
+
+                    // Model 2 configuration
+                    gbc.gridx = 0; gbc.gridy = 1; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
+                    optionsPanel.add(new JLabel(i18nFn("model2.label")), gbc);
+                    gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+                    var model2Field = new JTextField(20);
+                    optionsPanel.add(model2Field, gbc);
+
+                    // API Key configuration
+                    gbc.gridx = 0; gbc.gridy = 2; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
+                    optionsPanel.add(new JLabel(i18nFn("api.key.label")), gbc);
+                    gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+                    var apiKeyField = new JTextField(20);
+                    optionsPanel.add(apiKeyField, gbc);
+
+                    // Initially hide the options panel
+                    // optionsPanel.setVisible(true);
                     
                     mainPanel.add(splitPane, BorderLayout.CENTER);
 
                     var JButton = Packages.javax.swing.JButton;
                     var buttonPanel = new JPanel();
-                    var replaceButton = new JButton("Replace");
+                    var replaceButton = new JButton(i18nFn("replace.button")); // "Replace in Document"
                     buttonPanel.add(replaceButton);
                     buttonPanel.setComponentOrientation(Packages.java.awt.ComponentOrientation.RIGHT_TO_LEFT);
                     mainPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -154,12 +155,30 @@ function applicationStarted(pluginWorkspaceAccess) {
 
                     // Set the component and title for the view
                     viewInfo.setComponent(mainPanel);
-                    viewInfo.setTitle("DILA AI Markup Assistant");
+                    viewInfo.setTitle(i18nFn("view.title")); // "DILA AI Markup Assistant"
+
+                    // Create a container that can switch between splitPane and optionsPanel
+                    var CardLayout = Packages.java.awt.CardLayout;
+                    var cardPanel = new JPanel(new CardLayout());
+                    cardPanel.add(splitPane, "MAIN");
+                    cardPanel.add(optionsPanel, "OPTIONS");
+                    
+                    var cardLayout = cardPanel.getLayout();
 
                     // Add action listeners to menu items
                     menuItemActionAIMarkup.addActionListener(function(e) {
                         logDebug("AI Markup action triggered");
-                        infoArea.setText("選取Action: AI Markup (用 AI 作參照標記)\n");
+
+                                                // Switch back to main view if options panel is currently showing
+                        if (optionsPanel.isVisible()) {
+                            cardLayout.show(cardPanel, "MAIN");
+                            mainPanel.remove(cardPanel);
+                            mainPanel.add(splitPane, BorderLayout.CENTER);
+                            mainPanel.revalidate();
+                            mainPanel.repaint();
+                        }
+
+                        infoArea.setText(i18nFn("action.ai.markup.selected"));
                         var selectedText = fetchAndDisplaySelectedText(infoArea);
 
                         // Send selectedText to LLM and handle response
@@ -179,13 +198,16 @@ function applicationStarted(pluginWorkspaceAccess) {
                                     
                                     var url = new URL("https://api.openai.com/v1/chat/completions"); // ft LLM endpoint
                                     var connection = url.openConnection();
+
+                                    var API_KEY = apiKeyField.getText().trim();
+
                                     connection.setRequestMethod("POST");
                                     connection.setRequestProperty("Content-Type", "application/json");
-                                    connection.setRequestProperty("Authorization", "Bearer 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"); // API key
+                                    connection.setRequestProperty("Authorization", "Bearer " + API_KEY); // API key
                                     connection.setDoOutput(true);
                                     
                                     // Define the system prompt to guide the AI's response.
-                                    var systemPrompt = "請將選取文字中，只要與「藏經參照」相關的藏經、冊、頁、欄、行等均標上 XML 標籤。";
+                                    var systemPrompt = i18nFn("system.prompt.ai.markup");
 
                                     // Prepare request payload
                                     var requestBody = JSON.stringify({
@@ -241,7 +263,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                                 } catch (error) {
                                     // --- Schedule error message update back on the EDT ---
                                     SwingUtilities.invokeLater(function() {
-                                        infoArea.setText("呼叫語言模型發生錯誤: " + error.message);
+                                        infoArea.setText(i18nFn("llm.error", error.message));
                                         logDebug("LLM API Error: " + error);
                                     });
                                 }
@@ -293,24 +315,34 @@ function applicationStarted(pluginWorkspaceAccess) {
                                                 buttonPanel.setVisible(false);
                                             }
                                         } else {
-                                            infoArea.append("\n文字模式編輯器未開啟，請切換到文字模式再使用。");
+                                            infoArea.append(i18nFn("text.mode.not.active.for.replace"));
                                         }
                                     } catch (error) {
-                                        infoArea.append("\n替換文字時發生錯誤: " + error.message);
+                                        infoArea.append(i18nFn("error.replacing.text", error.message));
                                         logDebug("Error during text replacement: " + error);
                                     }
                                 }
                             } else {
-                                infoArea.append("文字模式編輯器未開啟。");
+                                infoArea.append(i18nFn("text.editor.not.open"));
                             }
                         } else {
-                            infoArea.append("無文字可替換。");
+                            infoArea.append(i18nFn("no.text.to.replace"));
                         }
                     });
 
                     menuItemActionTagRemoval.addActionListener(function(e) {
                         logDebug("Tag Removal action triggered");
-                        infoArea.setText("選取Action: Tag Removal (移除選取文字的標記)。\n");
+
+                        // Switch back to main view if options panel is currently showing
+                        if (optionsPanel.isVisible()) {
+                            cardLayout.show(cardPanel, "MAIN");
+                            mainPanel.remove(cardPanel);
+                            mainPanel.add(splitPane, BorderLayout.CENTER);
+                            mainPanel.revalidate();
+                            mainPanel.repaint();
+                        }
+
+                        infoArea.setText(i18nFn("action.tag.removal.selected"));
                         var selectedText = fetchAndDisplaySelectedText(infoArea);
                         if (selectedText && selectedText.length() > 0) {
                             // Convert the Java String to a JavaScript string to use the regex-capable replace() method.
@@ -324,9 +356,19 @@ function applicationStarted(pluginWorkspaceAccess) {
                     });
                     menuItemOption.addActionListener(function(e) {
                         logDebug("Settings option triggered");
-                        infoArea.setText("選取 Option: Settings (設定參數)。\n\n此為待完成功能");
+                        // infoArea.setText(i18nFn("action.settings.selected"));
                         // pluginWorkspaceAccess.showOptionsDialog("DILA AI Markup Assistant Settings", "dila.ai.markup.assistant");
                         buttonPanel.setVisible(false);
+
+                        // Switch to options view only if main panel is currently shown
+                        if (!optionsPanel.isVisible()) {
+                            cardLayout.show(cardPanel, "OPTIONS");
+                            mainPanel.remove(splitPane);
+                            mainPanel.add(cardPanel, BorderLayout.CENTER);
+                            mainPanel.revalidate();
+                            mainPanel.repaint();
+                        }
+
                    });
                 }
             }
@@ -341,38 +383,20 @@ function applicationStarted(pluginWorkspaceAccess) {
                 var textPageAccess = pageAccess;
                 var selectedText = textPageAccess.getSelectedText();
                 if (selectedText != null && selectedText.length() > 0) {
-                    area.append("\n選取文字: " + selectedText);
+                    area.append(i18nFn("selected.text.label") + selectedText);
                     return selectedText;
                 } else {
-                    area.append("[FND]編輯器內未選取文字。");
+                    area.append(i18nFn("no.text.selected"));
                     return "";
                 }
             } else {
-                area.append("[FND]當前頁面不是Text模式編輯器。");
+                area.append(i18nFn("not.text.mode"));
                 return "";
             }
         } else {
-            area.append("[FND]目前沒有開啟的Text模式編輯器。");
+            area.append(i18nFn("no.editor.ope"));
             return "";
         }
-    }
-
-    // Function to get translation by key
-    function i18nFn(key, lang) {
-    var keys = doc.getElementsByTagName("key");
-    for (var i = 0; i < keys.getLength(); i++) {
-        var keyElem = keys.item(i);
-        if (keyElem.getAttribute("value") == key) {
-        var vals = keyElem.getElementsByTagName("val");
-        for (var j = 0; j < vals.getLength(); j++) {
-            var valElem = vals.item(j);
-            if (valElem.getAttribute("lang") == lang) {
-            return valElem.getTextContent();
-            }
-        }
-        }
-    }
-    return key; // fallback: return key if not found
     }
 }
 
@@ -380,6 +404,9 @@ function applicationStarted(pluginWorkspaceAccess) {
 
 // This is called by Oxygen when the plugin is being disposed.
 function applicationClosing() {
+    // Global variable for our logger instance.
+    var UTF8PrintStream = null;
+    var DEBUG = false; // default value
     // Function to determine debug mode from environment variable or system property
     function getDebugMode() {
         // Try to get DEBUG from environment variable first
@@ -397,7 +424,6 @@ function applicationClosing() {
                 }
              } catch (e) {
                 // Keep default value
-                Packages.java.lang.System.err.println("Keep default value: " + DEBUG);
             }
         }
         return DEBUG;
@@ -409,7 +435,6 @@ function applicationClosing() {
      * @param {string} message The message to log.
      */
     function logDebug(message) {
-        DEBUG = true
         if (DEBUG) {
             if (UTF8PrintStream === null) {
                 // Initialize the stream.
@@ -421,7 +446,7 @@ function applicationClosing() {
     }
 
     // Clean up resources if needed.
-    // var PrintStream = Packages.java.io.PrintStream;
-    // var UTF8PrintStream = new PrintStream(Packages.java.lang.System.err, true, "UTF-8");
-    logDebug("\nClosing AI Markup plugin.");
+    getDebugMode()
+    logDebug("\nClosing DILA AI Markup plugin.");
+    logDebug("debug mode: " + getDebugMode());
 }

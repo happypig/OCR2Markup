@@ -2,26 +2,24 @@
 <plugin 
     id="com.dila.ai.markup"
     name="DILA AI Markup"
-    version="0.1"
+    version="0.2.0"
     vendor="DILA"
     class="ro.sync.exml.plugin.Plugin" 
     classLoaderType="preferReferencedResources">
 
     <description>
-        This plugin provides an AI-empowered markup assistant for editing XML documents.
+        This plugin provides an AI-empowered markup assistant for editing TEI XML documents.
 
         Features:
-        - AI-driven markup for unmarked reference
-        - TEI tag removal
+            * AI-driven markup for unmarked references
+            * TEI tag removal
+            * multi-language support (English, Simplified Chinese)
+            * Preferences dialog (pending implementation)
     </description>
     
     <extension 
         type="WorkspaceAccessJS" 
         href="dila-ai-markup.js"/>
-
-    <!-- <extension 
-        type="AdditionalUITranslation" 
-        href="translation.xml"/> -->
    
     <view 
         id="dila.ai.markup.view"
