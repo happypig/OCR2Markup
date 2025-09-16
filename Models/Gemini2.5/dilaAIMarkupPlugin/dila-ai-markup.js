@@ -55,13 +55,151 @@ function applicationStarted(pluginWorkspaceAccess) {
         return resources.getMessage(key);
     }
 
+    // //plugin options file.
+    // var jsFile = pluginWorkspaceAccess.getPluginDescriptor().getPluginDir();
+    // var jsDirURL = jsFile.toURI().toURL();
+    // var optionsXMLUrl = new Packages.java.net.URL(jsDirURL, "DAMAOptions.xml");
+    // var optionsFile = pluginWorkspaceAccess.getUtilAccess().locateFile(optionsXMLUrl);
+
+    optionsXMLUrl = jsDirURL.toString() + "/DAMAOptions.xml";
+    //Global options file.
+    optionsFile = pluginWorkspaceAccess.getUtilAccess().locateFile(new Packages.java.net.URL(optionsXMLUrl));
+
+    /**
+     * Imports options from an XML file and sets them in the options panel fields.
+     * @param {java.io.File} optionsFile The XML file containing the options.
+     * @param {javax.swing.JTextField} parseModelField The text field for the parse model.
+     * @param {javax.swing.JTextField} detectModelField The text field for the detect model.
+     * @param {javax.swing.JPasswordField} apiKeyField The password field for the API key.
+     */
+    function importDAMAOptions(optionsFile, parseModelField, detectModelField, apiKeyField) {
+        if (optionsFile != null && optionsFile.exists()) {
+            try {
+                var DocumentBuilderFactory = Packages.javax.xml.parsers.DocumentBuilderFactory;
+                var factory = DocumentBuilderFactory.newInstance();
+                var builder = factory.newDocumentBuilder();
+                var doc = builder.parse(optionsFile);
+                doc.getDocumentElement().normalize();
+
+                var fields = doc.getElementsByTagName("field");
+                for (var i = 0; i < fields.getLength(); i++) {
+                    var field = fields.item(i);
+                    var fieldName = field.getAttribute("name");
+                    var valueNode = field.getElementsByTagName("string").item(0);
+                    if (valueNode) {
+                        var fieldValue = valueNode.getTextContent();
+                        if (fieldName == "ft.parse.model") {
+                            parseModelField.setText(fieldValue);
+                        } else if (fieldName == "ft.detect.model") {
+                            detectModelField.setText(fieldValue);
+                        } else if (fieldName == "api.key") {
+                            // The API key is stored in Base64 for simple obfuscation. Decode it.
+                            // WARNING: This is not true encryption.
+                            var Base64 = Packages.java.util.Base64;
+                            var decodedBytes = Base64.getDecoder().decode(fieldValue);
+                            apiKeyField.setText(new Packages.java.lang.String(decodedBytes));
+                        }
+                    }
+                }
+                logDebug("Successfully imported options from DAMAOptions.xml");
+            } catch (e) {
+                logDebug("Error importing DAMAOptions.xml: " + e);
+            }
+        } else {
+            logDebug("DAMAOptions.xml not found, using default values.");
+        }
+    }
+
+    /**
+     * Saves the current options to the XML file.
+     * @param {java.io.File} optionsFile The XML file to save the options to.
+     * @param {javax.swing.JTextField} parseModelField The text field for the parse model.
+     * @param {javax.swing.JTextField} detectModelField The text field for the detect model.
+     * @param {javax.swing.JPasswordField} apiKeyField The password field for the API key.
+     */
+    function saveDAMAOptions(optionsFile, parseModelField, detectModelField, apiKeyField) {
+        try {
+            // Ensure parent directory exists
+            var parentDir = optionsFile.getParentFile();
+            if (!parentDir.exists()) {
+                parentDir.mkdirs();
+            }
+
+            var DocumentBuilderFactory = Packages.javax.xml.parsers.DocumentBuilderFactory;
+            var DocumentBuilder = Packages.javax.xml.parsers.DocumentBuilder;
+            var TransformerFactory = Packages.javax.xml.transform.TransformerFactory;
+            var Transformer = Packages.javax.xml.transform.Transformer;
+            var DOMSource = Packages.javax.xml.transform.dom.DOMSource;
+            var StreamResult = Packages.javax.xml.transform.stream.StreamResult;
+            var OutputKeys = Packages.javax.xml.transform.OutputKeys;
+
+            var docFactory = DocumentBuilderFactory.newInstance();
+            var docBuilder = docFactory.newDocumentBuilder();
+
+            // Create the root element
+            var doc = docBuilder.newDocument();
+            var serialized = doc.createElement("serialized");
+            serialized.setAttribute("version", "18.0");
+            serialized.setAttribute("xml:space", "preserve");
+            doc.appendChild(serialized);
+
+            var map = doc.createElement("map");
+            serialized.appendChild(map);
+
+            var entry = doc.createElement("entry");
+            map.appendChild(entry);
+
+            var stringKey = doc.createElement("String");
+            stringKey.appendChild(doc.createTextNode("dila.ai.markup.assistant.options"));
+            entry.appendChild(stringKey);
+
+            var options = doc.createElement("dilaAIMarkupAssistantOptions");
+            entry.appendChild(options);
+
+            // Helper to create a field element
+            function createField(name, value) {
+                var field = doc.createElement("field");
+                field.setAttribute("name", name);
+                var stringValue = doc.createElement("string");
+                stringValue.appendChild(doc.createTextNode(value));
+                field.appendChild(stringValue);
+                return field;
+            }
+
+            // Get values and create fields
+            options.appendChild(createField("ft.parse.model", parseModelField.getText()));
+            options.appendChild(createField("ft.detect.model", detectModelField.getText()));
+
+            // WARNING: Storing API keys, even obfuscated, in a config file is a security risk.
+            // Here we use Base64 as a simple deterrent, not as a secure encryption method.
+            var Base64 = Packages.java.util.Base64;
+            var encodedApiKey = Base64.getEncoder().encodeToString(apiKeyField.getPassword().join("").getBytes());
+            options.appendChild(createField("api.key", encodedApiKey));
+
+            // Write the content into xml file
+            var transformerFactory = TransformerFactory.newInstance();
+            var transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            var source = new DOMSource(doc);
+            var result = new StreamResult(optionsFile);
+            transformer.transform(source, result);
+
+            logDebug("Successfully saved options to DAMAOptions.xml");
+            return true;
+        } catch (e) {
+            logDebug("Error saving DAMAOptions.xml: " + e);
+            return false;
+        }
+    }
+
+
     // Add a view component customizer
     pluginWorkspaceAccess.addViewComponentCustomizer(new JavaAdapter(
         Packages.ro.sync.exml.workspace.api.standalone.ViewComponentCustomizer, {
             customizeView: function(viewInfo) {
                 if ("dila.ai.markup.view" == viewInfo.getViewID()) {
           
-                    // Create a simple UI for the view
+                    // Menu for the view
                     var JMenuBar = Packages.javax.swing.JMenuBar;
                     var JMenu = Packages.javax.swing.JMenu;
                     var JMenuItem = Packages.javax.swing.JMenuItem;
@@ -79,13 +217,13 @@ function applicationStarted(pluginWorkspaceAccess) {
                     menuBar.add(menuOptions);
                     menuOptions.add(menuItemOption);
 
-                    // Main panel with BorderLayout
+                    // Main panel of BorderLayout with menu bar
                     var JPanel = Packages.javax.swing.JPanel;
                     var BorderLayout = Packages.java.awt.BorderLayout;
                     var mainPanel = new JPanel(new BorderLayout());
                     mainPanel.add(menuBar, BorderLayout.NORTH);
 
-                    // Text area in the center
+                    // Text areas for info and results
                     var JTextArea = Packages.javax.swing.JTextArea;
                     var JScrollPane = Packages.javax.swing.JScrollPane;
                     var JSplitPane = Packages.javax.swing.JSplitPane;
@@ -100,6 +238,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                     resultArea.setWrapStyleWord(true);
                     resultArea.setEditable(false);
 
+                    // Button panel for the replace button
                     var JButton = Packages.javax.swing.JButton;
                     var buttonPanel = new JPanel();
                     var replaceButton = new JButton(i18nFn("replace.button")); // "Replace in Document"
@@ -107,18 +246,19 @@ function applicationStarted(pluginWorkspaceAccess) {
                     buttonPanel.setComponentOrientation(Packages.java.awt.ComponentOrientation.RIGHT_TO_LEFT);
                     buttonPanel.setVisible(false);
 
-                    // Create a panel to hold the result area and the button panel
+                    // Bottom panel to hold the text areas and the button panel
                     var bottomPanel = new JPanel(new BorderLayout());
                     bottomPanel.add(new JScrollPane(resultArea), BorderLayout.CENTER);
                     bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
                     
+                    // Split pane to divide info area and bottom panel
                     var splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, 
                                                    new JScrollPane(infoArea), 
                                                    bottomPanel);
                     splitPane.setDividerLocation(0.5);
                     splitPane.setResizeWeight(0.5);
 
-                    // Create options panel with model and API key configuration
+                    // Options panel with model and API key configuration
                     var optionsPanel = new JPanel();
                     var BorderFactory = Packages.javax.swing.BorderFactory;
                     var TitledBorder = Packages.javax.swing.border.TitledBorder;
@@ -140,15 +280,17 @@ function applicationStarted(pluginWorkspaceAccess) {
                     gbc.gridx = 0; gbc.gridy = 0;
                     optionsPanel.add(new JLabel(i18nFn("ft.parse.model.label")), gbc); // "解析參照用預訓練模型"
                     gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-                    var model1Field = new JTextField(20);
-                    optionsPanel.add(model1Field, gbc);
+                    var parseModelField = new JTextField(20);
+                    parseModelField.setName("ft.parse.model");
+                    optionsPanel.add(parseModelField, gbc);
 
                     // ft detect model configuration
                     gbc.gridx = 0; gbc.gridy = 1; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
                     optionsPanel.add(new JLabel(i18nFn("ft.detect.model.label")), gbc); // "偵測參照用預訓練模型"
                     gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
-                    var model2Field = new JTextField(20);
-                    optionsPanel.add(model2Field, gbc);
+                    var detectModelField = new JTextField(20);
+                    detectModelField.setName("ft.detect.model");
+                    optionsPanel.add(detectModelField, gbc);
 
                     // API Key configuration
                     gbc.gridx = 0; gbc.gridy = 2; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
@@ -156,16 +298,25 @@ function applicationStarted(pluginWorkspaceAccess) {
                     gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
                     var JPasswordField = Packages.javax.swing.JPasswordField;
                     var apiKeyField = new JPasswordField(40);
+                    apiKeyField.setName("api.key");
                     optionsPanel.add(apiKeyField, gbc);
 
-                    // Add a filler panel to push everything to the top
+                    // Save button
                     gbc.gridy = 3;
+                    gbc.gridx = 1;
+                    gbc.fill = GridBagConstraints.NONE;
+                    gbc.anchor = GridBagConstraints.EAST;
+                    var saveButton = new JButton("Save");
+                    optionsPanel.add(saveButton, gbc);
+
+                    // Add a filler panel to push everything to the top
+                    gbc.gridy = 4;
                     gbc.weighty = 1.0;
                     gbc.fill = GridBagConstraints.VERTICAL;
                     optionsPanel.add(new JPanel(), gbc);
 
                     
-                    // Create a container that can switch between splitPane and optionsPanel
+                    // Card container that can switch between splitPane and optionsPanel
                     var CardLayout = Packages.java.awt.CardLayout;
                     var cardPanel = new JPanel(new CardLayout());
                     cardPanel.add(splitPane, "MAIN");
@@ -179,9 +330,20 @@ function applicationStarted(pluginWorkspaceAccess) {
                     viewInfo.setComponent(mainPanel);
                     viewInfo.setTitle(i18nFn("view.title")); // "DILA AI Markup Assistant"
 
+                    importDAMAOptions(optionsFile, parseModelField, detectModelField, apiKeyField);
+
+                    // Add action listener for the save button
+                    saveButton.addActionListener(function() {
+                        var saved = saveDAMAOptions(optionsFile, parseModelField, detectModelField, apiKeyField);
+                        if (saved) {
+                            Packages.javax.swing.JOptionPane.showMessageDialog(mainPanel, "Options saved successfully.");
+                        } else {
+                            Packages.javax.swing.JOptionPane.showMessageDialog(mainPanel, "Failed to save options.", "Error", Packages.javax.swing.JOptionPane.ERROR_MESSAGE);
+                        }
+                    });
 
                     // Add action listeners to menu items
-                    menuItemActionAIMarkup.addActionListener(function(e) {
+                    menuItemActionAIMarkup.addActionListener(function() {
                         logDebug("AI Markup action triggered");
 
                         // Switch back to main view if options panel is currently showing
@@ -272,7 +434,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                                 } catch (error) {
                                     // --- Schedule error message update back on the EDT ---
                                     SwingUtilities.invokeLater(function() {
-                                        infoArea.setText(i18nFn("llm.error", error.message));
+                                        infoArea.setText(i18nFn("llm.error") + "\n" + error.message);
                                         logDebug("LLM API Error: " + error);
                                     });
                                 }
@@ -282,7 +444,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                     });
 
                     // Add action listener to the replace button
-                    replaceButton.addActionListener(function(e) {
+                    replaceButton.addActionListener(function() {
                         var replacementText = resultArea.getText();
                         var replacementTextLength = replacementText.length();
                         logDebug("Replace button clicked with replacement: " + replacementText + 
@@ -339,7 +501,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                         }
                     });
 
-                    menuItemActionTagRemoval.addActionListener(function(e) {
+                    menuItemActionTagRemoval.addActionListener(function() {
                         logDebug("Tag Removal action triggered");
 
                         // Switch back to main view if options panel is currently showing
@@ -357,7 +519,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                             buttonPanel.setVisible(false);
                         }
                     });
-                    menuItemOption.addActionListener(function(e) {
+                    menuItemOption.addActionListener(function() {
                         logDebug("Settings option triggered");
                         buttonPanel.setVisible(false);
 

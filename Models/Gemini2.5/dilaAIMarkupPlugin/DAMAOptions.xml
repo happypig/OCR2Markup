@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serialized version="18.0" xml:space="preserve">
+	<map>
+		<entry>
+			<String>dila.ai.markup.assistant.options</String>
+			<dilaAIMarkupAssistantOptions>
+				<field name="ft.parse.model">
+					<string>ft:gpt-4.1-mini-2025-04-14:dila::CBFXGs2r</string>
+				</field>
+				<field name="ft.detect.model">
+					<string>ft:gpt-4.1-mini-2025-04-14:dila::CBCVGeZ6</string>
+				</field>
+				<field name="api.key">
+					<string></string>
+				</field>
+			</dilaAIMarkupAssistantOptions>
+		</entry>
+	</map>
+</serialized>
