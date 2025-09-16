@@ -12,7 +12,7 @@
             <h4>Release Notes v0.2.0:</h4>
             <ul>
                 <li>multi-language support (English, Simplified Chinese)</li>
-                <li>Preferences page for setting LLM ft models and API key</li>
+                <li>Options-Preferences page for setting LLM ft models and API key</li>
             </ul>
             <h4>Release Notes v0.1.0:</h4>
             <ul>
