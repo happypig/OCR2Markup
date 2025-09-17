@@ -135,4 +135,19 @@
     <val lang="zh_CN">DILA AI標記助手設定</val>
     <val lang="zh_TW">DILA AI標記助手設定</val>
   </key>
+  <key value="options.info">
+    <val lang="en_US">Configure the AI models and API key used for reference parsing and detection. The parsing model processes selected text to add XML markup tags, while the detection model identifies potential references. Your API key is stored locally with basic encoding for security.</val>
+    <val lang="zh_CN">設定用於參照解析和偵測的AI模型和API金鑰。解析模型處理選取文字以添加XML標記標籤，偵測模型識別潛在參照。您的API金鑰會以基本編碼方式儲存在本機以確保安全。</val>
+    <val lang="zh_TW">設定用於參照解析和偵測的AI模型和API金鑰。解析模型處理選取文字以添加XML標記標籤，偵測模型識別潛在參照。您的API金鑰會以基本編碼方式儲存在本機以確保安全。</val>
+  </key>
+  <key value="options.saved.successfully">
+    <val lang="en_US">Options saved successfully.</val>
+    <val lang="zh_CN">選項已成功儲存。</val>
+    <val lang="zh_TW">選項已成功儲存。</val>
+  </key>
+  <key value="options.saved.failed">
+    <val lang="en_US">Failed to save options.</val>
+    <val lang="zh_CN">儲存選項失敗。</val>
+    <val lang="zh_TW">儲存選項失敗。</val>
+  </key>
 </translation>

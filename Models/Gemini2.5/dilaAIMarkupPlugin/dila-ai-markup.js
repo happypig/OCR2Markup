@@ -55,15 +55,14 @@ function applicationStarted(pluginWorkspaceAccess) {
         return resources.getMessage(key);
     }
 
-    // //plugin options file.
-    // var jsFile = pluginWorkspaceAccess.getPluginDescriptor().getPluginDir();
-    // var jsDirURL = jsFile.toURI().toURL();
-    // var optionsXMLUrl = new Packages.java.net.URL(jsDirURL, "DAMAOptions.xml");
-    // var optionsFile = pluginWorkspaceAccess.getUtilAccess().locateFile(optionsXMLUrl);
-
-    optionsXMLUrl = jsDirURL.toString() + "/DAMAOptions.xml";
-    //Global options file.
-    optionsFile = pluginWorkspaceAccess.getUtilAccess().locateFile(new Packages.java.net.URL(optionsXMLUrl));
+    // Now we can safely call getDescriptor()
+    var optionsXMLUrl = jsDirURL.toString().substring(6) + "DAMAOptions.xml"; 
+    logDebug("jsDirURL: " + jsDirURL);
+    logDebug("jsDirURL 2 string: " + jsDirURL.toString());
+    logDebug("clean jsDirURL: " + jsDirURL.toString().substring(6));
+    logDebug("pluginDirPath: " + optionsXMLUrl);
+    var optionsFile = new Packages.java.io.File(optionsXMLUrl);
+    logDebug("optionsFile: " + optionsFile);
 
     /**
      * Imports options from an XML file and sets them in the options panel fields.
@@ -217,11 +216,11 @@ function applicationStarted(pluginWorkspaceAccess) {
                     menuBar.add(menuOptions);
                     menuOptions.add(menuItemOption);
 
-                    // Main panel of BorderLayout with menu bar
+                    // Plugin panel of BorderLayout with menu bar
                     var JPanel = Packages.javax.swing.JPanel;
                     var BorderLayout = Packages.java.awt.BorderLayout;
-                    var mainPanel = new JPanel(new BorderLayout());
-                    mainPanel.add(menuBar, BorderLayout.NORTH);
+                    var pluginPanel = new JPanel(new BorderLayout());
+                    pluginPanel.add(menuBar, BorderLayout.NORTH);
 
                     // Text areas for info and results
                     var JTextArea = Packages.javax.swing.JTextArea;
@@ -265,6 +264,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                     var titledBorder = BorderFactory.createTitledBorder(i18nFn("options.panel.title"));
                     titledBorder.setTitlePosition(TitledBorder.BELOW_TOP);
                     optionsPanel.setBorder(titledBorder);
+
                     var GridBagLayout = Packages.java.awt.GridBagLayout;
                     var GridBagConstraints = Packages.java.awt.GridBagConstraints;
                     var JLabel = Packages.javax.swing.JLabel;
@@ -309,11 +309,19 @@ function applicationStarted(pluginWorkspaceAccess) {
                     var saveButton = new JButton("Save");
                     optionsPanel.add(saveButton, gbc);
 
-                    // Add a filler panel to push everything to the top
+                    // Filler panel to push everything to the top
                     gbc.gridy = 4;
+                    gbc.gridx = 0;
+                    gbc.gridwidth = 2; // Span across both columns
+                    gbc.weightx = 1.0; // Take full horizontal space
                     gbc.weighty = 1.0;
-                    gbc.fill = GridBagConstraints.VERTICAL;
-                    optionsPanel.add(new JPanel(), gbc);
+                    gbc.fill = GridBagConstraints.BOTH; // Fill both horizontal and vertical space
+                    
+                    var optionInfoArea = new JTextArea(i18nFn("options.info"), 4, 20);
+                    optionInfoArea.setLineWrap(true);
+                    optionInfoArea.setWrapStyleWord(true);
+                    optionInfoArea.setEditable(false);
+                    optionsPanel.add(optionInfoArea, gbc);
 
                     
                     // Card container that can switch between splitPane and optionsPanel
@@ -324,10 +332,10 @@ function applicationStarted(pluginWorkspaceAccess) {
                     
                     var cardLayout = cardPanel.getLayout();
 
-                    mainPanel.add(cardPanel, BorderLayout.CENTER);
+                    pluginPanel.add(cardPanel, BorderLayout.CENTER);
 
                     // Set the component and title for the view
-                    viewInfo.setComponent(mainPanel);
+                    viewInfo.setComponent(pluginPanel);
                     viewInfo.setTitle(i18nFn("view.title")); // "DILA AI Markup Assistant"
 
                     importDAMAOptions(optionsFile, parseModelField, detectModelField, apiKeyField);
@@ -336,9 +344,9 @@ function applicationStarted(pluginWorkspaceAccess) {
                     saveButton.addActionListener(function() {
                         var saved = saveDAMAOptions(optionsFile, parseModelField, detectModelField, apiKeyField);
                         if (saved) {
-                            Packages.javax.swing.JOptionPane.showMessageDialog(mainPanel, "Options saved successfully.");
+                            optionInfoArea.setText(i18nFn("options.saved.successfully")); // "Options saved successfully."
                         } else {
-                            Packages.javax.swing.JOptionPane.showMessageDialog(mainPanel, "Failed to save options.", "Error", Packages.javax.swing.JOptionPane.ERROR_MESSAGE);
+                            optionInfoArea.setText(i18nFn("options.saved.failed")); // "Failed to save options."
                         }
                     });
 
@@ -554,6 +562,7 @@ function applicationStarted(pluginWorkspaceAccess) {
             return "";
         }
     }
+
 }
 
 
