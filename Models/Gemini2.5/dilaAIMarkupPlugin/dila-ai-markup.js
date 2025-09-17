@@ -60,7 +60,7 @@ function applicationStarted(pluginWorkspaceAccess) {
     logDebug("jsDirURL: " + jsDirURL);
     logDebug("jsDirURL 2 string: " + jsDirURL.toString());
     logDebug("clean jsDirURL: " + jsDirURL.toString().substring(6));
-    logDebug("pluginDirPath: " + optionsXMLUrl);
+    logDebug("optionsDirPath: " + optionsXMLUrl);
     var optionsFile = new Packages.java.io.File(optionsXMLUrl);
     logDebug("optionsFile: " + optionsFile);
 
@@ -172,7 +172,13 @@ function applicationStarted(pluginWorkspaceAccess) {
             // WARNING: Storing API keys, even obfuscated, in a config file is a security risk.
             // Here we use Base64 as a simple deterrent, not as a secure encryption method.
             var Base64 = Packages.java.util.Base64;
-            var encodedApiKey = Base64.getEncoder().encodeToString(apiKeyField.getPassword().join("").getBytes());
+            var passwordChars = apiKeyField.getPassword();
+            var passwordString = "";
+            for (var i = 0; i < passwordChars.length; i++) {
+                passwordString += passwordChars[i];
+            }
+            var javaString = new Packages.java.lang.String(passwordString);
+            var encodedApiKey = Base64.getEncoder().encodeToString(javaString.getBytes("UTF-8"));
             options.appendChild(createField("api.key", encodedApiKey));
 
             // Write the content into xml file
