@@ -129,7 +129,123 @@ expand options.info, options.saved.successfully, options.saved.failed In transla
 
 _**Assistant**_
 
+I'll add the missing translation keys to your `translation.xml` file. Here are the additions:
 
+````xml
+// ...existing code...
+  <key value="options.panel.title">
+    <val lang="en_US">DILA AI Markup Assistant Settings</val>
+    <val lang="zh_CN">DILA AI標記助手設定</val>
+    <val lang="zh_TW">DILA AI標記助手設定</val>
+  </key>
+  <key value="options.info">
+    <val lang="en_US">Configure the AI models and API key used for reference parsing and detection. The parsing model processes selected text to add XML markup tags, while the detection model identifies potential references. Your API key is stored locally with basic encoding for security.</val>
+    <val lang="zh_CN">設定用於參照解析和偵測的AI模型和API金鑰。解析模型處理選取文字以添加XML標記標籤，偵測模型識別潛在參照。您的API金鑰會以基本編碼方式儲存在本機以確保安全。</val>
+    <val lang="zh_TW">設定用於參照解析和偵測的AI模型和API金鑰。解析模型處理選取文字以添加XML標記標籤，偵測模型識別潛在參照。您的API金鑰會以基本編碼方式儲存在本機以確保安全。</val>
+  </key>
+  <key value="options.saved.successfully">
+    <val lang="en_US">Options saved successfully.</val>
+    <val lang="zh_CN">選項已成功儲存。</val>
+    <val lang="zh_TW">選項已成功儲存。</val>
+  </key>
+  <key value="options.saved.failed">
+    <val lang="en_US">Failed to save options.</val>
+    <val lang="zh_CN">儲存選項失敗。</val>
+    <val lang="zh_TW">儲存選項失敗。</val>
+  </key>
+</translation>
+````
+
+These translations provide:
+
+1. **options.info** - A comprehensive explanation of what the options panel does, explaining the purpose of both models and the API key storage method
+2. **options.saved.successfully** - A success message when options are saved
+3. **options.saved.failed** - An error message when saving fails
+
+The translations are provided in all three languages (English, Simplified Chinese, and Traditional Chinese) to match your existing pattern.
+
+---
+
+_**User (2025-09-17 23:01Z)**_
+
+@workspace /explain 
+
+---
+
+_**Assistant**_
+
+## Code Explanation
+
+This code snippet demonstrates **API key encoding and XML field creation** for what appears to be a configuration or data structure. Let me break down what's happening step by step.
+
+The first line performs **Base64 encoding** of an API key. It takes a password field (`apiKeyField`), extracts the password characters using `getPassword()`, joins them into a single string with `join("")`, converts that string to bytes with `getBytes()`, and then encodes those bytes using Base64 encoding. The result is stored in `encodedApiKey`. This is a common security practice to obscure sensitive data like API keys when storing or transmitting them.
+
+The second line creates an XML field element by calling the `createField` function with two parameters: the field name `"api.key"` and the encoded API key value. This newly created field is then appended to an `options` element, suggesting this is part of building an XML configuration structure.
+
+The `createField` helper function is responsible for **creating XML elements**. It creates a `<field>` element with a `name` attribute, then creates a nested `<string>` element containing the actual value as a text node. This produces XML structure like `<field name="api.key"><string>encodedValue</string></field>`.
+
+## Key Considerations
+
+**Security Note**: While Base64 encoding obscures the API key, it's important to understand that Base64 is **not encryption** - it's easily reversible. This encoding likely serves to handle special characters or formatting requirements rather than true security.
+
+**Potential Gotcha**: The `getPassword().join("")` pattern suggests this might be working with a character array (common in Java), but the `.getBytes()` method call indicates this could be JavaScript code that's mimicking Java-style APIs, which might cause confusion about the actual runtime environment.
+
+This pattern is commonly seen in configuration management systems where sensitive values need to be encoded before being stored in XML format.
+
+---
+
+_**User (2025-09-17 23:05Z)**_
+
+@workspace /fix since we got TypeError: Cannot find function getBytes in object
+
+---
+
+_**Assistant**_
+
+I can see the issue in your code. The problem is that `apiKeyField.getPassword().join("")` returns a JavaScript string, but you're trying to call `.getBytes()` on it as if it were a Java String object.
+
+**Plan:**
+1. Fix the character array to string conversion from the password field
+2. Properly convert the JavaScript string to a Java String object
+3. Then call getBytes() on the Java String to get the byte array for Base64 encoding
+
+Here's the corrected code:
+
+````javascript
+// ...existing code...
+// WARNING: Storing API keys, even obfuscated, in a config file is a security risk.
+// Here we use Base64 as a simple deterrent, not as a secure encryption method.
+var Base64 = Packages.java.util.Base64;
+var passwordChars = apiKeyField.getPassword();
+var passwordString = "";
+for (var i = 0; i < passwordChars.length; i++) {
+    passwordString += passwordChars[i];
+}
+var javaString = new Packages.java.lang.String(passwordString);
+var encodedApiKey = Base64.getEncoder().encodeToString(javaString.getBytes("UTF-8"));
+options.appendChild(createField("api.key", encodedApiKey));
+// ...existing code...
+````
+
+**Alternative shorter approach:**
+
+````javascript
+// ...existing code...
+// WARNING: Storing API keys, even obfuscated, in a config file is a security risk.
+// Here we use Base64 as a simple deterrent, not as a secure encryption method.
+var Base64 = Packages.java.util.Base64;
+var passwordString = new Packages.java.lang.String(apiKeyField.getPassword());
+var encodedApiKey = Base64.getEncoder().encodeToString(passwordString.getBytes("UTF-8"));
+options.appendChild(createField("api.key", encodedApiKey));
+// ...existing code...
+````
+
+The key changes:
+1. **Proper conversion**: Convert the char array from `getPassword()` to a proper Java String object
+2. **Explicit encoding**: Use `getBytes("UTF-8")` to specify character encoding
+3. **Remove problematic join()**: The `join("")` method was creating a JavaScript string that doesn't have the `getBytes()` method
+
+This should resolve the `TypeError: Cannot find function getBytes in object` error you're encountering.
 
 ---
 
