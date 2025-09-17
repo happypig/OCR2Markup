@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The plugin.dtd file is located in the OXYGEN_INSATALL_DIR/plugins directory -->
+<!DOCTYPE plugin SYSTEM "../plugin.dtd">
+
+
+<plugin
+    id="com.oxygenxml.plugin.FormatPreserveText"
+    name="Format with text preserve"
+    description="Formats keeping the text nodes intact"
+    version="1.0"
+    vendor="Syncro Soft"
+    class="DILA.formatpreserve.FormatPreserveTextPlugin"
+    classLoaderType="preferReferencedResources">
+    <runtime>
+        <library name="lib/oxygen-sample-plugin-format-preserve-text-1.0.jar"/>
+    </runtime>
+    <extension type="selectionProcessor" 
+        class="DILA.formatpreserve.FormatPreserveTextPluginExtension"/>
+</plugin>

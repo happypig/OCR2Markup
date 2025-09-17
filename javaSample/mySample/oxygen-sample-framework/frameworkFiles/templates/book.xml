@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book xmlns="http://www.oxygenxml.com/sample/documentation"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:abs="http://www.oxygenxml.com/sample/documentation/abstracts">
+    <title>Book Template Title</title>
+    <section>
+        <title>Section Title</title>
+        <abs:def/>
+        <para>This content is copyrighted:</para>
+        <table>
+            <title>Table Title</title>
+            <header>
+                <td>Company</td>
+                <td>Date</td>
+            </header>
+            <tr>
+                <td/>
+                <td/>
+            </tr>
+        </table>
+    </section>
+</book>

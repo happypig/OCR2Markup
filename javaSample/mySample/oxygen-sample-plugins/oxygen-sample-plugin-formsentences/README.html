@@ -1,0 +1,24 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Sample XML Form Sentences plugin</title>
+    </head>
+    <body>
+        <p> This plugin capitalizes the first letter of every sentence in the selected text from the
+            document. </p>
+        <p> If the first character in the sentence is not a letter then this plugin has no effect.
+            The sentences are considered to be separated by: '.', '!' or '?'. </p>
+        <p>The plugin uses the following API classes:</p>
+        <pre>ro.sync.exml.plugin.selection.SelectionPluginContext;
+ro.sync.exml.plugin.selection.SelectionPluginExtension;
+ro.sync.exml.plugin.selection.SelectionPluginResult;
+ro.sync.exml.plugin.selection.SelectionPluginResultImpl;</pre>
+        <p>After installing the plugin it can be accessed through the editor's contextual menu by
+            choosing <b>Plugins->Form Sentences</b>.</p>
+        <p>Example:</p>
+        <pre>Input:
+	this is a sample. this is a sample! this is a sample?
+Result:
+	This is a sample. This is a sample! This is a sample?
+</pre>
+    </body>
+</html>

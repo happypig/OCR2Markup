@@ -1,0 +1,198 @@
+<xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension" id="com.oxygenxml.plugin.Conversion">
+    <xt:location href="${project.build.finalName}-plugin.jar"/>
+    <xt:version>${project.parent.version}.0</xt:version>
+    <xt:oxy_version>${project.parent.version}</xt:oxy_version>
+    <xt:type>plugin</xt:type>
+    <xt:author>Syncro Soft</xt:author>
+    <xt:name>Conversion</xt:name>
+    <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                <title>Configurable conversion plugin</title>
+            </head>
+            <body>
+                <div>
+                    <p>Converts between the European and U.S. metric systems. After installing the
+                        plugin it can be accessed through the editor's contextual menu by choosing
+                            <b>Plugins->Conversion</b>.</p>
+                </div>
+                <div>
+                    <h3>Configuring the converter plugin</h3>
+                    <div>
+                        <h4>Adding a new format</h4>
+
+                        <p>If you want to add new format, start Oxygen XML editor and edit the
+                            &quot;conversion.xml&quot; file following next steps:</p>
+                        <ol>
+                            <li>Add a new element &apos;entries&apos; with the format attribute set
+                                to the name of the format. (Eg. The name of the format can be
+                                &quot;length&quot;, &quot;speed&quot;, etc..)
+                                <pre>
+&lt;entries format = &quot;format name&quot;&gt;
+.
+. one or more entries
+.
+&lt;/entries&gt;</pre></li>
+                            <li> Add one or more &apos;entry&apos; inside the &apos;entries&apos;
+                                element. Eg.
+                                <pre>
+&lt;entry&gt;
+   &lt;!-- Master measure unit  --&gt;
+   &lt;s1Value&gt;Foot&lt;/s1Value&gt; 
+
+   &lt;!-- Master measure unit  label--&gt;
+   &lt;s1Label&gt;ft&lt;/s1Label&gt;
+   
+   &lt;!-- Slave measure unit  --&gt;
+   &lt;s2Value&gt;Meter&lt;/s2Value&gt;
+   
+   &lt;!-- Slave measure unit  label--&gt;
+   &lt;s2Label&gt;m&lt;/s2Label&gt;
+   
+    &lt;!-- The conversion factor: result will be : s2 = s1 * convertionFactor--&gt;
+    &lt;convertionFactor&gt;0.3048&lt;/convertionFactor&gt; 
+        &lt;!-- 
+        ( or, instead of convertionFactor element :
+            &lt;convertionFormula&gt; 
+                &lt;v1&gt;0&lt;/v1&gt;
+                &lt;v2&gt;3.2808&lt;/v2&gt;
+            &lt;/convertionFormula&gt;
+            result will be : s2 = (s1 - v1) / v2
+         )
+         --&gt;
+    &lt;!-- The number of decimals to be shown in the result--&gt;
+     &lt;decimals&gt;4&lt;/decimals&gt;             
+ &lt;/entry&gt;
+</pre> Note:<ul>
+                                    <li>&apos;s1Value&apos;, &apos;s2Value&apos;,
+                                        &apos;s1Label&apos;, &apos;s2Label&apos; and one of
+                                        &apos;conversionFactor&apos; or
+                                        &apos;conversionFormula&apos; tags are REQUIRED;</li>
+                                    <li>&apos;decimals&apos; tag AREN&apos;T REQUIRED, if this tag
+                                        isn&apos;t appearing then all decimals of the result will be
+                                        show.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                    <div>
+                        <h4>Changing the labels of the measurement systems</h4>
+
+                        <p>In the beginning of the configuration document, there are the following
+                            elements that allow you to control the label strings of the plugin
+                            dialog:</p>
+                        <pre>
+&lt;!-- Labels for internationalization--&gt;
+&lt;labels&gt;
+    &lt;label key=&quot;Format&quot; value=&quot;Format&quot;/&gt;
+    &lt;label key=&quot;Master system&quot; value=&quot;U.S. System&quot;/&gt;
+    &lt;label key=&quot;Slave system&quot; value=&quot;Metric System&quot;/&gt;
+    &lt;label key=&quot;Copy value and close&quot; value=&quot;Copy value and close&quot;/&gt;
+    &lt;label key=&quot;Include labels&quot; value=&quot;Include labels&quot;/&gt;
+    &lt;label key=&quot;Swap values&quot; value=&quot;Swap values&quot;/&gt;
+    &lt;label key=&quot;Decimals override&quot; value=&quot;Decimals Override&quot;/&gt;
+    &lt;label key=&quot;Type&quot; value=&quot;Type&quot;/&gt;
+&lt;/labels&gt;
+        </pre>
+                        <p>By modifying the values you can chnage the labels displayed in the
+                            dialog. The keys must remain the same! Make sure you do not modify
+                            them.</p>
+                    </div>
+                    <div>
+                        <h4>Changing the default settings</h4>
+
+                        <p>The following section allows locking/unlocking the checkbox that controls
+                            the format label insertion. If the value is true, the checkbox is
+                            selected and locked.</p>
+                        <pre>
+ &lt;!-- Default values --&gt;
+&lt;defaults&gt;
+    &lt;defaultvalue key=&quot;Lock labels&quot; value=&quot;true&quot;/&gt;
+&lt;/defaults&gt;
+        </pre>
+                    </div>
+                    <div>
+                        <h4>Sample - AREA</h4>
+
+                        <pre>
+&lt;!-- Area Conversion Factors --&gt;
+&lt;entries format=&quot;Area&quot;&gt;
+    &lt;entry&gt;
+                &lt;s1Value&gt;Square foot&lt;/s1Value&gt;
+                &lt;s1Label&gt;sq. ft.&lt;/s1Label&gt;
+                &lt;s2Value&gt;Square meter&lt;/s2Value&gt;
+                &lt;s2Label&gt;sq. m.&lt;/s2Label&gt;
+                &lt;convertionFactor&gt;0.09290304&lt;/convertionFactor&gt;                      
+                &lt;decimals&gt;-1&lt;/decimals&gt;               
+    &lt;/entry&gt;
+    &lt;entry&gt;
+                &lt;s1Value&gt;Square inch&lt;/s1Value&gt;
+                &lt;s1Label&gt;sq. in.&lt;/s1Label&gt;
+                &lt;s2Value&gt;Square meter&lt;/s2Value&gt;
+                &lt;s2Label&gt;sq. m.&lt;/s2Label&gt;
+                &lt;convertionFactor&gt;0.00064516&lt;/convertionFactor&gt;                      
+                &lt;decimals&gt;-1&lt;/decimals&gt;               
+    &lt;/entry&gt;
+    &lt;entry&gt;
+                &lt;s1Value&gt;square yard&lt;/s1Value&gt;
+                &lt;s1Label&gt;sq. yd.&lt;/s1Label&gt;
+                &lt;s2Value&gt;Square meter&lt;/s2Value&gt;
+                &lt;s2Label&gt;sq. m.&lt;/s2Label&gt;
+                &lt;convertionFactor&gt;0.83612736&lt;/convertionFactor&gt;                      
+                &lt;decimals&gt;-1&lt;/decimals&gt;               
+    &lt;/entry&gt;
+    &lt;entry&gt;
+                &lt;s1Value&gt;Acre&lt;/s1Value&gt;
+                &lt;s1Label&gt;ac.&lt;/s1Label&gt;
+                &lt;s2Value&gt;Hectare&lt;/s2Value&gt;
+                &lt;s2Label&gt;ha.&lt;/s2Label&gt;
+                &lt;convertionFactor&gt;0.4047&lt;/convertionFactor&gt;                      
+                &lt;decimals&gt;-1&lt;/decimals&gt;               
+    &lt;/entry&gt;
+&lt;/entries&gt;
+            </pre>
+                    </div>
+                    <div>
+                        <h4>Sample - MASS</h4>
+
+                        <pre>
+&lt;!-- Mass format --&gt;
+&lt;entries format=&quot;Mass&quot;&gt; 
+ &lt;!-- Add a new entry in this format--&gt;
+
+ &lt;!-- This &apos;entry&apos; will be transform pounds(lb) to Kilograms(kg) 
+     with conversion factor 0.4535924.
+     All resulted decimals will be show in convertor plugin. --&gt;  
+ &lt;entry&gt;
+   &lt;s1Value&gt;Pound&lt;/s1Value&gt;
+   &lt;s1Label&gt;lb.&lt;/s1Label&gt;
+   &lt;s2Value&gt;Kilograms&lt;/s2Value&gt;
+   &lt;s2Label&gt;kg.&lt;/s2Label&gt;
+   &lt;convertionFactor&gt;0.4535924&lt;/convertionFactor&gt;                      
+ &lt;/entry&gt;               
+
+ &lt;!-- This &apos;entry&apos; will be transform ounce(oz.) to grams(g) 
+     with conversion factor 28.34952 --&gt;
+     Six resulted decimals will be show in convertor plugin --&gt;  
+ &lt;entry&gt;
+   &lt;s1Value&gt;Ounce&lt;/s1Value&gt; 77
+   &lt;s1Label&gt;oz.&lt;/s1Label&gt;
+   &lt;s2Value&gt;Grams&lt;/s2Value&gt;
+   &lt;s2Label&gt;g&lt;/s2Label&gt;
+   &lt;convertionFactor&gt;28.34952&lt;/convertionFactor&gt;                      
+   &lt;decimals&gt;6&lt;/decimals&gt;
+ &lt;/entry&gt;               
+&lt;/entries&gt;</pre>
+                    </div>
+                    <p>Note:</p>
+                    <ul>
+                        <li>After modifying the conversion.xml file, check it to be valid.</li>
+                        <li>Restart the editor in order for the plugin to reinitialize.</li>
+                    </ul>
+                </div>
+            </body>
+        </html>
+    </xt:description>
+    <xt:license><![CDATA[(c) Syncro Soft SRL, All rights reserved.
+This Plug-In is part of the Oxygen XML Software and, as such, is part of the License Agreement governing the Oxygen XML Software.
+]]></xt:license>
+</xt:extension>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The plugin.dtd file is located in the OXYGEN_INSATALL_DIR/plugins directory -->
+<!DOCTYPE plugin SYSTEM "../plugin.dtd">
+
+<plugin
+    id="com.oxygenxml.plugin.LowerCase"
+    name="LowerCase"
+    description="Convert the selection to lowercase"
+    version="${project.nosnapshot.version}"
+    vendor="Syncro Soft"
+    class="DILA.lowercase.LowercasePlugin"
+    classLoaderType="preferReferencedResources">
+    <runtime>
+        <library name="lib/${project.build.finalName}.jar"/>
+    </runtime>
+    <extension type="selectionProcessor" 
+    class="DILA.lowercase.LowercasePluginExtension"/>
+</plugin>

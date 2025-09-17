@@ -1,0 +1,35 @@
+<xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
+    id="com.oxygenxml.plugin.CustomProtocol">
+    <xt:location href="${project.build.finalName}-plugin.jar"/>
+    <xt:version>${project.parent.version}.0</xt:version>
+    <xt:oxy_version>${project.parent.version}</xt:oxy_version>
+    <xt:type>plugin</xt:type>
+    <xt:author>Syncro Soft</xt:author>
+    <xt:name>CustomProtocol</xt:name>
+    <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                <title>Sample Custom Protocol plugin</title>
+            </head>
+            <body>
+                <div>
+                    <p> This plugin installs a protocol handler for a protocol called CPROTO in
+                        &lt;oXygen/>. That enables &lt;oXygen/> to open resources with a URL of the
+                        form: <code>cproto://C:/path/to/file.txt</code> using the normal file system
+                        browser dialogs of &lt;oXygen/>. </p>
+                    <p>Such a plugin must provide a standard Java URL stream handler class
+                        (URLStreamHandlerPluginExtension) and must return a URL with the supported
+                        protocol when it is called by &lt;oXygen/> (URLChooserPluginExtension).</p>
+                    <p> After installing the plugin it can be accessed from the <b>File</b> menu
+                        through action <b>Open using Custom Protocol</b>.</p>
+                    <p>For more details: <a
+                            href="http://www.oxygenxml.com/doc/ug-oxygen/index.html?q=/doc/ug-oxygen/tasks/howto-custom-protocol-plugin.html"
+                            >http://www.oxygenxml.com/doc/ug-oxygen/index.html?q=/doc/ug-oxygen/tasks/howto-custom-protocol-plugin.html</a>
+                    </p>
+                </div>
+            </body>
+        </html>
+    </xt:description>
+    <xt:license><![CDATA[(c) Syncro Soft SRL, All rights reserved.
+This Plug-In is part of the Oxygen XML Software and, as such, is part of the License Agreement governing the Oxygen XML Software.
+]]></xt:license>
+</xt:extension>

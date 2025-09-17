@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="@@CODEBASE@@" href="@@HREF@@">
+  <!-- The tokens marked with @@ and the DEPENDENCIES element are replaced by Ant/Maven with the correct values-->
+  <information>
+        <title>&lt;oXygen/> XML Author Component Sample Applet</title>
+        <vendor>Syncro Soft LTD</vendor>
+        <homepage href="http://www.oxygenxml.com/"/>
+        <description>&lt;oXygen/> XML Author Component Sample Applet</description>
+        <description kind="short">&lt;oXygen/> XML Author Component Sample Applet Copyright (c) 1998-2012 Syncro Soft LTD, all rights reserved.</description>
+    </information>
+    <security>
+  		<all-permissions/>
+	</security>
+    <resources>
+        <!-- Application Resources -->
+        <j2se java-vm-args="-Xmx256m -XX:MaxPermSize=80m" version="1.6+"
+              href="http://java.sun.com/products/autodl/j2se"/>
+    	<DEPENDENCIES/>
+    </resources>    
+    
+    <applet-desc 
+         name="Author Component Samples Applet"
+         main-class="@@MAIN_CLASS@@"
+         width="800"
+         height="600">
+     </applet-desc>
+     
+     <update check="always"/>
+</jnlp>			

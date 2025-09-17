@@ -1,0 +1,26 @@
+<xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
+    id="com.oxygenxml.plugin.WorkspaceAccess">
+    <xt:location href="${project.build.finalName}-plugin.jar"/>
+    <xt:version>${project.parent.version}.0</xt:version>
+    <xt:oxy_version>${project.parent.version}</xt:oxy_version>
+    <xt:type>plugin</xt:type>
+    <xt:author>Syncro Soft</xt:author>
+    <xt:name>Convert Hex to Char</xt:name>
+    <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                <title>Convert Hex to Char</title>
+            </head>
+            <body>
+                <div>
+                    <p>Converts a sequence of four hexadecimal characters to the UTF-8 character
+                        (glyph) of that codepoint. The '0x' should not be included.</p>
+                    <p>The caret should be placed after the 4 digits sequence.</p>
+                    <p>The shortcut is F8</p>
+                </div>
+            </body>
+        </html>
+    </xt:description>
+    <xt:license><![CDATA[(c) Syncro Soft SRL, All rights reserved.
+This Plug-In is part of the Oxygen XML Software and, as such, is part of the License Agreement governing the Oxygen XML Software.
+]]></xt:license>
+</xt:extension>

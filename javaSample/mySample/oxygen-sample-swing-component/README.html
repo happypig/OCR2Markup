@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>oXygen Sample Component</title>
+  </head>
+  <body>
+    <h1>Using oXygen XML Author as a component for building a Java application</h1>
+    <section>
+      <p>This project can be used as a starting point for creating an oXygen
+        Author as a Swing component.</p>
+      <p><b>Note:</b> To access resources from your CMS you can
+        either use WebDAV (if your server supports it), or you can write a custom protocol handler
+        and plug it into the component using the <code>URL.setURLStreamHandlerFactory</code> method.</p>
+    </section>
+    <section>
+      <h2>Dependencies</h2>
+      <ul>
+        <li><a href="../bundle-frameworks/README.html">bundle-frameworks</a></li>
+        <li><a href="../bundle-options/README.html">bundle-options</a></li>
+        <li><a href="../bundle-samplefiles/README.html">bundle-samplefiles</a></li>
+      </ul>
+    </section>
+    <section>
+      <h2>The contents of this project</h2>
+      <table>
+        <tr>
+          <td>src</td>
+          <td>The Java sources of the sample application/applet.</td>
+        </tr>
+        <tr>
+          <td>pom.xml</td>
+          <td>The Maven project file</td>
+        </tr>
+      </table>
+    </section>
+    <section>
+      <h2>Resouces</h2>
+      <p>More details may be found in the oXygen <a
+          href="https://www.oxygenxml.com/doc/ug-oxygen/index.html#topics/author-component.html">user
+          guide</a>.</p>
+    </section>
+    <section>
+      <h2>Requirements</h2>
+      <section>
+        <h3>Specify the license key</h3>
+        <p>Licensing options:</p>
+        <ol>
+          <li> Request an Author Component development license key from us (support@oxygenxml.com).
+            Set this license key (look for a TODO in the Java code) in the
+            <code>AuthorComponentSample</code> Java class.</li>
+          <li>Use a fixed license key of "evaluation" type - i.e for development only - and put it
+            in the file: "src/main/resources/license.key" (the license key string must be the same
+            as the one received from oXygen, including start/end markers and line breaks)</li>
+          <li>A floating license key, for the production environment. In this case modify the code
+            to access the specific license server. See the TODOs from
+            <code>AuthorComponentSample.java</code> and <code>Reviewer.java</code> </li>
+        </ol>
+        <p>Licensing informations can be found <a href="https://www.oxygenxml.com/doc/ug-oxygen/topics/component_licensing.html">here</a>
+        </p>
+      </section>
+      <section>
+        <h3>Enabling the logging</h3>
+        <p>You can change the verbosity of the logger by modifiying the
+          <code>src/main/resource/logback.xml</code></p>
+      </section>
+    </section>
+    <section>
+      <h2>Build and deployment </h2>
+      <p>To build the entire set of files needed by the component, run the following command in the
+        main project directory:</p>
+      <pre>
+        mvn -pl oxygen-sample-swing-component -am install
+        </pre>
+      <p>Note that the command has been executed in the root project rather that in the module
+        directory. This way, all dependencies of the oxygen-sample-applet module are also built. As
+        a side effect, all the modules in the project will also be built. If you do not need all the
+        modules, you can remove them from their parent's pom.xml file to speed up the build process.
+      </p>
+    </section>
+    <section>
+      <h2>Running the standalone sample applications</h2>
+      <p>You can run the standalone sample using:</p>
+      <pre>
+      editor.bat
+      reviewer.bat
+      </pre>
+      <p>For other platforms than Windows, use directly the Maven command from the bat files.</p>
+    </section>
+    <section>
+      <h2>Having problems?</h2>
+      <p>Write us to one of our <a href="https://www.oxygenxml.com/support.html">support channels</a>.</p>
+    </section>
+  </body>
+</html>

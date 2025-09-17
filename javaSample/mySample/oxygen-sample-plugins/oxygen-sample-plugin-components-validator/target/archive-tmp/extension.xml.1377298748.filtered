@@ -1,0 +1,26 @@
+<xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
+    id="com.oxygenxml.plugin.ComponentsValidator">
+    <xt:location href="oxygen-sample-plugin-components-validator-1.0-plugin.jar"/>
+    <xt:version>1.0-SNAPSHOT.0</xt:version>
+    <xt:oxy_version>1.0-SNAPSHOT</xt:oxy_version>
+    <xt:type>plugin</xt:type>
+    <xt:author>Syncro Soft</xt:author>
+    <xt:name>Components Validator</xt:name>
+    <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                <title>Components Validator plugin</title>
+            </head>
+            <body>
+                <div>
+                    <p>This plugin allow customization of the Editor's menus, toolbars and some
+                        other components. For more details see <a
+                            href="http://www.oxygenxml.com/doc/ug-oxygen/index.html?q=/doc/ug-oxygen/concepts/components-validation-plugin.html"
+                            >http://www.oxygenxml.com/doc/ug-oxygen/index.html?q=/doc/ug-oxygen/concepts/components-validation-plugin.html</a></p>
+                </div>
+            </body>
+        </html>
+    </xt:description>
+    <xt:license><![CDATA[(c) Syncro Soft SRL, All rights reserved.
+This Plug-In is part of the Oxygen XML Software and, as such, is part of the License Agreement governing the Oxygen XML Software.
+]]></xt:license>
+</xt:extension>

@@ -1,0 +1,31 @@
+<xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension" id="com.oxygenxml.plugin.LowerCase">
+    <xt:location href="oxygen-sample-plugin-lowercase-1.0-plugin.jar"/>
+    <xt:version>1.0-SNAPSHOT.0</xt:version>
+    <xt:oxy_version>1.0-SNAPSHOT</xt:oxy_version>
+    <xt:type>plugin</xt:type>
+    <xt:author>Syncro Soft</xt:author>
+    <xt:name>LowerCase</xt:name>
+    <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                <title>Sample XML LowerCase plugin</title>
+            </head>
+            <body>
+                <div>
+                    <p>This plugin converts every character in the selected text to lowercase. Of
+                        course, this works only for letters.</p>
+                    <p>After installing the plugin it can be accessed through the editor's
+                        contextual menu by choosing <b>Plugins->LowerCase</b>.</p>
+                    <p>Example:</p>
+                    <pre>Input:
+	THIS is A SaMple.
+Result:
+	this is a sample.
+</pre>
+                </div>
+            </body>
+        </html>
+    </xt:description>
+    <xt:license><![CDATA[(c) Syncro Soft SRL, All rights reserved.
+This Plug-In is part of the Oxygen XML Software and, as such, is part of the License Agreement governing the Oxygen XML Software.
+]]></xt:license>
+</xt:extension>

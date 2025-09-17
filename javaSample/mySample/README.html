@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>oXygen SDK Sample Projects</title>
+  </head>
+  <body>
+    <h1>Samples for the oXygen SDK</h1>
+    <p>The oXygen SDK allows you to extend or create new applications based on the oXygen XML
+      editing technology. </p>
+    <section><h2>The contents of this project</h2>Main sample sub-projects:<table>
+        <colgroup>
+          <col width="31%" />
+          <col width="69%" />
+        </colgroup>
+        <tr>
+          <td><a href="oxygen-sample-swing-component/README.html">oxygen-sample-swing-component</a></td>
+          <td> This project is a sample application of using an oXygen XML Author Component which can be embedded in a Java Swing-based application.</td>
+        </tr>
+        <tr>
+          <td><a href="oxygen-sample-eclipse-plugin/README.html"
+            >oxygen-sample-eclipse-plugin</a></td>
+          <td> You can use this as a starting project for creating an Eclipse IDE plug-in that
+            extends the oXygen XML Editor plug-in for Eclipse.</td>
+        </tr>
+        <tr>
+          <td><a href="oxygen-sample-framework/README.html"
+            >oxygen-sample-framework</a></td>
+          <td> You can use this as a starting project for creating an Java extensions needed 
+          by an Author customization for a specific type of XML documents.</td>
+        </tr>
+        <tr>
+          <td><a href="oxygen-sample-plugins/README.html">oxygen-sample-plugins</a></td>
+          <td>You can find here a set of plugins for the oXygen XML Editor standalone
+            distribution.</td>
+        </tr>
+      </table><p>Resources sub-projects:</p><table>
+        <col width="31%" />
+        <col width="69%" />
+        <tr>
+          <td><a href="bundle-frameworks/README.html">bundle-frameworks</a></td>
+          <td> Packs the frameworks you need to deploy to the applet.</td>
+        </tr>
+        <tr>
+          <td><a href="bundle-options/README.html">bundle-options</a></td>
+          <td> Packs the default oXygen options you need to deploy to the applet.</td>
+        </tr>
+        <tr>
+          <td><a href="bundle-plugins/README.html">bundle-plugins</a></td>
+          <td>Packs the plugins you need to deploy to the applet. Uses all the
+            plugins from the <code>oxygen-sample-plugins</code> project.</td>
+        </tr>
+        <tr>
+          <td><a href="bundle-samplefiles/README.html">bundle-samplefiles</a></td>
+          <td>Packs the samples you need to deploy to the applet.</td>
+        </tr>
+      </table></section>
+    <section>
+      <h2>Keep what you need</h2>
+      <p>This sample project is modular. You can keep any of the main sample sub-projects and its
+        dependencies and delete the rest. Make sure you update also the pom.xml file.</p>
+      <p>For instance if you want to develop an Eclipse plugin you could keep the 
+          <code>oxygen-sample-eclipse-plugin</code> and delete from the filesystem the other
+          <code>oxygen-*</code> projects.</p>
+    </section>
+    <section><h2>How to build the project</h2><p>All the subprojects can be built
+        directly.</p>So, running the
+      command<pre>mvn install</pre></section>
+      <section>
+        <h2>Oxygen XML Web Author</h2>
+        <p> To develop a Web Author integration you can use a developer-friendly project that was created on GitHub - <a href="https://github.com/oxygenxml/web-author-component-integration">Web Author Component Integration</a>.</p>
+        <p>A detailed description of the new project and more information can be found in its <a href="https://github.com/oxygenxml/web-author-component-integration/blob/master/README.md">README.md</a> file.</p>
+      </section>    
+  </body>
+</html>

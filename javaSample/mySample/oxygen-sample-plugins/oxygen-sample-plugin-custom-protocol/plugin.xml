@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The plugin.dtd file is located in the OXYGEN_INSATALL_DIR/plugins directory -->
+<!DOCTYPE plugin SYSTEM "../plugin.dtd">
+
+<plugin
+ id="DILA.customprotocol.CustomProtocol"
+ name="CustomProtocol"
+ description="An example of a custom protocol implementation allowing access to local resources."
+ version="${project.nosnapshot.version}"
+ vendor="Syncro Soft"
+ class="DILA.customprotocol.CustomProtocolPlugin"
+ classLoaderType="preferReferencedResources">
+ <runtime>
+        <library name="lib/${project.build.finalName}.jar"/>
+ </runtime>
+ 
+ <extension type="URLHandler" 
+  class="DILA.customprotocol.CustomProtocolURLHandlerExtension"/>
+ 
+ <extension type="URLChooser" 
+  class="DILA.customprotocol.CustomProtocolChooserExtension"/>
+ 
+ <extension type="URLChooserToolbar" 
+  class="DILA.customprotocol.CustomProtocolChooserExtension"/>
+ 
+</plugin>
