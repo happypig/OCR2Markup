@@ -249,3 +249,38 @@ This should resolve the `TypeError: Cannot find function getBytes in object` err
 
 ---
 
+_**User (2025-09-17 23:25Z)**_
+
+add entry for save button
+
+---
+
+_**Assistant**_
+
+I'll add the translation entry for the save button to your `translation.xml` file:
+
+````xml
+// ...existing code...
+  <key value="options.saved.failed">
+    <val lang="en_US">Failed to save options.</val>
+    <val lang="zh_CN">儲存選項失敗。</val>
+    <val lang="zh_TW">儲存選項失敗。</val>
+  </key>
+  <key value="save.button">
+    <val lang="en_US">Save</val>
+    <val lang="zh_CN">儲存</val>
+    <val lang="zh_TW">儲存</val>
+  </key>
+</translation>
+````
+
+This adds the `save.button` translation key that your code is referencing with `i18nFn("save.button")` on line 315 of your JavaScript file. The translations provide:
+
+- **English**: "Save"
+- **Simplified Chinese**: "儲存" 
+- **Traditional Chinese**: "儲存"
+
+Now your save button will display the appropriate text based on the user's language setting.
+
+---
+
