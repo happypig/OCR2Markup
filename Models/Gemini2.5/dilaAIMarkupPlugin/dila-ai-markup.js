@@ -312,7 +312,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                     gbc.gridx = 1;
                     gbc.fill = GridBagConstraints.NONE;
                     gbc.anchor = GridBagConstraints.EAST;
-                    var saveButton = new JButton("Save");
+                    var saveButton = new JButton(i18nFn("save.button"));
                     optionsPanel.add(saveButton, gbc);
 
                     // Filler panel to push everything to the top
@@ -564,7 +564,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                 return "";
             }
         } else {
-            area.append(i18nFn("no.editor.ope"));
+            area.append(i18nFn("no.editor.open"));
             return "";
         }
     }
