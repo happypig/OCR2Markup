@@ -72,6 +72,7 @@ function applicationStarted(pluginWorkspaceAccess) {
      * @param {javax.swing.JPasswordField} apiKeyField The password field for the API key.
      */
     function importDAMAOptions(optionsFile, parseModelField, detectModelField, apiKeyField) {
+        logDebug("\nimportDAMAOptions");
         if (optionsFile != null && optionsFile.exists()) {
             try {
                 var DocumentBuilderFactory = Packages.javax.xml.parsers.DocumentBuilderFactory;
@@ -95,8 +96,11 @@ function applicationStarted(pluginWorkspaceAccess) {
                             // The API key is stored in Base64 for simple obfuscation. Decode it.
                             // WARNING: This is not true encryption.
                             var Base64 = Packages.java.util.Base64;
+                            logDebug("fieldValue: " + fieldValue);
                             var decodedBytes = Base64.getDecoder().decode(fieldValue);
+                            logDebug("decodedBytes: " + decodedBytes);
                             apiKeyField.setText(new Packages.java.lang.String(decodedBytes));
+                            logDebug("apiKeyField after convert: " + apiKeyField.getText());
                         }
                     }
                 }
@@ -123,6 +127,7 @@ function applicationStarted(pluginWorkspaceAccess) {
             if (!parentDir.exists()) {
                 parentDir.mkdirs();
             }
+            logDebug("\nsaveDAMAOptions");
 
             var DocumentBuilderFactory = Packages.javax.xml.parsers.DocumentBuilderFactory;
             var DocumentBuilder = Packages.javax.xml.parsers.DocumentBuilder;
@@ -173,12 +178,12 @@ function applicationStarted(pluginWorkspaceAccess) {
             // Here we use Base64 as a simple deterrent, not as a secure encryption method.
             var Base64 = Packages.java.util.Base64;
             var passwordChars = apiKeyField.getPassword();
-            var passwordString = "";
-            for (var i = 0; i < passwordChars.length; i++) {
-                passwordString += passwordChars[i];
-            }
-            var javaString = new Packages.java.lang.String(passwordString);
+            logDebug("class name of passwordChars: " + passwordChars.getClass().getName());
+            logDebug("passwordChars: " + passwordChars);
+            var javaString = new Packages.java.lang.String(passwordChars);
             var encodedApiKey = Base64.getEncoder().encodeToString(javaString.getBytes("UTF-8"));
+            logDebug("encodedApiKey: " + encodedApiKey);
+
             options.appendChild(createField("api.key", encodedApiKey));
 
             // Write the content into xml file
@@ -345,6 +350,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                     viewInfo.setTitle(i18nFn("view.title")); // "DILA AI Markup Assistant"
 
                     importDAMAOptions(optionsFile, parseModelField, detectModelField, apiKeyField);
+                    logDebug("apiKeyField: " + apiKeyField.getText());
 
                     // Add action listener for the save button
                     saveButton.addActionListener(function() {
@@ -463,9 +469,9 @@ function applicationStarted(pluginWorkspaceAccess) {
                         var replacementTextLength = replacementText.length();
                         logDebug("Replace button clicked with replacement: " + replacementText + 
                             "\n(length: " + replacementTextLength + ")");
-                        var typeOfReplacementText = typeof replacementText;
-                        if (typeof replacementTextLength != 'number') {
-                            logDebug("\nType of replacementTextLength: " + typeOfReplacementText);
+                        var classNameOfReplacementText = replacementText.getClass().getName();
+                        if (classNameOfReplacementText != 'number') {
+                            logDebug("\nClass name of replacementTextLength: " + classNameOfReplacementText);
                         }
 
                         if (replacementText && replacementTextLength > 0) {
