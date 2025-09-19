@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serialized xml:space="preserve">
+	<map>
+		<entry> <!-- 53 direct.connector-->
+			<String>PLUGIN_CUSTOM_OPTIONS.oxygen.positron.plugin.direct.connector</String>
+			<String>open-ai-connector</String>
+		</entry>
+		<entry> <!-- 137 direct.connector.param.open-ai-connector.base_URL_param-->
+			<String>PLUGIN_CUSTOM_OPTIONS.oxygen.positron.plugin.direct.connector.param.open-ai-connector.base_URL_param</String>
+			<String>https://api.openai.com/</String>
+		</entry>
+		<entry> <!-- 133 direct.connector.param.open-ai-connector.ai_key_param-->
+			<String>PLUGIN_CUSTOM_OPTIONS.oxygen.positron.plugin.direct.connector.param.open-ai-connector.ai_key_param</String>
+			<String>9.1.88;86;157;113;106;155;157;150;146;159;216;159;97;159;168;212;205;144;164;190;161;132;178;151;163;135;107;212;109;106;163;175;157;166;158;162;136;111;199;178;164;174;142;188;151;167;183;147;173;146;134;171;203;151;167;169;122;118;225;167;105;104;175;207;168;154;133;220;145;160;171;161;161;153;181;124;110;110;132;152;165;146;149;174;106;159;173;169;166;169;168;198;138;101;169;155;148;162;123;177;139;173;134;189;153;153;156;159;157;133;155;180;169;174;124;213;169;107;215;126;126;146;139;151;153;153;117;182;163;155;192;95;116;124;141;217;140;140;140;166;126;160;184;153;134;135;186;177;172;137;142;171;122;137;175;159;117;126;168;184;185;152;168;156;125;105;186;155;162;159;118;152;156;122;102;</String>
+		</entry>
+		<entry> <!-- 153 direct.connector.param.open-ai-connector.model_param-->
+			<String>PLUGIN_CUSTOM_OPTIONS.oxygen.positron.plugin.direct.connector.param.open-ai-connector.model_param</String>
+			<String>ft:gpt-4.1-mini-2025-04-14:dila::CBFXGs2r</String>
+		</entry>		
+		<entry> <!-- 145 direct.connector.param.open-ai-connector.enable_text_moderation_param-->
+			<String>PLUGIN_CUSTOM_OPTIONS.oxygen.positron.plugin.direct.connector.param.open-ai-connector.enable_text_moderation_param</String>
+			<String>true</String>
+		</entry>
+		<entry>  <!-- 141 direct.connector.param.open-ai-connector.enable_speech_to_text_param-->
+			<String>PLUGIN_CUSTOM_OPTIONS.oxygen.positron.plugin.direct.connector.param.open-ai-connector.enable_speech_to_text_param</String>
+			<String>false</String>
+		</entry>
+		<entry> <!-- 157 direct.connector.param.open-ai-connector.streaming_param-->
+			<String>PLUGIN_CUSTOM_OPTIONS.oxygen.positron.plugin.direct.connector.param.open-ai-connector.streaming_param</String>
+			<String>true</String>
+		</entry>
+		<entry> <!-- 149 direct.connector.param.open-ai-connector.extra_headers_param-->
+			<String>PLUGIN_CUSTOM_OPTIONS.oxygen.positron.plugin.direct.connector.param.open-ai-connector.extra_headers_param</String>
+			<String>[]</String>
+		</entry>
+	</map>
+</serialized>
