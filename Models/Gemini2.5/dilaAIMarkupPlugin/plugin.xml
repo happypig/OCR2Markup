@@ -1,21 +1,26 @@
 <!DOCTYPE plugin PUBLIC "-//Oxygen Plugin" "../plugin.dtd">
 <plugin 
     id="com.dila.ai.markup"
-    name="DILA AI Markup"
-    version="0.2.1"
+    name="DILA AI Markup Assistant"
+    version="0.2.2"
     vendor="DILA"
     class="ro.sync.exml.plugin.Plugin" 
     classLoaderType="preferReferencedResources">
 
     <description>
             <p>This plugin provides an AI-empowered markup assistant for editing TEI XML documents.</p>
+            <h3>Release Notes v0.2.2:</h3>
+            <ul>
+                <li>Options saved with Oxygen's wsOptionsStorage approach</li>
+                <li>API key saved and retrieved with secretOption</li>
+            </ul>
             <h3>Release Notes v0.2.1:</h3>
             <ul>
                 <li>Issue fixed: Error calling LLM after saving options caused by API key handling</li>
             </ul>
             <h3>Release Notes v0.2.0:</h3>
             <ul>
-                <li>multi-language support (English, Simplified Chinese)</li>
+                <li>Multi-language support (English, Simplified Chinese)</li>
                 <li>Options-Preferences page for setting LLM ft models and API key</li>
             </ul>
             <h3>Release Notes v0.1.0:</h3>

@@ -1,48 +1,52 @@
+// Global variable for our logger instance.
+var UTF8PrintStream = null;
+var DEBUG = false; // default value
+
+// Function to determine debug mode from environment variable or system property
+function getDebugMode() {
+    // Try to get DEBUG from environment variable first
+    try {
+        var debugEnv = Packages.java.lang.System.getenv("DILA_DEBUG");
+        if (debugEnv != null) {
+            DEBUG = String(debugEnv).toLowerCase() === "true";
+        }
+    } catch (e) {
+        // Fallback to system property
+        try {
+            var debugProp = Packages.java.lang.System.getProperty("dila.debug");
+            if (debugProp != null) {
+                DEBUG = String(debugProp).toLowerCase() === "true";
+            }
+            } catch (e) {
+            // Keep default value
+            Packages.java.lang.System.err.println("Keep default value: " + DEBUG);
+        }
+    }
+    return DEBUG;
+}
+
+/**
+ * Logs a message to the System.err stream if in DEBUG mode.
+ * Initializes the stream on first use.
+ * @param {string} message The message to log.
+ */
+function logDebug(message) {
+    if (DEBUG) {
+        if (UTF8PrintStream === null) {
+            // Initialize the stream.
+            var PrintStream = Packages.java.io.PrintStream;
+            UTF8PrintStream = new PrintStream(Packages.java.lang.System.err, true, "UTF-8");
+        }
+        var now = new Date();
+        var timestamp = now.toLocaleString();
+        UTF8PrintStream.println("[" + timestamp + "] " + message);
+    }
+}
+
 // This is called by Oxygen when the plugin is initialized.
 function applicationStarted(pluginWorkspaceAccess) {
 
-    // Global variable for our logger instance.
-    var UTF8PrintStream = null;
-    var DEBUG = false; // default value
 
-    // Function to determine debug mode from environment variable or system property
-    function getDebugMode() {
-        // Try to get DEBUG from environment variable first
-        try {
-            var debugEnv = Packages.java.lang.System.getenv("DILA_DEBUG");
-            if (debugEnv != null) {
-                DEBUG = String(debugEnv).toLowerCase() === "true";
-            }
-       } catch (e) {
-            // Fallback to system property
-            try {
-                var debugProp = Packages.java.lang.System.getProperty("dila.debug");
-                if (debugProp != null) {
-                    DEBUG = String(debugProp).toLowerCase() === "true";
-                }
-             } catch (e) {
-                // Keep default value
-                Packages.java.lang.System.err.println("Keep default value: " + DEBUG);
-            }
-        }
-        return DEBUG;
-    }
-
-    /**
-     * Logs a message to the System.err stream if in DEBUG mode.
-     * Initializes the stream on first use.
-     * @param {string} message The message to log.
-     */
-    function logDebug(message) {
-        if (DEBUG) {
-            if (UTF8PrintStream === null) {
-                // Initialize the stream.
-                var PrintStream = Packages.java.io.PrintStream;
-                UTF8PrintStream = new PrintStream(Packages.java.lang.System.err, true, "UTF-8");
-            }
-            UTF8PrintStream.println(message);
-        }
-    }
 
     getDebugMode()
 
@@ -55,153 +59,53 @@ function applicationStarted(pluginWorkspaceAccess) {
         return resources.getMessage(key);
     }
 
-    // Now we can safely call getDescriptor()
-    var optionsXMLUrl = jsDirURL.toString().substring(6) + "DAMAOptions.xml"; 
-    logDebug("jsDirURL: " + jsDirURL);
-    logDebug("jsDirURL 2 string: " + jsDirURL.toString());
-    logDebug("clean jsDirURL: " + jsDirURL.toString().substring(6));
-    logDebug("optionsDirPath: " + optionsXMLUrl);
-    var optionsFile = new Packages.java.io.File(optionsXMLUrl);
-    logDebug("optionsFile: " + optionsFile);
-
-    /**
-     * Imports options from an XML file and sets them in the options panel fields.
-     * @param {java.io.File} optionsFile The XML file containing the options.
-     * @param {javax.swing.JTextField} parseModelField The text field for the parse model.
-     * @param {javax.swing.JTextField} detectModelField The text field for the detect model.
-     * @param {javax.swing.JPasswordField} apiKeyField The password field for the API key.
-     */
-    function importDAMAOptions(optionsFile, parseModelField, detectModelField, apiKeyField) {
-        logDebug("\nimportDAMAOptions");
-        if (optionsFile != null && optionsFile.exists()) {
-            try {
-                var DocumentBuilderFactory = Packages.javax.xml.parsers.DocumentBuilderFactory;
-                var factory = DocumentBuilderFactory.newInstance();
-                var builder = factory.newDocumentBuilder();
-                var doc = builder.parse(optionsFile);
-                doc.getDocumentElement().normalize();
-
-                var fields = doc.getElementsByTagName("field");
-                for (var i = 0; i < fields.getLength(); i++) {
-                    var field = fields.item(i);
-                    var fieldName = field.getAttribute("name");
-                    var valueNode = field.getElementsByTagName("string").item(0);
-                    if (valueNode) {
-                        var fieldValue = valueNode.getTextContent();
-                        if (fieldName == "ft.parse.model") {
-                            parseModelField.setText(fieldValue);
-                        } else if (fieldName == "ft.detect.model") {
-                            detectModelField.setText(fieldValue);
-                        } else if (fieldName == "api.key") {
-                            // The API key is stored in Base64 for simple obfuscation. Decode it.
-                            // WARNING: This is not true encryption.
-                            var Base64 = Packages.java.util.Base64;
-                            logDebug("fieldValue: " + fieldValue);
-                            var decodedBytes = Base64.getDecoder().decode(fieldValue);
-                            logDebug("decodedBytes: " + decodedBytes);
-                            apiKeyField.setText(new Packages.java.lang.String(decodedBytes));
-                            logDebug("apiKeyField after convert: " + apiKeyField.getText());
-                        }
-                    }
-                }
-                logDebug("Successfully imported options from DAMAOptions.xml");
-            } catch (e) {
-                logDebug("Error importing DAMAOptions.xml: " + e);
-            }
-        } else {
-            logDebug("DAMAOptions.xml not found, using default values.");
-        }
+    var optionStorage = pluginWorkspaceAccess.getOptionsStorage();
+    if (optionStorage == null) {
+        logDebug("No options storage available.");
+    } else {
+        logDebug("Options storage available.");
+        var positionApiKey = optionStorage.getSecretOption("oxygen.positron.plugin.direct.connector.param.custom-ai-service.ai_key_param", "");
+        logDebug("API Key: " + positionApiKey);
+        var positionBaseURL = optionStorage.getOption("oxygen.positron.plugin.direct.connector.param.custom-ai-service.base_URL_param", "");
+        logDebug("Base URL: " + positionBaseURL);
+        var positionActionFolder = optionStorage.getOption("oxygen.positron.plugin.actions.folder", "");
+        logDebug("Actions Folder: " + positionActionFolder);
+        var builderXpathType = optionStorage.getOption("builder.xpath.type.v14", "");
+        logDebug("Builder XPath Type: " + builderXpathType);
     }
+        
+    function importOptionsSpace(optionStorage, parseModelField, detectModelField, apiKeyField) {
+        var parseModel = optionStorage.getOption("dila.dama.ft.parse.model", "");
+        var detectModel = optionStorage.getOption("dila.dama.ft.detect.model", "");
+        var apiKey = optionStorage.getSecretOption("dila.dama.api.key", "");
 
-    /**
-     * Saves the current options to the XML file.
-     * @param {java.io.File} optionsFile The XML file to save the options to.
-     * @param {javax.swing.JTextField} parseModelField The text field for the parse model.
-     * @param {javax.swing.JTextField} detectModelField The text field for the detect model.
-     * @param {javax.swing.JPasswordField} apiKeyField The password field for the API key.
-     */
-    function saveDAMAOptions(optionsFile, parseModelField, detectModelField, apiKeyField) {
+        parseModelField.setText(parseModel);
+        detectModelField.setText(detectModel);
+        apiKeyField.setText(apiKey);
+    }
+    
+    function saveOptionsSpace(optionStorage, parseModelField, detectModelField, apiKeyField) {
         try {
-            // Ensure parent directory exists
-            var parentDir = optionsFile.getParentFile();
-            if (!parentDir.exists()) {
-                parentDir.mkdirs();
-            }
-            logDebug("\nsaveDAMAOptions");
+            var parseModel = parseModelField.getText();
+            var detectModel = detectModelField.getText();
+            var apiKey = apiKeyField.getText();
 
-            var DocumentBuilderFactory = Packages.javax.xml.parsers.DocumentBuilderFactory;
-            var DocumentBuilder = Packages.javax.xml.parsers.DocumentBuilder;
-            var TransformerFactory = Packages.javax.xml.transform.TransformerFactory;
-            var Transformer = Packages.javax.xml.transform.Transformer;
-            var DOMSource = Packages.javax.xml.transform.dom.DOMSource;
-            var StreamResult = Packages.javax.xml.transform.stream.StreamResult;
-            var OutputKeys = Packages.javax.xml.transform.OutputKeys;
-
-            var docFactory = DocumentBuilderFactory.newInstance();
-            var docBuilder = docFactory.newDocumentBuilder();
-
-            // Create the root element
-            var doc = docBuilder.newDocument();
-            var serialized = doc.createElement("serialized");
-            serialized.setAttribute("version", "18.0");
-            serialized.setAttribute("xml:space", "preserve");
-            doc.appendChild(serialized);
-
-            var map = doc.createElement("map");
-            serialized.appendChild(map);
-
-            var entry = doc.createElement("entry");
-            map.appendChild(entry);
-
-            var stringKey = doc.createElement("String");
-            stringKey.appendChild(doc.createTextNode("dila.ai.markup.assistant.options"));
-            entry.appendChild(stringKey);
-
-            var options = doc.createElement("dilaAIMarkupAssistantOptions");
-            entry.appendChild(options);
-
-            // Helper to create a field element
-            function createField(name, value) {
-                var field = doc.createElement("field");
-                field.setAttribute("name", name);
-                var stringValue = doc.createElement("string");
-                stringValue.appendChild(doc.createTextNode(value));
-                field.appendChild(stringValue);
-                return field;
+            if (optionStorage == null) {
+                logDebug("No options storage available to save options.");
+                return false;
             }
 
-            // Get values and create fields
-            options.appendChild(createField("ft.parse.model", parseModelField.getText()));
-            options.appendChild(createField("ft.detect.model", detectModelField.getText()));
+            optionStorage.setOption("dila.dama.ft.parse.model", parseModel);
+            optionStorage.setOption("dila.dama.ft.detect.model", detectModel);
+            optionStorage.setSecretOption("dila.dama.api.key", apiKey);
 
-            // WARNING: Storing API keys, even obfuscated, in a config file is a security risk.
-            // Here we use Base64 as a simple deterrent, not as a secure encryption method.
-            var Base64 = Packages.java.util.Base64;
-            var passwordChars = apiKeyField.getPassword();
-            logDebug("class name of passwordChars: " + passwordChars.getClass().getName());
-            logDebug("passwordChars: " + passwordChars);
-            var javaString = new Packages.java.lang.String(passwordChars);
-            var encodedApiKey = Base64.getEncoder().encodeToString(javaString.getBytes("UTF-8"));
-            logDebug("encodedApiKey: " + encodedApiKey);
-
-            options.appendChild(createField("api.key", encodedApiKey));
-
-            // Write the content into xml file
-            var transformerFactory = TransformerFactory.newInstance();
-            var transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            var source = new DOMSource(doc);
-            var result = new StreamResult(optionsFile);
-            transformer.transform(source, result);
-
-            logDebug("Successfully saved options to DAMAOptions.xml");
+            logDebug("Options saved to optionStorage.");
             return true;
         } catch (e) {
-            logDebug("Error saving DAMAOptions.xml: " + e);
+            logDebug("Error saving options (saveOptionsSpace): " + e);
             return false;
         }
     }
-
 
     // Add a view component customizer
     pluginWorkspaceAccess.addViewComponentCustomizer(new JavaAdapter(
@@ -276,6 +180,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                     titledBorder.setTitlePosition(TitledBorder.BELOW_TOP);
                     optionsPanel.setBorder(titledBorder);
 
+                    // Options panel with GridBagLayout for form-like layout
                     var GridBagLayout = Packages.java.awt.GridBagLayout;
                     var GridBagConstraints = Packages.java.awt.GridBagConstraints;
                     var JLabel = Packages.javax.swing.JLabel;
@@ -287,7 +192,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                     gbc.insets = new Insets(5, 5, 5, 5);
                     gbc.anchor = GridBagConstraints.WEST;
 
-                    // ft parse model configuration
+                    // Field for ft parse model
                     gbc.gridx = 0; gbc.gridy = 0;
                     optionsPanel.add(new JLabel(i18nFn("ft.parse.model.label")), gbc); // "解析參照用預訓練模型"
                     gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
@@ -295,7 +200,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                     parseModelField.setName("ft.parse.model");
                     optionsPanel.add(parseModelField, gbc);
 
-                    // ft detect model configuration
+                    // Field for ft detect model
                     gbc.gridx = 0; gbc.gridy = 1; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
                     optionsPanel.add(new JLabel(i18nFn("ft.detect.model.label")), gbc); // "偵測參照用預訓練模型"
                     gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
@@ -303,7 +208,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                     detectModelField.setName("ft.detect.model");
                     optionsPanel.add(detectModelField, gbc);
 
-                    // API Key configuration
+                    // Field for API Key
                     gbc.gridx = 0; gbc.gridy = 2; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
                     optionsPanel.add(new JLabel(i18nFn("api.key.label")), gbc); // "API Key"
                     gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
@@ -328,13 +233,13 @@ function applicationStarted(pluginWorkspaceAccess) {
                     gbc.weighty = 1.0;
                     gbc.fill = GridBagConstraints.BOTH; // Fill both horizontal and vertical space
                     
+                    // Info text area below the save button
                     var optionInfoArea = new JTextArea(i18nFn("options.info"), 4, 20);
                     optionInfoArea.setLineWrap(true);
                     optionInfoArea.setWrapStyleWord(true);
                     optionInfoArea.setEditable(false);
                     optionsPanel.add(optionInfoArea, gbc);
 
-                    
                     // Card container that can switch between splitPane and optionsPanel
                     var CardLayout = Packages.java.awt.CardLayout;
                     var cardPanel = new JPanel(new CardLayout());
@@ -349,16 +254,20 @@ function applicationStarted(pluginWorkspaceAccess) {
                     viewInfo.setComponent(pluginPanel);
                     viewInfo.setTitle(i18nFn("view.title")); // "DILA AI Markup Assistant"
 
-                    importDAMAOptions(optionsFile, parseModelField, detectModelField, apiKeyField);
+                    importOptionsSpace(optionStorage, parseModelField, detectModelField, apiKeyField);
                     logDebug("apiKeyField: " + apiKeyField.getText());
 
                     // Add action listener for the save button
                     saveButton.addActionListener(function() {
-                        var saved = saveDAMAOptions(optionsFile, parseModelField, detectModelField, apiKeyField);
+                        var saved = saveOptionsSpace(optionStorage, parseModelField, detectModelField, apiKeyField);
                         if (saved) {
                             optionInfoArea.setText(i18nFn("options.saved.successfully")); // "Options saved successfully."
+                            logDebug("Options saved: " + saved);
+
                         } else {
                             optionInfoArea.setText(i18nFn("options.saved.failed")); // "Failed to save options."
+                            logDebug("Options saved failed: " + saved);
+
                         }
                     });
 
@@ -390,11 +299,12 @@ function applicationStarted(pluginWorkspaceAccess) {
                                     var url = new URL("https://api.openai.com/v1/chat/completions"); // ft LLM endpoint
                                     var connection = url.openConnection();
 
-                                    var API_KEY = apiKeyField.getText().trim();
+                                    var apiKey = apiKeyField.getText().trim();
+                                    var parseModel = parseModelField.getText().trim();
 
                                     connection.setRequestMethod("POST");
                                     connection.setRequestProperty("Content-Type", "application/json");
-                                    connection.setRequestProperty("Authorization", "Bearer " + API_KEY); // API key
+                                    connection.setRequestProperty("Authorization", "Bearer " + apiKey); // API key
                                     connection.setDoOutput(true);
                                     
                                     // Define the system prompt to guide the AI's response.
@@ -402,7 +312,7 @@ function applicationStarted(pluginWorkspaceAccess) {
 
                                     // Prepare request payload
                                     var requestBody = JSON.stringify({
-                                        "model": "ft:gpt-4.1-mini-2025-04-14:dila::CBFXGs2r",
+                                        "model": parseModel,
                                         "messages": [
                                             {"role": "system", "content": systemPrompt},
                                             {"role": "user", "content": selectedText}
@@ -436,7 +346,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                                         SwingUtilities.invokeLater(function() {
                                             resultArea.setText("<ref>" + llmResponse + "</ref>");
                                             buttonPanel.setVisible(true);
-                                            logDebug("\nAPI call successful.");
+                                            logDebug("API call successful.");
                                         });
                                         
                                 } else {
@@ -471,7 +381,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                             "\n(length: " + replacementTextLength + ")");
                         var classNameOfReplacementText = replacementText.getClass().getName();
                         if (classNameOfReplacementText != 'number') {
-                            logDebug("\nClass name of replacementTextLength: " + classNameOfReplacementText);
+                            logDebug("Class name of replacementTextLength: " + classNameOfReplacementText);
                         }
 
                         if (replacementText && replacementTextLength > 0) {
@@ -521,6 +431,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                         }
                     });
 
+                    // Add action listener to the Tag Removal menu item
                     menuItemActionTagRemoval.addActionListener(function() {
                         logDebug("Tag Removal action triggered");
 
@@ -539,6 +450,8 @@ function applicationStarted(pluginWorkspaceAccess) {
                             buttonPanel.setVisible(false);
                         }
                     });
+
+                    // Add action listener to the Preferences menu item
                     menuItemOption.addActionListener(function() {
                         logDebug("Settings option triggered");
                         buttonPanel.setVisible(false);
@@ -577,53 +490,11 @@ function applicationStarted(pluginWorkspaceAccess) {
 
 }
 
-
-
 // This is called by Oxygen when the plugin is being disposed.
 function applicationClosing() {
-    // Global variable for our logger instance.
-    var UTF8PrintStream = null;
-    var DEBUG = false; // default value
-    // Function to determine debug mode from environment variable or system property
-    function getDebugMode() {
-        // Try to get DEBUG from environment variable first
-        try {
-            var debugEnv = Packages.java.lang.System.getenv("DILA_DEBUG");
-            if (debugEnv != null) {
-                DEBUG = String(debugEnv).toLowerCase() === "true";
-            }
-       } catch (e) {
-            // Fallback to system property
-            try {
-                var debugProp = Packages.java.lang.System.getProperty("dila.debug");
-                if (debugProp != null) {
-                    DEBUG = String(debugProp).toLowerCase() === "true";
-                }
-             } catch (e) {
-                // Keep default value
-            }
-        }
-        return DEBUG;
-    }
-
-    /**
-     * Logs a message to the System.err stream if in DEBUG mode.
-     * Initializes the stream on first use.
-     * @param {string} message The message to log.
-     */
-    function logDebug(message) {
-        if (DEBUG) {
-            if (UTF8PrintStream === null) {
-                // Initialize the stream.
-                var PrintStream = Packages.java.io.PrintStream;
-                UTF8PrintStream = new PrintStream(Packages.java.lang.System.err, true, "UTF-8");
-            }
-            UTF8PrintStream.println(message);
-        }
-    }
 
     // Clean up resources if needed.
     getDebugMode()
-    logDebug("\nClosing DILA AI Markup plugin.");
+    logDebug("Closing DILA AI Markup plugin.");
     logDebug("debug mode: " + getDebugMode());
 }
