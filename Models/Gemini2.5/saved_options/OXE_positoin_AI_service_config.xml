@@ -34,4 +34,14 @@
 			<String>[]</String>
 		</entry>
 	</map>
+	<toBeChecked>
+		<entry>
+			<function>loadPageState(PluginWorkspace pluginWorkspace)</function>
+			<function>com.oxygenxml.positron.plugin.preferences</function>
+		</entry>
+		<entry>
+			<function>DirectConnectionHelper.isDirectConnection()</function>
+			<function>com.oxygenxml.positron.plugin.util.DirectConnectionHelper</function>
+		</entry>
+	</toBeChecked>
 </serialized>
