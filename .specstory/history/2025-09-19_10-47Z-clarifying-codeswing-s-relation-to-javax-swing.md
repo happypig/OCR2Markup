@@ -180,3 +180,59 @@ _**Assistant**_
 
 ---
 
+_**User (2025-09-20 07:11Z)**_
+
+How to refer to the other folders which is not in the same project folder as the reference?
+
+---
+
+_**Assistant**_
+
+Use an absolute path or resolve a relative path from a known base (project folder, actions folder, user profile). Prefer packaging resources inside the plugin ZIP for portability; otherwise resolve and canonicalize paths with Java File APIs and handle errors.
+
+Example helper you can add to `dila-ai-markup.js` (uses the actions folder /any other base you already have as basePath; returns canonical path or null and logs failures):
+
+````javascript
+// ...existing code...
+function resolveExternalPath(basePath, targetPath) {
+    try {
+        var File = Packages.java.io.File;
+        var targetFile = new File(targetPath);
+        // If target is not absolute, resolve against basePath
+        if (!targetFile.isAbsolute()) {
+            targetFile = new File(basePath, targetPath);
+        }
+        var canonical = targetFile.getCanonicalPath();
+        var exists = new File(canonical).exists();
+        if (!exists) {
+            logDebug("resolveExternalPath: path does not exist: " + canonical);
+            return null;
+        }
+        return canonical;
+    } catch (e) {
+        logDebug("resolveExternalPath error: " + e);
+        return null;
+    }
+}
+// ...existing code...
+// Example usage inside applicationStarted or customizeView:
+var base = positionActionFolder || "C:\\Users\\jeffw\\Documents\\OxygenXMLEditor\\samples\\actions";
+var external = resolveExternalPath(base, "..\\OtherProject\\data\\myfile.txt"); // relative to base
+if (external) {
+    var file = new Packages.java.io.File(external);
+    var bytes = Packages.java.nio.file.Files.readAllBytes(file.toPath());
+    var content = new Packages.java.lang.String(bytes, "UTF-8");
+    logDebug("Loaded external file: " + external);
+    // use content...
+} else {
+    logDebug("Could not resolve external path.");
+}
+````
+
+Quick tips
+- Use absolute paths (C:\full\path) when possible on Windows, or resolve relative paths with getCanonicalPath().
+- Escape backslashes or use forward slashes in string literals.
+- For portable plugins, bundle resources in the plugin ZIP and load via class/resource APIs instead of referencing external folders.
+
+---
+
