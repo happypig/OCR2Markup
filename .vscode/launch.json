@@ -5,6 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "java",
+            "name": "TestOptionPageUI",
+            "request": "launch",
+            "mainClass": "DILA.workspace.TestOptionPageUI",
+            "projectName": "oxygen-sample-plugin-workspace-access"
+        },
+        {
+            "type": "java",
+            "name": "PasswordDemo",
+            "request": "launch",
+            "mainClass": "components.PasswordDemo",
+            "projectName": ""
+        },
+        {
             "name": "Python Debugger: Current File",
             "type": "debugpy",
             "request": "launch",
