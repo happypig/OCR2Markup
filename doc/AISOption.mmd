@@ -1,0 +1,24 @@
+sequenceDiagram
+  participant User as User (Preferences UI)
+  participant Page as AIServiceConfigurationPage
+  participant UI as Swing UI Components
+  participant Storage as WSOptionsStorage
+  participant Other as Other code / EnginesManager
+
+  User->>Page: open preferences -> init(pluginWorkspace)
+  Page->>Storage: getOption(...)  // loadPageState
+  Storage-->>Page: option values
+  Page->>UI: populate controls (serviceAddress, model combo, connectors)
+  Note right of Page: register WSOptionListener(s)
+
+  User->>UI: modify fields
+  User->>Page: click Apply
+  Page->>Page: gather inputs (paramsInputsMap)
+  Page->>Storage: setOption(key, value)  // persist changes
+  Storage-->>Other: notify listeners (if any)
+
+  User->>Page: click Restore Defaults
+  Page->>Page: restoreDefaults()  // reset UI controls
+  Page->>User: UI updated to defaults
+  User->>Page: click Apply
+  Page->>Storage: setOption(key, null) // may remove options
