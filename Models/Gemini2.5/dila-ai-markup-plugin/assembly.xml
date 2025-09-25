@@ -1,0 +1,40 @@
+<!-- filepath: c:\Project\OCR2Markup\Models\Gemini2.5\dilaAIMarkupOptionPlugin\assemblyComponent.xml -->
+<component>
+    <fileSets>
+        <!-- Core module resources -->
+        <fileSet>
+            <directory>dila-ai-markup-core/src/main/resources</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+    
+    <files>
+        <!-- Core module JAR -->
+        <!-- code below was commented out since covered by fileSet -->
+        <!-- <file>
+            <source>dila-ai-markup-core/target/dila-ai-markup-core-${project.version}.jar</source>
+            <outputDirectory>/lib</outputDirectory>
+        </file> -->
+        
+        <!-- Options module JAR -->
+        <file>
+            <source>dila-ai-markup-options/target/dila-ai-markup-options-${project.version}.jar</source>
+            <outputDirectory>/lib</outputDirectory>
+        </file>
+        
+        <!-- Master plugin configuration -->
+        <file>
+            <source>plugin.xml</source>
+            <outputDirectory>/</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>extension.xml</source>
+            <outputDirectory>/</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+     </files>
+</component>
