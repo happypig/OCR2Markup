@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic-1">
+ <title>Snowdrop</title>
+ <body><p><i>From Wikipedia, the free encyclopedia.</i></p><p><b>Snowdrop</b> is the
+   <?oxy_delete author="John" timestamp="20120601T165229+0300" content="usual"?><?oxy_insert_start author="John" timestamp="20120601T165231+0300"?>common<?oxy_insert_end?>
+   name for members of the <xref href="../concepts/glossary.xml#genus" format="dita">genus</xref>
+   <b>Galanthus</b>, a small genus of about 20 species in the family
+    <b><?oxy_comment_start author="Tom" timestamp="20120601T164618+0300" comment="Please check the spelling of the Latin names."?>Amaryllidaceae<?oxy_comment_end?></b>;
+   snowdrops are among the first <xref href="../concepts/glossary.xml#bulb" format="dita"
+    >bulbs</xref> to bloom in spring, although
+   <?oxy_comment_start author="Mary" timestamp="20120601T164940+0300" comment="Which ones? An example would be great."?>certain
+   species<?oxy_comment_end?> flower in late autumn and
+   winter<?oxy_comment_start author="John" timestamp="20120510T122717+0300" comment="We could add a phrase with information about snowdrop propagation."?>.<?oxy_comment_end?></p><image href="../images/Snowdrop.jpg" scale="75"/><p><b>Galanthus nivalis</b> is the
+   best-known and most widespread representative of the genus <b>Galanthus</b>. It is native to a
+   large area of Europe, stretching from the Pyrenees in the west, through France and Germany to
+   Poland in the north, Italy, Northern Greece and European Turkey. It has been introduced and is
+   widely naturalised elsewhere. Although it is often thought of as a British native wild flower, or
+   to have been brought to the British Isles by the Romans, it was probably introduced around the
+   early sixteenth century.</p><p>All species of <b>Galanthus</b> are <xref
+    href="../concepts/glossary.xml#perennial" format="dita">perennial</xref>, herbaceous plants
+   which grow from bulbs. The flower has no petals: it consists of six tepals, the outer three being
+   larger and more convex than the inner series. An important feature which helps to distinguish
+   between species (and to help to determine the parentage of hybrids) is their "<i>vernation</i>"
+   (the arrangement of the emerging leaves relative to each other). This can be "<i>applanate</i>",
+    "<i>supervolute</i>" or "<i>explicative</i>". In <i>applanate vernation</i> the two leaf blades
+   are pressed flat to each other within the bud and as they emerge; explicative leaves are also
+   pressed flat against each other, but the edges of the leaves are folded back or sometimes rolled;
+   in <i>supervolute</i> plants one leaf is tightly clasped around the other within the bud and
+   generally remains at the point where the leaves emerge from the soil.</p></body>
+ <related-links>
+  <link href="iris.xml#topic-1"/>
+ </related-links>
+</topic>

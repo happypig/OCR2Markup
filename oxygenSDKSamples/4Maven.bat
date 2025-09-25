@@ -1,0 +1,1 @@
+mvn org.apache.maven.plugins:maven-archetype-plugin:2.4:generate -DarchetypeGroupId=com.oxygenxml.samples -DarchetypeArtifactId=oxygen-sdk-samples-archetype -DarchetypeVersion=27.1.0.3 -DgroupId=dila -DartifactId=explore -Dversion=1.0-SNAPSHOT -DarchetypeRepository=https://oxygenxml.com/maven/

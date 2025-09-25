@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The plugin.dtd file is located in the OXYGEN_INSATALL_DIR/plugins directory -->
+<!DOCTYPE plugin SYSTEM "../plugin.dtd">
+
+<plugin
+    id="com.oxygenxml.plugin.FormWords"
+    name="Form Words"
+    description="Convert the first letter of each word to uppercase"
+    version="${project.nosnapshot.version}"
+    vendor="Syncro Soft"
+    class="dila.formwords.FormWordsPlugin"
+    classLoaderType="preferReferencedResources">
+    <runtime>
+        <library name="lib/${project.build.finalName}.jar"/>
+    </runtime>
+    <extension type="selectionProcessor" 
+    class="dila.formwords.FormWordsPluginExtension"/>
+</plugin>

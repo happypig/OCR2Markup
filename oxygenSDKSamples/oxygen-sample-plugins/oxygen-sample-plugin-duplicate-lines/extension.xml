@@ -1,0 +1,25 @@
+<xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
+ id="com.oxygenxml.plugin.DuplicateLines">
+ <xt:location href="${project.build.finalName}-plugin.jar"/>
+ <xt:version>${project.parent.version}.0</xt:version>
+ <xt:oxy_version>${project.parent.version}</xt:oxy_version>
+ <xt:type>plugin</xt:type>
+ <xt:author>Syncro Soft</xt:author>
+ <xt:name>DuplicateLine</xt:name>
+ <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
+   <head>
+    <title> Sample XML duplicate lines plugin </title>
+   </head>
+   <body>
+    <div>
+     <p>This plugin duplicates the current line.</p>
+     <p>After installing the plugin it can be accessed through the editor's contextual menu by
+      choosing <b>Plugins->Duplicate Line Up/Duplicate Line Down</b>.</p>
+    </div>
+   </body>
+  </html>
+ </xt:description>
+ <xt:license><![CDATA[(c) Syncro Soft SRL, All rights reserved.
+This Plug-In is part of the Oxygen XML Software and, as such, is part of the License Agreement governing the Oxygen XML Software.
+]]></xt:license>
+</xt:extension>

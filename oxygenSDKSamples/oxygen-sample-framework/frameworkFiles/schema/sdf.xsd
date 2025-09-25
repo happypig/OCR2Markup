@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.oxygenxml.com/sample/documentation"
+    xmlns:doc="http://www.oxygenxml.com/sample/documentation"
+    xmlns:abs="http://www.oxygenxml.com/sample/documentation/abstracts"
+    elementFormDefault="qualified">
+    <xs:import namespace="http://www.oxygenxml.com/sample/documentation/abstracts"
+        schemaLocation="abs.xsd"/>
+    <xs:element name="book" type="doc:articleType"/>
+    <xs:element name="article" type="doc:articleType"/>
+    <xs:element name="section" type="doc:sectionType"/>
+    <xs:complexType name="sectionType">
+        <xs:complexContent>
+            <xs:restriction base="doc:articleType">
+                <xs:sequence>
+                    <xs:element name="title" type="xs:string"/>
+                    <xs:element ref="abs:def" minOccurs="0"/>
+                    <xs:choice>
+                        <xs:sequence>
+                            <xs:element ref="doc:section" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                        <xs:choice maxOccurs="unbounded">
+                            <xs:element ref="doc:para"/>
+                            <xs:element ref="doc:ref"/>
+                            <xs:element ref="doc:image"/>
+                            <xs:element ref="doc:table"/>
+                        </xs:choice>
+                    </xs:choice>
+                </xs:sequence>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="para" type="doc:paragraphType"/>
+    <xs:complexType name="paragraphType" mixed="true">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="b"/>
+            <xs:element name="i"/>
+            <xs:element name="link"/>
+        </xs:choice>
+    </xs:complexType>
+    <xs:element name="ref">
+        <xs:complexType>
+            <xs:attribute name="location" type="xs:anyURI" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="image">
+        <xs:complexType>
+            <xs:attribute name="href" type="xs:anyURI" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="table">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element form="qualified" minOccurs="0" name="title" type="xs:string"/>
+                <xs:element name="customcol" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:attribute name="width" type="xs:string"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="header" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="td" maxOccurs="unbounded" type="doc:paragraphType"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="tr" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="td" type="doc:tdType" maxOccurs="unbounded"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute name="width" type="xs:string"/>
+            <xs:attribute name="bgcolor" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="tdType">
+        <xs:complexContent>
+            <xs:extension base="doc:paragraphType">
+                <xs:attribute name="row_span" type="xs:integer"/>
+                <xs:attribute name="column_span" type="xs:integer"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="articleType">
+        <xs:sequence>
+            <xs:element name="title" type="xs:string"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="author">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="name"/>
+                        <xs:element name="country"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element ref="abs:def" minOccurs="0"/>
+            <xs:choice>
+                <xs:sequence>
+                    <xs:element ref="doc:section" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:choice maxOccurs="unbounded">
+                    <xs:element ref="doc:para"/>
+                    <xs:element ref="doc:ref"/>
+                    <xs:element ref="doc:image"/>
+                    <xs:element ref="doc:table"/>
+                </xs:choice>
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

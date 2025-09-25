@@ -1,0 +1,29 @@
+<xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension" id="com.oxygenxml.plugin.ZeroIndent">
+    <xt:location href="${project.build.finalName}-plugin.jar"/>
+    <xt:version>${project.parent.version}.0</xt:version>
+    <xt:oxy_version>${project.parent.version}</xt:oxy_version>
+    <xt:type>plugin</xt:type>
+    <xt:author>Syncro Soft</xt:author>
+    <xt:name>ZeroIndent</xt:name>
+    <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                <title>Zero Indent plugin</title>
+            </head>
+            <body>
+                <p>This plugin removes the whitespaces that start each of the selected line. After
+                    installing the plugin it can be accessed through the editor's contextual menu by
+                    choosing <b>Plugins->Zero Indent</b>.</p>
+                <p>Example:</p>
+                <pre>
+Input:
+	This is a sample.
+Result: 
+This is a sample.
+</pre>
+            </body>
+        </html>
+    </xt:description>
+    <xt:license><![CDATA[(c) Syncro Soft SRL, All rights reserved.
+This Plug-In is part of the Oxygen XML Software and, as such, is part of the License Agreement governing the Oxygen XML Software.
+]]></xt:license>
+</xt:extension>

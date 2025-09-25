@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>oXygen Sample Eclipse Plugin</title>
+  </head>
+  <body>
+    <h1>Extending the oXygen XML Editor Plugin for Eclipse</h1>
+    <p>This project can be used as a starting point for creating an Eclipse IDE plug-in that extends
+      the oXygen plug-in for Eclipse. </p>
+    <p>You have samples for adding custom actions to the toolbar and contextual menu, about creating
+      a custom view and accessing the API behind the oXygen Author mode. </p>
+    <p>This sample Eclipse plugin extends oXygen in the following extension points:</p>
+    <pre>
+   com.oxygenxml.editor.actionBarContributorCustomizer
+   org.eclipse.ui.views
+    </pre>
+    <section>
+      <h2>Source code</h2>
+      <table>
+        <col width="58%" />
+        <col width="42%" />
+        <tr>
+          <td>dila.eclipse.SampleView</td>
+          <td>Starting from it, you can check which pages are active in the opened XML editors,
+            modify them or add listeners to notify custom views which can provide additional context
+            information. It is possible to access the document model from the Author page directly
+            from your plugin, using most of the Authoring API.</td>
+        </tr>
+        <tr>
+          <td>dila.eclipse.action.CustomActionBarContributorCustomizerImpl</td>
+          <td>Showcases adding actions in the oXygen text page contextual menus, in oXygen toolbar
+            and author's Outline view.</td>
+        </tr>
+        <tr></tr>
+      </table>
+      <p>The extension points are referenced in the plugin.xml file.</p>
+    </section>
+    <section>
+      <h2>How to build the project</h2>
+      <p>If you want to use this project from Eclipse, or you need to build against a newer version
+        of Eclipse: </p>
+      <ol>
+        <li>make sure you have installed Oxygen XML Editor plugin in your development Eclipse
+          IDE.</li>
+        <li>remove the "org.eclipse*" dependencies from the pom.xml file.</li>
+        <li>convert the project to a plug-in project (in Eclipse, from the project contextual menu:
+          "Configure/Convert to Plug-in Projects"),</li>
+      </ol>
+      <p><b>Note:</b> This project may be built in the absence of an Eclipse IDE, by use the
+        command:</p>
+      <pre>mvn install</pre>
+      <p>The jar file from the <code>target</code> directory can be copied in the
+          <code>dropins</code> folder of an Eclipse installation.</p>
+      <p><b>Note:</b> At build time, the <code>META-INF/MANIFEST.MF</code> file has some of its
+        fields replaced with values from the <code>pom.xml</code> (bundle name, bundle version,
+        bundle vendor). For the rest of the values make sure you keep them in sync in the two files,
+        or adapt the pom.xml to replace others too. </p>
+    </section>
+    <p> </p>
+  </body>
+</html>

@@ -1,0 +1,145 @@
+/* Element from another namespace */
+@namespace abs "http://www.oxygenxml.com/sample/documentation/abstracts";
+
+abs|def{
+    font-family:monospace;
+    font-size:smaller;    
+}
+abs|def:before{
+    content:"Definition:";
+    color:gray;
+}
+
+/* Vertical flow */
+book,
+section,
+para,
+title,
+image,
+ref {
+    display:block;
+}
+
+/* Horizontal flow */
+b,i {
+    display:inline;
+}
+
+section{
+    margin-left:1em;
+    margin-top:1em;
+}
+
+section{
+    -oxy-foldable:true;
+    -oxy-not-foldable-child: title;
+}
+
+link[href]:before{
+    display:inline;
+    link:attr(href);
+    content: "Click to open: " attr(href);
+}
+
+link:before {
+    content:oxy_link-text();
+}
+
+/* Title rendering*/
+title{
+    font-size: 2.4em;
+    font-weight:bold;    
+}
+
+* * title{
+    font-size: 2.0em;
+}
+* * * title{
+    font-size: 1.6em;
+}
+* * * * title{
+    font-size: 1.2em;
+}
+
+book, 
+article{
+    counter-reset:sect;
+}
+book > section,
+article > section{
+    counter-increment:sect;
+}
+book > section > title:before,
+article > section > title:before{
+    content: "Section: " counter(sect) " ";
+}
+
+/* Inlines rendering*/
+b {
+    font-weight:bold;
+}
+
+i {
+    font-style:italic;
+}
+
+/*Table rendering */
+table{
+    display:table;
+    border:1px solid navy;
+    margin:1em;
+    max-width:1000px;
+    min-width:150px;
+}
+
+table[width]{
+  width:attr(width, length);
+}
+
+table[bgcolor],
+tr[bgcolor],
+td[bgcolor]{
+    background-color:attr(bgcolor);
+    color:inherit;
+}
+
+tr, header{
+    display:table-row;
+}
+
+customcol {
+    text-align:left;
+    display:block;
+    color:#444444;
+    background-color:inherit;
+    margin:0.2em;
+    padding:2px;
+    font-family:monospace;
+    font-size:small;    
+}
+
+header{
+    background-color: silver;
+    color:inherit
+}
+
+td{
+  display:table-cell;
+  border:1px solid navy;
+  padding:1em;
+}
+
+image{
+    display:block;
+    content: attr(href, url);
+    margin-left:2em;
+}
+
+author, name, country {
+    display:block;
+    margin-left:20px;
+}
+
+name:before {
+    content: oxy_label(text, "Author: ", width, 100px, color, gray);
+}

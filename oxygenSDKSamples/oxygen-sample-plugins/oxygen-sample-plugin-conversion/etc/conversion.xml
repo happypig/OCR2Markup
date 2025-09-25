@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE converter-config SYSTEM "conversion.dtd">
+<!-- This file will define the converter configuration -->
+<converter-config>
+    <!-- Labels for internationalization-->
+    <labels>
+        <label key="Format" value="Format"/>
+        <label key="Master system" value="U.S. System"/>
+        <label key="Slave system" value="Metric System"/>
+        <label key="Copy value and close" value="Copy value and close"/>
+        <label key="Include labels" value="Include labels"/>
+        <label key="Swap values" value="Swap values"/>
+        <label key="Decimals override" value="Decimals Override"/>
+        <label key="Type" value="Type"/>
+    </labels>
+    <!-- Default values -->
+    <defaults>
+        <defaultvalue key="Lock labels" value="true"/>
+    </defaults>
+    <!-- Torque Conversion Factors -->
+    <entries format="Torque">
+        <!-- Foot - pounds => Newton Meters -->
+        <entry>
+            <s1Value>Foot-pounds</s1Value>
+            <s1Label>ft-lbs.</s1Label>
+            <s2Value>Newton Meters</s2Value>
+            <s2Label>Nm.</s2Label>
+            <conversionFactor>1.355867</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+        <!-- Inch - pounds => Newton Meters -->
+        <entry>
+            <s1Value>Inch-pounds</s1Value>
+            <s1Label>in-lbs.</s1Label>
+            <s2Value>Newton Meters</s2Value>
+            <s2Label>Nm.</s2Label>
+            <conversionFactor>0.112982</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+    </entries>
+    <!-- Length Conversion Factors -->
+    <entries format="Length">
+        <!-- -->
+        <entry>
+            <s1Value>Inches</s1Value>
+            <s1Label>in.</s1Label>
+            <s2Value>Millimeters</s2Value>
+            <s2Label>mm.</s2Label>
+            <conversionFactor>25.4</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+        <!-- -->
+        <entry>
+            <s1Value>Inches</s1Value>
+            <s1Label>in.</s1Label>
+            <s2Value>Centimeters</s2Value>
+            <s2Label>cm.</s2Label>
+            <conversionFactor>2.54</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+        <!-- -->
+        <entry>
+            <s1Value>Inches</s1Value>
+            <s1Label>in.</s1Label>
+            <s2Value>Meters</s2Value>
+            <s2Label>m.</s2Label>
+            <conversionFactor>0.0254</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+        <!-- -->
+        <entry>
+            <s1Value>Foot</s1Value>
+            <s1Label>ft.</s1Label>
+            <s2Value>Meters</s2Value>
+            <s2Label>m.</s2Label>
+            <conversionFactor>0.3048</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+        <!-- -->
+        <entry>
+            <s1Value>Yard</s1Value>
+            <s1Label>yd.</s1Label>
+            <s2Value>Meters</s2Value>
+            <s2Label>m.</s2Label>
+            <conversionFactor>0.9144</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+        <!-- -->
+        <entry>
+            <s1Value>Miles</s1Value>
+            <s1Label>mi.</s1Label>
+            <s2Value>Kilometers</s2Value>
+            <s2Label>km.</s2Label>
+            <conversionFactor>1.609347</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+    </entries>
+    <!-- Volume Conversion Factors -->
+    <entries format="Fluid Volume">
+        <!-- -->
+        <entry>
+            <s1Value>Quarts</s1Value>
+            <s1Label>qt.</s1Label>
+            <s2Value>Liters</s2Value>
+            <s2Label>l.</s2Label>
+            <conversionFactor>0.946</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+        <!-- -->
+        <entry>
+            <s1Value>Fluid ounces</s1Value>
+            <s1Label>fl. oz.</s1Label>
+            <s2Value>Milliliter</s2Value>
+            <s2Label>ml.</s2Label>
+            <conversionFactor>29.57353</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+        <!-- -->
+        <entry>
+            <s1Value>Pints</s1Value>
+            <s1Label>pt.</s1Label>
+            <s2Value>Liters</s2Value>
+            <s2Label>l.</s2Label>
+            <conversionFactor>0.47305</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+        <!-- -->
+        <entry>
+            <s1Value>Gallons</s1Value>
+            <s1Label>gal.</s1Label>
+            <s2Value>Liters</s2Value>
+            <s2Label>l.</s2Label>
+            <conversionFactor>3.785</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+    </entries>
+    <!-- Temperature Conversion Factors -->
+    <entries format="Temperature">
+        <entry>
+            <s1Value>Fahrenheit</s1Value>
+            <s1Label>F</s1Label>
+            <s2Value>Celsius</s2Value>
+            <s2Label>C</s2Label>
+            <!-- Support for formulas like: s2=(s1-v1)/v2 -->
+            <conversionFormula>
+                <v1>32</v1>
+                <v2>1.8</v2>
+            </conversionFormula>
+            <decimals>-1</decimals>
+        </entry>
+    </entries>
+    <!-- Power Conversion Factors -->
+    <entries format="Velocity">
+        <entry>
+            <s1Value>Miles Per Hour</s1Value>
+            <s1Label>MPH</s1Label>
+            <s2Value>Kilometers Per Hour</s2Value>
+            <s2Label>kph</s2Label>
+            <conversionFactor>1.60934</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+    </entries>
+    <!-- Pressure or Stress Conversion Factors  -->
+    <entries format="Pressure">
+        <entry>
+            <s1Value>PSI</s1Value>
+            <s1Label>PSI</s1Label>
+            <s2Value>bars</s2Value>
+            <s2Label>bars</s2Label>
+            <conversionFactor>0.068948</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+        <entry>
+            <s1Value>PSI</s1Value>
+            <s1Label>PSI</s1Label>
+            <s2Value>kPa</s2Value>
+            <s2Label>kPa</s2Label>
+            <conversionFactor>6.8948</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+    </entries>
+    <!-- Mass Conversion Factors -->
+    <entries format="Mass">
+        <entry>
+            <s1Value>Pound</s1Value>
+            <s1Label>lb.</s1Label>
+            <s2Value>Kilograms</s2Value>
+            <s2Label>kg.</s2Label>
+            <conversionFactor>0.4535924</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+        <entry>
+            <s1Value>Ounce</s1Value>
+            <s1Label>oz.</s1Label>
+            <s2Value>Grams</s2Value>
+            <s2Label>g</s2Label>
+            <conversionFactor>28.34952</conversionFactor>
+            <decimals>-1</decimals>
+        </entry>
+    </entries>
+</converter-config>

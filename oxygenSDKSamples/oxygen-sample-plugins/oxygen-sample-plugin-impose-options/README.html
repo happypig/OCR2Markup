@@ -1,0 +1,27 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Impose Options Plugin</title>
+    </head>
+    <body>
+        <div>
+            <p>This plugin imposes options and layouts to oXygen. </p>
+            <p>Once installed, the plugin:</p>
+            <ol>
+            	<li>adds the file templates from the "templates" directory to the oXygen "New templates" templates.</li>
+            	<li>applies the options from the "options.xml" file to oXygen options, at the first start after plugin is installed.</li>
+            	<li>applies the layout from the "application.layout" file to oXygen as a fixed layout, at each application start.</li>            		            		
+            </ol>
+            <p>This plugin uses the following API:</p>        
+            <pre>ro.sync.exml.options.PerspectivesLayoutInfo;
+ro.sync.exml.plugin.workspace.WorkspaceAccessPluginExtension;
+ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;</pre>
+            <p><b>Note:</b> To configure the templates, make a <code>templates</code> directory in
+                the plugin's main directory and copy here the files you intend to use as
+                templates.</p>
+            <p><b>Note:</b> To create an <code>options.xml</code> file, use the action <code>Export
+                    Global Options..</code> from the oXygen <code>Options</code> menu. Export this file to the plugin's main directory and edit it as needed.</p>
+            <p><b>Note:</b> To create an <code>application.layout</code> file, use the action
+                    <code>Save Layout..</code> from the oXygen <code>Window</code> menu. Save this file into the plugin's main directory and edit it as needed.</p>            
+        </div>
+    </body>
+</html>

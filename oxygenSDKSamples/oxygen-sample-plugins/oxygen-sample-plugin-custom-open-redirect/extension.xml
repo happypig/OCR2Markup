@@ -1,0 +1,39 @@
+<xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
+    id="com.oxygenxml.plugin.CustomOpenRedirect">
+    <xt:location href="${project.build.finalName}-plugin.jar"/>
+    <xt:version>${project.parent.version}.0</xt:version>
+    <xt:oxy_version>${project.parent.version}</xt:oxy_version>
+    <xt:type>plugin</xt:type>
+    <xt:author>Syncro Soft</xt:author>
+    <xt:name>CustomOpenRedirect</xt:name>
+    <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                <title>Sample Open Redirect plugin</title>
+            </head>
+            <body>
+                <div>
+                    <p> This plugin installs a redirect handler for an URL opened in &lt;oXygen.
+                        Such a plugin must provide an implementation of
+                        ro.sync.exml.plugin.openredirect.OpenRedirectExtension which can redirect
+                        opened URLs in Oxygen.</p>
+                </div>
+                <div>
+                    <p>How the plugin works:</p>
+                    <ol>
+                        <li>You can decide that when a ZIP archive gets opened a file from the
+                            archive must be automatically opened as well.</li>
+                        <li>When a SVG gets opened it is opened both in the main editor and in the
+                            image previewer.</li>
+                        <li>Open a totally different location from the original selected URL.</li>
+                    </ol>
+                </div>
+                <p> For more information: <a
+                        href="http://www.oxygenxml.com/doc/ug-oxygen/index.html?q=/doc/ug-oxygen/concepts/open-redirect-plugin.html"
+                        >http://www.oxygenxml.com/doc/ug-oxygen/index.html?q=/doc/ug-oxygen/concepts/open-redirect-plugin.html</a></p>
+            </body>
+        </html>
+    </xt:description>
+    <xt:license><![CDATA[(c) Syncro Soft SRL, All rights reserved.
+This Plug-In is part of the Oxygen XML Software and, as such, is part of the License Agreement governing the Oxygen XML Software.
+]]></xt:license>
+</xt:extension>

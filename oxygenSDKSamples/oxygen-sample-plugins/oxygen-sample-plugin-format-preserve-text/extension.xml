@@ -1,0 +1,40 @@
+<xt:extension xmlns:xt="http://www.oxygenxml.com/ns/extension"
+    id="com.oxygenxml.plugin.FormatPreserveText">
+    <xt:location href="${project.build.finalName}-plugin.jar"/>
+    <xt:version>${project.parent.version}.0</xt:version>
+    <xt:oxy_version>${project.parent.version}</xt:oxy_version>
+    <xt:type>plugin</xt:type>
+    <xt:author>Syncro Soft</xt:author>
+    <xt:name>FormatPreserveText</xt:name>
+    <xt:description><html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                <title>Sample XML format with text preserve plugin</title>
+            </head>
+            <body>
+                <div>
+                    <p> This plugin formats the selected XML content by breaking only in element
+                        tags and never in text. Example: </p>
+                    <p> After installing the plugin it can be accessed through the editor's
+                        contextual menu by choosing <b>Plugins->Format with text preserve</b>.</p>
+                    <pre>
+Input:
+	&lt;root&gt;&lt;a&gt;&lt;b&gt;&lt;/b&gt;&lt;c&gt;&lt;/c&gt;&lt;/a&gt;&lt;/root&gt;
+Result:
+	&lt;root
+&gt;&lt;a
+&gt;&lt;b
+&gt;&lt;/b
+&gt;&lt;c
+&gt;&lt;/c
+&gt;&lt;/a
+&gt;&lt;/root
+&gt;
+</pre>
+                </div>
+            </body>
+        </html>
+    </xt:description>
+    <xt:license><![CDATA[(c) Syncro Soft SRL, All rights reserved.
+This Plug-In is part of the Oxygen XML Software and, as such, is part of the License Agreement governing the Oxygen XML Software.
+]]></xt:license>
+</xt:extension>

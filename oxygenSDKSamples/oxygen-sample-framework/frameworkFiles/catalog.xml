@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <system
+        systemId="http://www.oxygenxml.com/SDF/sdf.xsd"
+        uri="schema/sdf.xsd"/>
+    <system
+        systemId="http://www.oxygenxml.com/SDF/abs.xsd"
+        uri="schema/abs.xsd"/>
+</catalog>

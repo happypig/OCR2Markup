@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<plugin>
+    <extension point="com.oxygenxml.editor.actionBarContributorCustomizer">
+ 		<implementation class="dila.eclipse.action.CustomActionBarContributorCustomizerImpl"/>;
+ 	</extension>
+    
+    <!-- A sample view which accesses functionality from the opened XML Editors.-->
+    <extension point="org.eclipse.ui.views">
+     		<view class="dila.eclipse.SampleView"
+      		icon="images/View16.gif"
+      		id="dila.eclipse.SampleView" 
+      		name="Sample View"/>
+    </extension>
+	<!-- TODO We should add an example using the author API. -->
+     
+</plugin>
