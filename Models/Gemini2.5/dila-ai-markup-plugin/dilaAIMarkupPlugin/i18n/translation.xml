@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<translation>
+  <languageList>
+    <language description="English US" lang="en_US"/>
+    <language description="中文" lang="zh_CN"/>
+    <language description="繁體中文" lang="zh_TW"/>
+  </languageList>
+  <key value="actions.menu">
+    <val lang="en_US">Actions</val>
+    <val lang="zh_CN">標記功能</val>
+    <val lang="zh_TW">標記功能</val>
+  </key>
+  <key value="ai.markup.action">
+    <val lang="en_US">AI Markup</val>
+    <val lang="zh_CN">AI 標記</val>
+    <val lang="zh_TW">AI 標記</val>
+  </key>
+  <key value="tag.removal.action">
+    <val lang="en_US">Tag Removal</val>
+    <val lang="zh_CN">移除標籤</val>
+    <val lang="zh_TW">移除標籤</val>
+  </key>
+  <key value="options.menu">
+    <val lang="en_US">Options</val>
+    <val lang="zh_CN">選項</val>
+    <val lang="zh_TW">選項</val>
+  </key>
+  <key value="preferences.action">
+    <val lang="en_US">Preferences...</val>
+    <val lang="zh_CN">偏好設定...</val>
+    <val lang="zh_TW">偏好設定...</val>
+  </key>
+  <key value="initial.info">
+    <val lang="en_US">Please select a function from the Actions menu, or select Preferences from the Options menu to configure parameters.</val>
+    <val lang="zh_CN">請從「標記功能」菜單選擇功能，或從「選項」菜單選擇「偏好設定」以設定參數。</val>
+    <val lang="zh_TW">請從「標記功能」菜單選擇功能，或從「選項」菜單選擇「偏好設定」以設定參數。</val>
+  </key>
+  <key value="replace.button">
+    <val lang="en_US">Replace</val>
+    <val lang="zh_CN">替換</val>
+    <val lang="zh_TW">替換</val>
+  </key>
+  <key value="view.title">
+    <val lang="en_US">DILA AI Markup Assistant</val>
+    <val lang="zh_CN">DILA AI 標記助手</val>
+    <val lang="zh_TW">DILA AI 標記助手</val>
+  </key>
+  <key value="action.ai.markup.selected">
+    <val lang="en_US">Action selected: AI Markup (Use AI for reference tagging)\n</val>
+    <val lang="zh_CN">選取標記功能：AI 標記 (用 AI 來標記選取的參照文字)\n</val>
+    <val lang="zh_TW">選取標記功能：AI 標記 (用 AI 來標記選取的參照文字)\n</val>
+  </key>
+  <key value="system.prompt.ai.markup">
+    <val lang="en_US">Please add XML tags for all sutra, volume, page, column, and line references related to "sutra references" in the selected text.</val>
+    <val lang="zh_CN">請將選取文字中，只要與「藏經參照」相關的藏經、冊、頁、欄、行等均標上 XML 標籤。</val>
+    <val lang="zh_TW">請將選取文字中，只要與「藏經參照」相關的藏經、冊、頁、欄、行等均標上 XML 標籤。</val>
+  </key>
+  <key value="llm.error">
+    <val lang="en_US">\nError calling language model: </val>
+    <val lang="zh_CN">\n呼叫語言模型發生錯誤: </val>
+    <val lang="zh_TW">\n呼叫語言模型發生錯誤: </val>
+  </key>
+  <key value="text.replaced">
+    <val lang="en_US">\nSelected text has been replaced.</val>
+    <val lang="zh_CN">\n選取文字已替換。</val>
+    <val lang="zh_TW">\n選取文字已替換。</val>
+  </key>
+  <key value="text.mode.not.active.for.replace">
+    <val lang="en_US">\nText mode editor is not open. Please switch to text mode to use this feature.</val>
+    <val lang="zh_CN">\n文字模式編輯器未開啟，請切換到文字模式再使用。</val>
+    <val lang="zh_TW">\n文字模式編輯器未開啟，請切換到文字模式再使用。</val>
+  </key>
+  <key value="error.replacing.text">
+    <val lang="en_US">\nError during text replacement: </val>
+    <val lang="zh_CN">\n替換文字時發生錯誤: </val>
+    <val lang="zh_TW">\n替換文字時發生錯誤: </val>
+  </key>
+  <key value="text.editor.not.open">
+    <val lang="en_US">\nText mode editor is not open.</val>
+    <val lang="zh_CN">\nText 模式編輯器未開啟。</val>
+    <val lang="zh_TW">\nText 模式編輯器未開啟。</val>
+  </key>
+  <key value="no.text.to.replace">
+    <val lang="en_US">\nNo text to replace.</val>
+    <val lang="zh_CN">\n無文字可替換。</val>
+    <val lang="zh_TW">\n無文字可替換。</val>
+  </key>
+  <key value="action.tag.removal.selected">
+    <val lang="en_US">Action selected: Tag Removal (Remove tags from selected text).\n</val>
+    <val lang="zh_CN">選取標記功能： 移除標籤(移除選取參照文字的標記)。\n</val>
+    <val lang="zh_TW">選取標記功能： 移除標籤(移除選取參照文字的標記)。\n</val>
+  </key>
+  <key value="action.settings.selected">
+    <val lang="en_US">Option selected: Settings for fine-tuning model and API Key parameters.</val>
+    <val lang="zh_CN">選取選項：設定微調模型與 API 金鑰參數。</val>
+    <val lang="zh_TW">選取選項：設定微調模型與 API 金鑰參數。</val>
+  </key>
+  <key value="selected.text.label">
+    <val lang="en_US">\nSelected text: </val>
+    <val lang="zh_CN">\n選取文字: </val>
+    <val lang="zh_TW">\n選取文字: </val>
+  </key>
+  <key value="no.text.selected">
+    <val lang="en_US">\nNo text selected in the editor.</val>
+    <val lang="zh_CN">\n編輯器內未選取文字。</val>
+    <val lang="zh_TW">\n編輯器內未選取文字。</val>
+  </key>
+  <key value="not.text.mode">
+    <val lang="en_US">\nCurrent page is not a Text mode editor.</val>
+    <val lang="zh_CN">\n當前頁面不是Text模式編輯器。</val>
+    <val lang="zh_TW">\n當前頁面不是Text模式編輯器。</val>
+  </key>
+  <key value="no.editor.open">
+    <val lang="en_US">\nNo open Text mode editor.</val>
+    <val lang="zh_CN">\n目前沒有開啟的Text模式編輯器。</val>
+    <val lang="zh_TW">\n目前沒有開啟的Text模式編輯器。</val>
+  </key>
+  <key value="ft.parse.model.label">
+    <val lang="en_US">Parsing model:</val>
+    <val lang="zh_CN">解析參照模型：</val>
+    <val lang="zh_TW">解析參照模型：</val>
+  </key>
+  <key value="ft.detect.model.label">
+    <val lang="en_US">Detection model:</val>
+    <val lang="zh_CN">偵測參照模型：</val>
+    <val lang="zh_TW">偵測參照模型：</val>
+  </key>
+  <key value="api.key.label">
+    <val lang="en_US">API Key*: </val>
+    <val lang="zh_CN">API 金鑰*： </val>
+    <val lang="zh_TW">API 金鑰*： </val>
+  </key>
+  <key value="options.panel.title">
+    <val lang="en_US">DILA AI Markup Assistant Settings</val>
+    <val lang="zh_CN">DILA AI標記助手設定</val>
+    <val lang="zh_TW">DILA AI標記助手設定</val>
+  </key>
+  <key value="options.info">
+    <val lang="en_US">Configure the OpenAI models and API key used for reference parsing and detection. The parsing model processes selected text to add XML markup tags, while the detection model identifies potential references. Your API key is stored locally with basic encoding for security.</val>
+    <val lang="zh_CN">設定用於參照解析和偵測的OpenAI模型和API金鑰。解析模型處理選取文字以添加XML標記標籤，偵測模型識別潛在參照。您的API金鑰會以基本編碼方式儲存在本機以確保安全。</val>
+    <val lang="zh_TW">設定用於參照解析和偵測的OpenAI模型和API金鑰。解析模型處理選取文字以添加XML標記標籤，偵測模型識別潛在參照。您的API金鑰會以基本編碼方式儲存在本機以確保安全。</val>
+  </key>
+  <key value="options.saved.successfully">
+    <val lang="en_US">Options saved successfully.</val>
+    <val lang="zh_CN">選項已成功儲存。</val>
+    <val lang="zh_TW">選項已成功儲存。</val>
+  </key>
+  <key value="options.saved.failed">
+    <val lang="en_US">Failed to save options.</val>
+    <val lang="zh_CN">儲存選項失敗。</val>
+    <val lang="zh_TW">儲存選項失敗。</val>
+  </key>
+  <key value="save.button">
+    <val lang="en_US">Save</val>
+    <val lang="zh_CN">儲存</val>
+    <val lang="zh_TW">儲存</val>
+  </key>
+</translation>

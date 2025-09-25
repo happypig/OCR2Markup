@@ -56,10 +56,7 @@ public class DAMAWorkspaceAccessOptionPagePluginExtension extends OptionPagePlug
    */
   private JTextField apiKeyTextField;
 
-  /**
-   * Resource bundle for i18n support.
-   */
-  private PluginResourceBundle resources;
+
 
   /**
    * @see ro.sync.exml.plugin.option.OptionPagePluginExtension#apply(ro.sync.exml.workspace.api.PluginWorkspace)
@@ -99,9 +96,7 @@ public class DAMAWorkspaceAccessOptionPagePluginExtension extends OptionPagePlug
    */
   @Override
   public JComponent init(final PluginWorkspace pluginWorkspace) {
-    
-    // Store the resource bundle as an instance variable
-    this.resources = pluginWorkspace.getResourceBundle();
+
 
     GridBagConstraints c = new GridBagConstraints();
     JPanel panel = new JPanel(new GridBagLayout());
@@ -164,7 +159,6 @@ public class DAMAWorkspaceAccessOptionPagePluginExtension extends OptionPagePlug
     String apiKey = pluginWorkspace.getOptionsStorage().getOption(
         KEY_DILA_DAMA_API_KEY,
         null);
-        null);
     
     // Initialize the text fields with the stored options.
     parseModelTextField.setText(ftParseModel != null ? ftParseModel : "");
@@ -180,7 +174,17 @@ public class DAMAWorkspaceAccessOptionPagePluginExtension extends OptionPagePlug
    * @return the localized message
    */
   private String getMessage(String key) {
-    return resources != null ? resources.getMessage(key) : key;
+    // Simplified hardcoded strings for now
+    switch (key) {
+      case "ft.parse.model.label":
+        return "FT Parse Model:";
+      case "ft.detect.model.label":
+        return "FT Detect Model:";
+      case "api.key.label":
+        return "API Key:";
+      default:
+        return key;
+    }
   }
 
   /**

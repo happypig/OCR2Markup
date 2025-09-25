@@ -43,10 +43,10 @@
     </dependency>
     <!-- If you need MathFlow rendering, the best is to import the MathFlow 
       SDK jars as artifacts in your Maven repository and add dependencies here. -->
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.13.2</version>
-      <scope>test</scope>
       <scope>test</scope>
     </dependency>
 
@@ -104,6 +104,26 @@
           <target>1.8</target>
           <debug>true</debug>
         </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.6.0</version>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>install</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
+              <finalName>dilaAIMarkupPlugin</finalName>
+              <appendAssemblyId>false</appendAssemblyId>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
     <pluginManagement>
