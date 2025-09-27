@@ -11,7 +11,9 @@ import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 
 import ro.sync.exml.plugin.option.OptionPagePluginExtension;
+import ro.sync.exml.workspace.api.PluginResourceBundle;
 import ro.sync.exml.workspace.api.PluginWorkspace;
+import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 
 /**
  * Plugin option page extension Custom Workspace Access Plugin Extension.
@@ -59,9 +61,10 @@ public class DAMAWorkspaceAccessOptionPagePluginExtension extends OptionPagePlug
    */
   private JTextField apiKeyTextField;
 
-
-
-
+  /**
+   * Resource bundle for i18n support.
+   */
+  private PluginResourceBundle resources;
 
   /**
    * @see ro.sync.exml.plugin.option.OptionPagePluginExtension#apply(ro.sync.exml.workspace.api.PluginWorkspace)
@@ -194,103 +197,122 @@ public class DAMAWorkspaceAccessOptionPagePluginExtension extends OptionPagePlug
         return createSimplePanel("Options storage not available");
       }
 
+      // Store the resource bundle as an instance variable
+      // According to Oxygen SDK, cast to StandalonePluginWorkspace to access getResourceBundle()
+      try {
+        if (pluginWorkspace instanceof StandalonePluginWorkspace) {
+          this.resources = ((StandalonePluginWorkspace) pluginWorkspace).getResourceBundle();
+          if (this.resources != null) {
+            System.out.println("DILA Plugin: Resource bundle loaded successfully");
+          } else {
+            System.err.println("DILA Plugin: Resource bundle is null - i18n translations may not work");
+          }
+        } else {
+          System.err.println("DILA Plugin: PluginWorkspace is not StandalonePluginWorkspace - cannot access resource bundle");
+          this.resources = null;
+        }
+      } catch (Exception e) {
+        System.err.println("DILA Plugin: Failed to load resource bundle: " + e.getMessage());
+        this.resources = null;
+      }
+
       GridBagConstraints c = new GridBagConstraints();
-    JPanel panel = new JPanel(new GridBagLayout());
+      JPanel panel = new JPanel(new GridBagLayout());
 
-    JLabel parseModelLabel = new JLabel(getMessage("ft.parse.model.label"));
-    c.gridx = 0;
-    c.gridy = 0;
-    c.weightx = 0;
-    c.weighty = 0;
-    c.anchor = GridBagConstraints.WEST;
-    panel.add(parseModelLabel, c);
+      JLabel parseModelLabel = new JLabel(getMessage("ft.parse.model.label"));
+      c.gridx = 0;
+      c.gridy = 0;
+      c.weightx = 0;
+      c.weighty = 0;
+      c.anchor = GridBagConstraints.WEST;
+      panel.add(parseModelLabel, c);
 
-    parseModelTextField = new JTextField();
-    c.gridx ++;
-    c.weightx = 1;
-    c.fill = GridBagConstraints.HORIZONTAL;
-    c.insets = new Insets(0, 5, 0, 5);
-    panel.add(parseModelTextField, c);
-    
-    c.gridx = 0;
-    c.gridy ++;
-    JLabel detectModelLabel = new JLabel(getMessage("ft.detect.model.label"));
-    panel.add(detectModelLabel, c);
+      parseModelTextField = new JTextField();
+      c.gridx ++;
+      c.weightx = 1;
+      c.fill = GridBagConstraints.HORIZONTAL;
+      c.insets = new Insets(0, 5, 0, 5);
+      panel.add(parseModelTextField, c);
+      
+      c.gridx = 0;
+      c.gridy ++;
+      JLabel detectModelLabel = new JLabel(getMessage("ft.detect.model.label"));
+      panel.add(detectModelLabel, c);
 
-    detectModelTextField = new JTextField();
-    c.gridx ++;
-    c.weightx = 1;
-    c.fill = GridBagConstraints.HORIZONTAL;
-    c.insets = new Insets(0, 5, 0, 5);
-    panel.add(detectModelTextField, c);
-    
-    c.gridx = 0;
-    c.gridy ++;
-    JLabel apiKeyLabel = new JLabel(getMessage("api.key.label"));
-    panel.add(apiKeyLabel, c);
+      detectModelTextField = new JTextField();
+      c.gridx ++;
+      c.weightx = 1;
+      c.fill = GridBagConstraints.HORIZONTAL;
+      c.insets = new Insets(0, 5, 0, 5);
+      panel.add(detectModelTextField, c);
+      
+      c.gridx = 0;
+      c.gridy ++;
+      JLabel apiKeyLabel = new JLabel(getMessage("api.key.label"));
+      panel.add(apiKeyLabel, c);
 
-    apiKeyTextField = new JPasswordField();
-    c.gridx ++;
-    c.weightx = 1;
-    c.fill = GridBagConstraints.HORIZONTAL;
-    c.insets = new Insets(0, 5, 0, 5);
-    panel.add(apiKeyTextField, c);
+      apiKeyTextField = new JPasswordField();
+      c.gridx ++;
+      c.weightx = 1;
+      c.fill = GridBagConstraints.HORIZONTAL;
+      c.insets = new Insets(0, 5, 0, 5);
+      panel.add(apiKeyTextField, c);
 
-    c.gridx = 0;
-    c.gridy ++;
-    c.gridwidth = 3;
-    c.weightx = 1;
-    c.weighty = 1;
-    c.fill = GridBagConstraints.BOTH;
-    panel.add(new JPanel(), c);
-    
-    // Get stored options with extra null safety
-    String ftParseModel = SAFE_VALUE_FALLBACK;
-    String ftDetectModel = SAFE_VALUE_FALLBACK;
-    String apiKey = SAFE_VALUE_FALLBACK;
-    
-    if (pluginWorkspace != null && pluginWorkspace.getOptionsStorage() != null) {
-      if (KEY_DILA_DAMA_FT_PARSE_MODEL != null && !KEY_DILA_DAMA_FT_PARSE_MODEL.trim().isEmpty()) {
-        try {
-          String value = pluginWorkspace.getOptionsStorage().getOption(KEY_DILA_DAMA_FT_PARSE_MODEL, SAFE_VALUE_FALLBACK);
-          ftParseModel = (value != null) ? value : SAFE_VALUE_FALLBACK;
-        } catch (Exception e) {
-          System.err.println("DILA Plugin: Failed to get parse model option: " + e.getMessage());
-          ftParseModel = SAFE_VALUE_FALLBACK;
+      c.gridx = 0;
+      c.gridy ++;
+      c.gridwidth = 3;
+      c.weightx = 1;
+      c.weighty = 1;
+      c.fill = GridBagConstraints.BOTH;
+      panel.add(new JPanel(), c);
+      
+      // Get stored options with extra null safety
+      String ftParseModel = SAFE_VALUE_FALLBACK;
+      String ftDetectModel = SAFE_VALUE_FALLBACK;
+      String apiKey = SAFE_VALUE_FALLBACK;
+      
+      if (pluginWorkspace != null && pluginWorkspace.getOptionsStorage() != null) {
+        if (KEY_DILA_DAMA_FT_PARSE_MODEL != null && !KEY_DILA_DAMA_FT_PARSE_MODEL.trim().isEmpty()) {
+          try {
+            String value = pluginWorkspace.getOptionsStorage().getOption(KEY_DILA_DAMA_FT_PARSE_MODEL, SAFE_VALUE_FALLBACK);
+            ftParseModel = (value != null) ? value : SAFE_VALUE_FALLBACK;
+          } catch (Exception e) {
+            System.err.println("DILA Plugin: Failed to get parse model option: " + e.getMessage());
+            ftParseModel = SAFE_VALUE_FALLBACK;
+          }
+        }
+        if (KEY_DILA_DAMA_FT_DETECT_MODEL != null && !KEY_DILA_DAMA_FT_DETECT_MODEL.trim().isEmpty()) {
+          try {
+            String value = pluginWorkspace.getOptionsStorage().getOption(KEY_DILA_DAMA_FT_DETECT_MODEL, SAFE_VALUE_FALLBACK);
+            ftDetectModel = (value != null) ? value : SAFE_VALUE_FALLBACK;
+          } catch (Exception e) {
+            System.err.println("DILA Plugin: Failed to get detect model option: " + e.getMessage());
+            ftDetectModel = SAFE_VALUE_FALLBACK;
+          }
+        }
+        if (KEY_DILA_DAMA_API_KEY != null && !KEY_DILA_DAMA_API_KEY.trim().isEmpty()) {
+          try {
+            String value = pluginWorkspace.getOptionsStorage().getSecretOption(KEY_DILA_DAMA_API_KEY, SAFE_VALUE_FALLBACK);
+            apiKey = (value != null) ? value : SAFE_VALUE_FALLBACK;
+          } catch (Exception e) {
+            System.err.println("DILA Plugin: Failed to get API key option: " + e.getMessage());
+            apiKey = SAFE_VALUE_FALLBACK;
+          }
         }
       }
-      if (KEY_DILA_DAMA_FT_DETECT_MODEL != null && !KEY_DILA_DAMA_FT_DETECT_MODEL.trim().isEmpty()) {
-        try {
-          String value = pluginWorkspace.getOptionsStorage().getOption(KEY_DILA_DAMA_FT_DETECT_MODEL, SAFE_VALUE_FALLBACK);
-          ftDetectModel = (value != null) ? value : SAFE_VALUE_FALLBACK;
-        } catch (Exception e) {
-          System.err.println("DILA Plugin: Failed to get detect model option: " + e.getMessage());
-          ftDetectModel = SAFE_VALUE_FALLBACK;
-        }
+      
+      // Initialize the text fields with the stored options (guaranteed non-null)
+      if (parseModelTextField != null) {
+        parseModelTextField.setText((ftParseModel != null) ? ftParseModel : SAFE_VALUE_FALLBACK);
       }
-      if (KEY_DILA_DAMA_API_KEY != null && !KEY_DILA_DAMA_API_KEY.trim().isEmpty()) {
-        try {
-          String value = pluginWorkspace.getOptionsStorage().getSecretOption(KEY_DILA_DAMA_API_KEY, SAFE_VALUE_FALLBACK);
-          apiKey = (value != null) ? value : SAFE_VALUE_FALLBACK;
-        } catch (Exception e) {
-          System.err.println("DILA Plugin: Failed to get API key option: " + e.getMessage());
-          apiKey = SAFE_VALUE_FALLBACK;
-        }
+      if (detectModelTextField != null) {
+        detectModelTextField.setText((ftDetectModel != null) ? ftDetectModel : SAFE_VALUE_FALLBACK);
       }
-    }
-    
-    // Initialize the text fields with the stored options (guaranteed non-null)
-    if (parseModelTextField != null) {
-      parseModelTextField.setText((ftParseModel != null) ? ftParseModel : SAFE_VALUE_FALLBACK);
-    }
-    if (detectModelTextField != null) {
-      detectModelTextField.setText((ftDetectModel != null) ? ftDetectModel : SAFE_VALUE_FALLBACK);
-    }
-    if (apiKeyTextField != null) {
-      apiKeyTextField.setText((apiKey != null) ? apiKey : SAFE_VALUE_FALLBACK);
-    }
-    
-    return panel;
+      if (apiKeyTextField != null) {
+        apiKeyTextField.setText((apiKey != null) ? apiKey : SAFE_VALUE_FALLBACK);
+      }
+      
+      return panel;
     } catch (Exception e) {
       // Log the error and return a simple panel to prevent crashes
       System.err.println("DILA Plugin: Error initializing options page: " + e.getMessage());
@@ -318,13 +340,28 @@ public class DAMAWorkspaceAccessOptionPagePluginExtension extends OptionPagePlug
     return panel;
   }
 
+
   /**
    * Gets a localized message by key.
+   * Uses the properly loaded PluginResourceBundle from StandalonePluginWorkspace.
    * @param key the message key
    * @return the localized message
    */
   private String getMessage(String key) {
-    // Simplified hardcoded strings for now
+    // Try to get translation from resource bundle first
+    if (resources != null) {
+      try {
+        String translation = resources.getMessage(key);
+        // Check if we got a valid translation (not just the key back)
+        if (translation != null && !key.equals(translation)) {
+          return translation;
+        }
+      } catch (Exception e) {
+        System.err.println("DILA Plugin: Error getting message for key '" + key + "': " + e.getMessage());
+      }
+    }
+    
+    // Fallback translations matching the keys in our i18n/translation.xml
     switch (key) {
       case "ft.parse.model.label":
         return "Parsing model:";
@@ -333,7 +370,8 @@ public class DAMAWorkspaceAccessOptionPagePluginExtension extends OptionPagePlug
       case "api.key.label":
         return "API Key*: ";
       default:
-        return key;
+        System.out.println("DILA Plugin: Using key as fallback for: " + key);
+        return key; // Return the key itself if no translation found
     }
   }
 
