@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<translation>
+  <languageList>
+    <language description="English US" lang="en_US"/>
+  </languageList>
+  <key value="test.key">
+    <val lang="en_US">Test Value</val>
+  </key>
+</translation>

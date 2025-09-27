@@ -5,9 +5,9 @@
   <groupId>dila</groupId>
   <artifactId>dila-ai-markup-plugin</artifactId>
   <version>0.2.3</version>
-  <!-- This is a parent POM for a multi-module Maven project. -->
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
 
+  <name>DILA AI Markup Plugin</name>
   <description>AI markup assistant for detecting and working with DILA references.</description>
 
   <developers>
@@ -40,6 +40,7 @@
       <groupId>com.oxygenxml</groupId>
       <artifactId>oxygen-sdk</artifactId>
       <version>${oxygen.sdk.version}</version>
+      <scope>provided</scope>
     </dependency>
     <!-- If you need MathFlow rendering, the best is to import the MathFlow 
       SDK jars as artifacts in your Maven repository and add dependencies here. -->
@@ -65,7 +66,17 @@
       </properties>
     </profile>
   </profiles>
+  
   <build>
+
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -157,9 +168,4 @@
       </plugins>
     </pluginManagement>
   </build>
-
-<modules>
-  <module>dila-ai-markup-core</module>
-  <module>dila-ai-markup-options</module>
-</modules>
 </project>

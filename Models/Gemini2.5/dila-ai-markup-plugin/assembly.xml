@@ -1,40 +1,41 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.1"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.1 http://maven.apache.org/xsd/assembly-2.1.1.xsd">
+
     <id>plugin</id>
     <formats>
         <format>zip</format>
     </formats>
-    <includeBaseDirectory>false</includeBaseDirectory>
-    
+    <includeBaseDirectory>true</includeBaseDirectory>
+    <baseDirectory>dilaAIMarkupPlugin</baseDirectory>
+        
+    <files>
+        <file>
+            <source>target/${project.build.finalName}.jar</source>
+            <outputDirectory>lib</outputDirectory>
+        </file>
+    </files>
+
     <fileSets>
-        <!-- Core module resources -->
         <fileSet>
-            <directory>dila-ai-markup-core/src/main/resources</directory>
+            <directory>src/main/resources</directory>
             <outputDirectory>/</outputDirectory>
             <includes>
                 <include>**/*</include>
             </includes>
         </fileSet>
     </fileSets>
-    
-    <files>
-        <!-- Options module JAR -->
-        <file>
-            <source>dila-ai-markup-options/target/dila-ai-markup-options-${project.version}.jar</source>
-            <outputDirectory>/lib</outputDirectory>
-        </file>
-        
-        <!-- Master plugin configuration -->
-        <file>
-            <source>plugin.xml</source>
-            <outputDirectory>/</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-        <file>
-            <source>extension.xml</source>
-            <outputDirectory>/</outputDirectory>
-            <filtered>true</filtered>
-        </file>
-     </files>
+
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory>lib</outputDirectory>
+            <includes>
+                <include>*:jar</include>
+            </includes>
+            <excludes>
+                <exclude>com.oxygenxml:*</exclude>
+            </excludes>
+        </dependencySet>
+    </dependencySets>
 </assembly>
