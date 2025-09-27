@@ -3409,7 +3409,79 @@ where and how can we check the output?
 
 _**Assistant (copilot/claude-sonnet-4)**_
 
+You can check the plugin's output and debug information in several places depending on how you're running Oxygen XML Author:
 
+## 1. **Oxygen's Console/Log Window** (Primary Method)
+- **In Oxygen XML Author**: Go to **Help → Show Console**
+- This will show all `System.out.println()` and `System.err.println()` output from your plugin
+- All the debug messages from your code (like "DILA Plugin: Initializing option page...") will appear here
+
+## 2. **Oxygen's Error Log File**
+- **Location**: `%APPDATA%\com.oxygenxml\error.log` (Windows)
+- **Alternative**: Go to **Help → Report Problem** and click "Open Logs Folder"
+- Contains detailed error information and stack traces
+
+## 3. **Command Line Output** (If running from terminal)
+If you start Oxygen from command line:
+```powershell
+# Navigate to Oxygen installation directory
+cd "C:\Program Files\Oxygen XML Author 27"
+# Run Oxygen to see console output
+.\oxygenAuthor.exe
+```
+
+## 4. **Plugin Development Console** 
+For development, you can also add more detailed logging:
+
+```java
+// Add this to see more detailed output
+System.out.println("DILA Plugin: Resource bundle class: " + 
+    (resources != null ? resources.getClass().getName() : "null"));
+System.out.println("DILA Plugin: Translation for 'api.key.label': " + 
+    getMessage("api.key.label"));
+```
+
+## 5. **Check Your Plugin's Debug Output**
+Your current code already has extensive logging. When you:
+1. **Open Oxygen's Preferences** (Options → Preferences)
+2. **Navigate to your plugin's options page**
+The console should show:
+- "DILA Plugin: Initializing option page..."
+- "DILA Plugin: Resource bundle loaded successfully" (or error message)
+- Translation status for each key
+
+## 6. **Test Translation Loading**
+Add this temporary debug method to see what's happening:
+
+```java
+private void debugTranslations() {
+    System.out.println("=== DILA Plugin Translation Debug ===");
+    System.out.println("Resource bundle: " + (resources != null ? "loaded" : "null"));
+    
+    String[] testKeys = {"ft.parse.model.label", "ft.detect.model.label", "api.key.label"};
+    for (String key : testKeys) {
+        String translation = getMessage(key);
+        System.out.println("Key: " + key + " -> Translation: " + translation);
+    }
+    System.out.println("=====================================");
+}
+```
+
+Then call `debugTranslations()` in your `init()` method to see exactly what's being loaded.
+
+**Most immediate check**: Open Oxygen → Help → Show Console, then go to Options → Preferences and look for your plugin's page. You should see all the debug output there.
+
+---
+
+_**User (2025-09-27 23:32Z)**_
+
+please build maven project with clean plugin
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll build the Maven project with the clean plugin for you. 
 
 ---
 
