@@ -2956,9 +2956,96 @@ This resolves the TypeError while preserving the masking functionality.
 
 ---
 
-_**User (2025-09-27 06:33Z)**_
+_**User (2025-09-27 06:34Z)**_
 
 rebuild with the updated code
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll rebuild the plugin with your updated code that fixes the TypeError issue. Excellent! The build was successful. Now let me copy the updated files to the deployment directory: Perfect! The plugin has been successfully rebuilt and deployed with your updated code that fixes the TypeError issue.
+
+## ✅ **Build Complete with TypeError Fix**
+
+**Build Results:**
+- ✅ **Maven Build**: SUCCESS (4.046 seconds)
+- ✅ **Changes Detected**: Recompiled 1 source file with your fixes
+- ✅ **JAR Created**: `dila-ai-markup-plugin-0.2.3.jar`
+- ✅ **ZIP Assembly**: `dilaAIMarkupPlugin.zip` generated
+- ✅ **Files Deployed**: Updated files copied to deployment directory
+
+**Updated Files:**
+- ✅ `dilaAIMarkupPlugin.zip` - Contains your TypeError fix
+- ✅ `extension.xml` - For Oxygen add-on installation
+
+## 🔧 **Issue Fixed**
+
+The TypeError "Cannot call property length in object" should now be resolved with your updated code that:
+- ✅ **Preserves Java String methods** by avoiding premature type conversion
+- ✅ **Adds proper null checking** before calling `.length()`
+- ✅ **Uses correct string handling** for JavaScript regex operations
+- ✅ **Maintains proper API key masking** functionality
+
+## 🚀 **Ready for Testing**
+
+The plugin is now ready for:
+1. **Installation/Update** in Oxygen XML Editor
+2. **Testing without JavaScript errors**
+3. **Proper API key handling** with secure storage
+4. **Functional AI Markup calls**
+
+The TypeError should no longer appear when the plugin loads! 🎯
+
+---
+
+_**User (2025-09-27 16:10Z)**_
+
+please check why are there no correct i18n shown in the view
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I can see from the screenshot that the plugin view is showing raw i18n keys like "view.title", "actions.menu", "options.menu", "ai.markup.action", "tag.removal.action" instead of the actual translated text. This indicates that the internationalization (i18n) function is not working properly.
+
+Let me check the current i18n implementation in the JavaScript file: I can see the issue! The `i18nFn` function is trying to get messages from `resources.getMessage(key)`, but we need to check if the translation resources are properly loaded. Let me also check if there's a translation.xml file: I found the problem! The `translation.xml` file only contains a test key "test.key", but the JavaScript is trying to use keys like "view.title", "actions.menu", "options.menu", etc. The i18n system is working, but the translations for these specific keys are missing.
+
+Let me check what keys are being used in the JavaScript: Let me search for the actual usage pattern: Let me search more broadly for any i18n usage: Now I can see some i18n usage! Let me search for more: Perfect! Now I can see the i18n keys being used. Let me find more keys by searching through the file: Let me look at the menu creation section to see all the keys: Now let me see if there are more i18n keys in the rest of the file: Perfect! Now I can see all the i18n keys used in the JavaScript. Let me update the `translation.xml` file with all the required keys: Let me check the exact content of the `translation.xml` file: I see the format is different. Let me replace the entire file with the correct format: 
+```
+
+```
+Now let me rebuild the plugin with the updated translation file: Great! Now let me copy the built plugin to the deployment directory: Perfect! The plugin has been rebuilt with the complete translation file containing all the i18n keys used in the UI. Here's what I've done to fix the i18n issue:
+
+## Problem Identified
+The UI was showing raw i18n keys (like "view.title", "actions.menu") instead of translated text because the `translation.xml` file only contained a test key, not the actual keys used by the JavaScript code.
+
+## Solution Implemented
+1. **Identified all i18n keys** used in the JavaScript code by searching for `i18nFn("...")` calls
+2. **Updated `translation.xml`** with all required keys and their English translations:
+   - **View and Menu Labels**: view.title, actions.menu, ai.markup.action, tag.removal.action, options.menu, preferences.action
+   - **UI Elements**: initial.info, replace.button
+   - **Action Messages**: action.ai.markup.selected, action.tag.removal.selected
+   - **System Prompts**: system.prompt.ai.markup
+   - **Status Messages**: text.replaced, text.mode.not.active.for.replace, etc.
+   - **Error Messages**: llm.error, error.replacing.text
+
+3. **Rebuilt and deployed** the plugin with the complete translation file
+
+## Next Steps
+Please restart Oxygen XML Author and test the plugin view. You should now see:
+- **"DILA AI Markup Assistant"** as the view title (instead of "view.title")
+- **"Actions"** and **"Options"** as menu labels (instead of "actions.menu" and "options.menu")
+- **"AI Markup"** and **"Tag Removal"** as action items (instead of raw keys)
+- All other UI elements should display proper English text instead of i18n keys
+
+The plugin functionality should remain the same, but now with proper localized text display.
+
+---
+
+_**User (2025-09-27 16:13Z)**_
+
+please check and fix it then rebuild
 
 ---
 
