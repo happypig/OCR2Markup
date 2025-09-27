@@ -41,7 +41,6 @@
               <library name="lib/dila-ai-markup-plugin-0.2.3.jar" />
        </runtime>
 
-       <!-- FINAL VERSION: AdditionalUITranslation PERMANENTLY DISABLED (causes NPE) -->
        <extension 
               type="WorkspaceAccessJS" 
               href="dila-ai-markup.js"/>
@@ -49,12 +48,6 @@
        <extension 
               type="OptionPage" 
               class="dila.workspace.DAMAWorkspaceAccessOptionPagePluginExtension"/>
-
-       <!--
-        <extension
-              type="AdditionalUITranslation" 
-              href="i18n/translation.xml"/>
-       -->
               
        <view 
               id="dila.ai.markup.view"
