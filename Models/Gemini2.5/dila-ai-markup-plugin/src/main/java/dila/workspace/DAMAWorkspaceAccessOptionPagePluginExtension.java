@@ -321,13 +321,6 @@ public class DAMAWorkspaceAccessOptionPagePluginExtension extends OptionPagePlug
     }
   }
 
-  // /**
-  //  * Constructor that initializes the option page extension.
-  //  */
-  // public DAMAWorkspaceAccessOptionPagePluginExtension() {
-  //   // Default constructor
-  // }
-
   /**
    * Creates a simple panel with a message for error cases.
    */
@@ -396,11 +389,4 @@ public class DAMAWorkspaceAccessOptionPagePluginExtension extends OptionPagePlug
       return SAFE_KEY_FALLBACK;
     }
   }
-
-  // // Insert this method to ensure the option page appears directly under Plugins
-  // public String getParentGroupKey() {
-  //     return null; // or simply omit this method for the same effect
-  // }
-
-
 }
