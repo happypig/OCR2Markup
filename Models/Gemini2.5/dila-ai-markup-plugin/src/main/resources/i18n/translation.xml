@@ -155,4 +155,10 @@
     <val lang="zh_CN">儲存</val>
     <val lang="zh_TW">儲存</val>
   </key>
+  <key value="preferences.page.title">
+    <val lang="en_US">DILA AI Markup Assistant Options</val>
+    <val lang="zh_CN">DILA AI 標記助手偏好設定</val>
+    <val lang="zh_TW">DILA AI 標記助手偏好設定</val>
+  </key>
 </translation>
+

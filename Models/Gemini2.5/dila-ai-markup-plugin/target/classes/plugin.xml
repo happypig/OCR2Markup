@@ -47,7 +47,7 @@
 
        <extension 
               type="OptionPage" 
-              class="dila.workspace.DAMAWorkspaceAccessOptionPagePluginExtension"/>
+              class="com.dila.dama.plugin.preferences.DAMAOptionPagePluginExtension"/>
               
        <view 
               id="dila.ai.markup.view"
