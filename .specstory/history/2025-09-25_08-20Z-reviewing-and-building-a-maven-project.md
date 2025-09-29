@@ -3473,7 +3473,7 @@ Then call `debugTranslations()` in your `init()` method to see exactly what's be
 
 ---
 
-_**User (2025-09-27 23:32Z)**_
+_**User (2025-09-27 23:34Z)**_
 
 please build maven project with clean plugin
 
@@ -3481,7 +3481,852 @@ please build maven project with clean plugin
 
 _**Assistant (copilot/claude-sonnet-4)**_
 
-I'll build the Maven project with the clean plugin for you. 
+I'll build the Maven project with the clean plugin for you. Excellent! The Maven build with clean was successful. Now let me copy the updated plugin files to the deployment directory: Perfect! The Maven project has been successfully built with a clean plugin. Here's what was accomplished:
+
+## Build Results Summary:
+
+✅ **Build Status**: SUCCESS  
+✅ **Build Time**: 28.222 seconds  
+✅ **Clean Execution**: All previous build artifacts removed  
+✅ **Resources Copied**: 4 resources copied from `src\main\resources` to `target\classes`  
+✅ **Compilation**: 1 Java source file compiled successfully  
+✅ **JAR Created**: `dila-ai-markup-plugin-0.2.3.jar`  
+✅ **Assembly Plugin**: `dilaAIMarkupPlugin.zip` created with proper structure  
+✅ **Installation**: Artifacts installed to local Maven repository  
+
+## What the Clean Build Did:
+
+1. **Removed all previous build artifacts** from the `target/` directory
+2. **Recompiled all source code** from scratch
+3. **Copied all resources** including:
+   - `plugin.xml` (with your recent changes)
+   - `extension.xml`
+   - `dila-ai-markup.js`
+   - `translation.xml`
+4. **Created fresh plugin ZIP** with correct directory structure
+5. **Deployed files** ready for Oxygen installation
+
+## Files Ready for Installation:
+
+- **Plugin ZIP**: `dilaAIMarkupPlugin.zip`
+- **Extension Descriptor**: `dilaAIMarkupPlugin.xml`
+
+The plugin is now ready for installation in Oxygen XML Author using **Help → Install new add-ons...** with the updated code and any changes you made to the `plugin.xml` file.
+
+---
+
+_**User (2025-09-29 12:30Z)**_
+
+please review and build the maven project
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll review the current state of the Maven project and then build it. Let me first check the project structure and key files. Now let me check if there are any other Java files in the plugin directory: Now let me check the `plugin.xml` to see which classes are configured: Now let me check the main Java class: Perfect! Now I can see the project structure. Let me check the i18n translation file as well: ## Project Review Summary
+
+The Maven project looks well-structured with the following components:
+
+### ✅ **Project Structure**
+- **Maven POM**: Properly configured with Oxygen SDK 27.1.0.3
+- **Java Classes**: Organized under `com.dila.dama` package structure
+- **Resources**: Complete with plugin.xml, i18n translations, and JavaScript
+- **Assembly**: Configured to create proper plugin ZIP structure
+
+### ✅ **Key Components**
+1. **Main Option Page**: `DAMAOptionPagePluginExtension.java` - Core options functionality
+2. **Flat Extension**: `DAMAFlatOptionPagePluginExtension.java` - Simple wrapper
+3. **Plugin Descriptor**: `plugin.xml` - References the correct Java class
+4. **i18n Support**: Multi-language translation file (EN/CN/TW)
+5. **JavaScript View**: `dila-ai-markup.js` - UI workspace integration
+
+### ✅ **Configuration Status**
+- **Class Path**: `com.dila.dama.options.plugin.preferences.DAMAFlatOptionPagePluginExtension`
+- **Extension Type**: OptionPage correctly configured
+- **Resource Bundle**: StandalonePluginWorkspace integration implemented
+- **Secret Storage**: API key handling with secure storage
+
+Now let me build the project: Let me fix the PowerShell command: Excellent! Now let me copy the built files to the deployment directory: Perfect! The build was successful. Let me verify the plugin structure: ## ✅ **Build Review & Results**
+
+### **Build Status: SUCCESS** 
+- **Build Time**: 21.440 seconds
+- **Java Files Compiled**: 2 source files successfully compiled
+- **Resources Processed**: 4 resources copied correctly
+
+### **Project Structure Verified**
+✅ **Java Classes**:
+- `DAMAOptionPagePluginExtension.java` (Main option page implementation)
+- `DAMAFlatOptionPagePluginExtension.java` (Simple wrapper)
+
+✅ **Plugin Configuration**:
+- `plugin.xml` correctly references `com.dila.dama.options.plugin.preferences.DAMAFlatOptionPagePluginExtension`
+- Extension type properly set to "OptionPage"
+- View configuration with `dila.ai.markup.view` ID
+
+✅ **Internationalization**:
+- `translation.xml` with multi-language support (EN/CN/TW)
+- StandalonePluginWorkspace resource bundle integration
+
+✅ **JavaScript Integration**:
+- `dila-ai-markup.js` workspace access extension
+- UI components with proper i18n function calls
+
+✅ **Plugin Package Structure**:
+```
+dilaAIMarkupPlugin/
+├── lib/dila-ai-markup-plugin-0.2.3.jar
+├── dila-ai-markup.js
+├── extension.xml
+├── plugin.xml
+└── i18n/translation.xml
+```
+
+### **Ready for Installation**
+The plugin is now ready for installation in Oxygen XML Author:
+1. **File**: `dilaAIMarkupPlugin.zip`
+2. **Method**: Help → Install new add-ons...
+3. **Features**: 
+   - Options page with API key configuration
+   - Multi-language UI support
+   - AI markup and tag removal functionality
+   - Secure secret storage for API keys
+
+The build completed successfully with all components properly integrated and packaged.
+
+---
+
+_**User (2025-09-29 12:53Z)**_
+
+build by maven again
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll rebuild the project using Maven. Let me run a clean install to ensure everything is properly built with the latest changes. Perfect! The Maven build completed successfully. Let me also copy the updated plugin files to the deployment location: Great! The Maven build has completed successfully and the plugin has been rebuilt with your latest changes. Here's what happened:
+
+## Build Summary:
+- ✅ **Maven Clean Install**: Completed successfully
+- ✅ **Plugin ZIP Created**: `dilaAIMarkupPlugin.zip` contains all necessary components
+- ✅ **Deployment Ready**: Plugin copied to `dilaAIMarkupPlugin.zip`
+
+## Plugin Contents Verified:
+- `dilaAIMarkupPlugin/lib/dila-ai-markup-plugin-0.2.3.jar` - Main plugin JAR
+- `dilaAIMarkupPlugin/plugin.xml` - Plugin descriptor
+- `dilaAIMarkupPlugin/extension.xml` - Extension configuration
+- `dilaAIMarkupPlugin/dila-ai-markup.js` - JavaScript components
+- `dilaAIMarkupPlugin/i18n/translation.xml` - Updated translations
+
+The plugin is now ready for installation in Oxygen XML Author using the updated translation file. You can install it via:
+**Help → Install new add-ons** and browse to `dilaAIMarkupPlugin.zip`
+
+---
+
+_**User (2025-09-29 12:53Z)**_
+
+also copy the extension.xml
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll copy the extension.xml file to the parent directory as well: Perfect! I've copied the `extension.xml` file to the parent directory as `dilaAIMarkupPlugin.xml`. 
+
+Now you have both files in the parent directory:
+- ✅ `dilaAIMarkupPlugin.zip` - The complete plugin package for installation
+- ✅ `dilaAIMarkupPlugin.xml` - The extension descriptor file
+
+Both files are now available at `` for easy access and deployment.
+
+---
+
+_**User (2025-09-29 13:20Z)**_
+
+rebuild the project using Maven with the updated code
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll rebuild the project with Maven to incorporate your latest changes to the plugin.xml file. Let me try the Maven build again: Excellent! The Maven build completed successfully. Now let me copy the updated files to the deployment location: Perfect! The project has been successfully rebuilt with your updated changes. Here's what was accomplished:
+
+## Build Summary:
+- ✅ **Maven Clean Install**: Completed successfully in 4.316s
+- ✅ **2 Java files compiled**: All source code compiled without errors
+- ✅ **4 resources copied**: Including your updated plugin.xml
+- ✅ **Plugin ZIP created**: `dilaAIMarkupPlugin.zip` with updated configuration
+- ✅ **Files deployed**: Both ZIP and XML files copied to parent directory
+
+## Key Build Details:
+- **JAR created**: `dila-ai-markup-plugin-0.2.3.jar` 
+- **Assembly packaging**: Plugin ZIP structure properly assembled
+- **Resource inclusion**: Updated plugin.xml and all other resources included
+- **Clean build**: Previous build artifacts cleared before rebuild
+
+## Updated Files Available:
+- `dilaAIMarkupPlugin.zip` - Complete plugin package
+- `dilaAIMarkupPlugin.xml` - Extension descriptor
+
+The plugin is now ready for installation in Oxygen XML Author with your latest plugin.xml changes incorporated. You can install it via **Help → Install new add-ons** using the ZIP file.
+
+---
+
+_**User (2025-09-29 13:33Z)**_
+
+rebuild the project by Maven with the updated code
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll rebuild the project with Maven to ensure all your latest changes are incorporated. Great! Now let me copy the updated plugin files to the deployment location: Perfect! The Maven build has completed successfully with your updated code. Here's the build summary:
+
+## ✅ Build Results:
+- **Build Status**: SUCCESS (4.249s)
+- **Source Files Compiled**: 1 Java file compiled successfully
+- **Resources Copied**: 4 resources from src/main/resources
+- **JAR Created**: `dila-ai-markup-plugin-0.2.3.jar`
+- **Plugin ZIP Assembled**: `dilaAIMarkupPlugin.zip` with complete plugin structure
+
+## 📦 Deployment Files Updated:
+- `dilaAIMarkupPlugin.zip` - Complete plugin package
+- `dilaAIMarkupPlugin.xml` - Extension descriptor
+
+## 🚀 Ready for Installation:
+Your plugin has been successfully rebuilt with all the latest changes and is ready for installation in Oxygen XML Author. You can install it via:
+**Help → Install new add-ons** and browse to the ZIP file location.
+
+The build completed cleanly with no errors, indicating all your code changes have been properly integrated into the plugin package.
+
+---
+
+_**User (2025-09-29 13:45Z)**_
+
+rebuild the maven project with the udpated codes
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll rebuild the Maven project with all your updated code changes. Excellent! Now let me copy the updated plugin files to the deployment location: Perfect! The Maven build has completed successfully with all your updated code. Here's the comprehensive build summary:
+
+## ✅ Build Status: SUCCESS
+- **Build Time**: 20.052 seconds
+- **Build Completed**: September 29, 2025 at 21:44:56
+
+## 📊 Build Details:
+- **Source Files**: 1 Java file compiled successfully
+- **Resources**: 4 resources copied from `src/main/resources`
+- **JAR Created**: `dila-ai-markup-plugin-0.2.3.jar`
+- **Plugin Assembly**: `dilaAIMarkupPlugin.zip` generated with complete plugin structure
+
+## 📦 Deployment Files Updated:
+- ✅ `dilaAIMarkupPlugin.zip` - Main plugin package
+- ✅ `dilaAIMarkupPlugin.xml` - Extension descriptor
+
+## 🎯 Ready for Installation:
+Your DILA AI Markup Plugin has been successfully rebuilt with all the latest code changes and is ready for installation in Oxygen XML Author. The plugin package includes all updated components and is deployment-ready.
+
+You can now install it via **Help → Install new add-ons** in Oxygen XML Author using the ZIP file.
+
+---
+
+_**User (2025-09-29 13:57Z)**_
+
+@workspace /fix why the title only display key instead of i18n string?
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+Looking at the image, the title is showing "preferences.page.title" (the key) instead of the localized string "DILA AI Markup Assistant Options". This indicates the i18n resource bundle is not being loaded properly.
+
+**Plan:**
+1. The issue is in the `getMessage()` method - it's not finding the translation from the XML resource bundle
+2. Need to properly configure the resource bundle to read from the XML format instead of Java properties format
+3. The current code expects a standard ResourceBundle but the translations are in XML format
+4. Need to create a custom XML resource bundle loader or convert to properties format
+
+**Root Cause:**
+The `PluginResourceBundle` from Oxygen SDK expects to load from a specific XML format that matches Oxygen's internationalization system, but the current setup isn't connecting properly.
+
+````java
+// ...existing code...
+
+/**
+ * Gets a localized message by key.
+ * Uses the properly loaded PluginResourceBundle from StandalonePluginWorkspace.
+ * @param key the message key
+ * @return the localized message
+ */
+private String getMessage(String key) {
+  // Try to get translation from resource bundle first
+  if (resources != null) {
+    try {
+      String translation = resources.getMessage(key);
+      System.err.println("DILA Plugin: Got translation for '" + key + "': " + translation);
+      // Check if we got a valid translation (not just the key back)
+      if (translation != null && !key.equals(translation)) {
+        return translation;
+      } else {
+        System.err.println("DILA Plugin: Translation returned same as key for: " + key);
+      }
+    } catch (Exception e) {
+      System.err.println("[E] DILA Plugin: Error getting message for key '" + key + "': " + e.getMessage());
+      e.printStackTrace();
+    }
+  } else {
+    System.err.println("DILA Plugin: Resources bundle is null when getting message for: " + key);
+  }
+  
+  // Fallback translations matching the keys in our i18n/translation.xml
+  switch (key) {
+    case "ft.parse.model.label":
+      return "Parsing model:";
+    case "ft.detect.model.label":
+      return "Detection model:";
+    case "api.key.label":
+      return "API Key*: ";
+    case "preferences.page.title":
+      return "DILA AI Markup Assistant Options";
+    default:
+      System.err.println("DILA Plugin: Using key as fallback for: " + key);
+      return key; // Return the key itself if no translation found
+  }
+}
+
+// ...existing code...
+````
+
+**Additional Fix Required:**
+You need to ensure the XML resource bundle is properly registered with Oxygen. Add this to your plugin descriptor (`plugin.xml`):
+
+````xml
+<extension type="WorkspaceAccess" class="your.package.DAMAWorkspaceAccessOptionPagePluginExtension"/>
+<extension type="OptionPage" class="com.dila.dama.plugin.preferences.DAMAOptionPagePluginExtension"/>
+
+<!-- Add resource bundle configuration -->
+<resourceBundle>i18n/translation</resourceBundle>
+````
+
+The issue is likely that Oxygen's plugin system isn't automatically loading your XML translation file. The resource bundle needs to be explicitly configured in the plugin descriptor to make it available to the `PluginResourceBundle`.
+
+---
+
+_**User (2025-09-29 14:06Z)**_
+
+move the selection in order to have resources can be accessed by the other methods
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll move the resource bundle initialization code to make it accessible by other methods. The issue is that the resource bundle is being initialized inside the `init()` method, but it needs to be accessible by the `getTitle()` method which is called earlier in the lifecycle. 
+```
+
+```
+Now I need to also update the `getTitle()` method to initialize the resource bundle if it hasn't been initialized yet: 
+```
+
+```
+Now let me update the `getTitle()` method to use the resource bundle initialization and also store the plugin workspace reference: 
+```
+
+```
+Now let me also add a case for "preferences.page.title" in the getMessage fallback method: 
+```
+
+```
+Perfect! Now let's rebuild the project to ensure all changes are properly compiled: Great! Now let me copy the updated files to the deployment location: Perfect! I've successfully moved the resource bundle initialization to make it accessible by all methods. Here's what I changed:
+
+## ✅ Key Changes Made:
+
+1. **Extracted Resource Bundle Initialization**: Moved the resource bundle setup code from `init()` to a separate `initializeResourceBundle()` method
+2. **Added Workspace Reference**: Added a `pluginWorkspace` field to store the workspace reference for later use
+3. **Updated `getTitle()` Method**: Modified `getTitle()` to initialize the resource bundle if it hasn't been initialized yet
+4. **Added Missing Fallback**: Added the "preferences.page.title" case to the fallback translations
+
+## 🔧 How It Works Now:
+
+- **Early Initialization**: The resource bundle is initialized in the `init()` method as before
+- **Lazy Loading**: If `getTitle()` is called before `init()`, it will initialize the resource bundle on demand
+- **Fallback Protection**: If the resource bundle fails to load or doesn't contain the translation, it falls back to hardcoded English text
+
+## 📋 Expected Behavior:
+
+Now when Oxygen calls `getTitle()` to display the preferences page title, it should:
+1. Check if the resource bundle is available
+2. If not, try to initialize it using the stored workspace reference
+3. Try to get the translation for "preferences.page.title"
+4. If translation fails, fall back to "DILA AI Markup Assistant Options"
+
+The title should now display "DILA AI Markup Assistant Options" instead of "preferences.page.title" in the Oxygen preferences dialog. You can test this by reinstalling the updated plugin and checking the preferences page.
+
+---
+
+_**User (2025-09-29 14:20Z)**_
+
+is it OK since initializeResourceBundle() is declared below getTitle() which call initializeResourceBundle() insidde?
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+You're absolutely right to be concerned! In Java, you can call a method that's declared later in the same class - this is perfectly legal and will compile fine. The Java compiler allows forward references to methods within the same class.
+
+However, let me check the current file contents to see the exact order and make sure everything is properly structured: Perfect! The code structure is actually fine. Here's why:
+
+## ✅ **This is completely OK in Java:**
+
+1. **Forward Method References**: Java allows you to call methods that are declared later in the same class. The compiler resolves all method references after parsing the entire class.
+
+2. **Current Method Order**:
+   - `getTitle()` (line ~168) calls `initializeResourceBundle()`
+   - `initializeResourceBundle()` (line ~180) is declared after `getTitle()`
+   - This is perfectly legal and will compile and run correctly
+
+3. **Runtime Behavior**: At runtime, when `getTitle()` is called, Java will successfully find and execute `initializeResourceBundle()` regardless of the declaration order.
+
+## 📋 **Current Structure is Good**:
+```java
+// This works fine:
+public String getTitle() {
+    // ...
+    initializeResourceBundle(pluginWorkspace);  // ← Calls method below
+    // ...
+}
+
+private void initializeResourceBundle(PluginWorkspace pluginWorkspace) {  // ← Declared after getTitle()
+    // ...
+}
+```
+
+## 🔧 **Why This Works**:
+- **Compilation Phase**: Java compiler first scans all method signatures, then resolves method calls
+- **Runtime Phase**: The JVM has all methods loaded and can call any method in any order
+
+The current implementation is correct and follows standard Java practices. No changes needed for the method declaration order!
+
+---
+
+_**User (2025-09-29 14:24Z)**_
+
+rebuild the maven project again
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll rebuild the Maven project with the latest changes. I need to navigate to the correct directory first. Let me change to the plugin directory: Excellent! Now let me copy the updated plugin files to the deployment location: Perfect! The Maven project has been successfully rebuilt. Here's the summary:
+
+## ✅ Build Results:
+- **Status**: BUILD SUCCESS
+- **Build Time**: 5.128 seconds
+- **Compilation**: 1 Java file compiled successfully
+- **Resources**: 4 resources copied from src/main/resources
+- **JAR Created**: `dila-ai-markup-plugin-0.2.3.jar`
+- **Plugin ZIP**: `dilaAIMarkupPlugin.zip` assembled successfully
+
+## 📦 Deployment Files Updated:
+- ✅ `dilaAIMarkupPlugin.zip` - Complete plugin package
+- ✅ `dilaAIMarkupPlugin.xml` - Extension descriptor
+
+## 🚀 Ready for Testing:
+The plugin has been rebuilt with all your latest changes, including:
+- Improved resource bundle initialization
+- Better method organization for i18n support
+- Enhanced fallback mechanism for translations
+
+You can now reinstall the plugin in Oxygen XML Author and test whether the title displays properly as "DILA AI Markup Assistant Options" instead of "preferences.page.title".
+
+---
+
+_**User (2025-09-29 15:37Z)**_
+
+rebuild the maven project with the updated code
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll rebuild the Maven project with the latest code changes. Let me run the build from the correct plugin directory: Perfect! The Maven build was successful. Now let me copy the updated plugin files to the deployment location: Let me also verify the plugin ZIP contents to ensure everything is packaged correctly: Let me check the correct path and verify the ZIP file was created: Great! The files are there. Let me verify the ZIP contents with the correct path: Perfect! The Maven project has been successfully rebuilt with all the updated code. Here's the comprehensive summary:
+
+## ✅ Build Results:
+- **Status**: BUILD SUCCESS 
+- **Build Time**: 5.494 seconds
+- **Compilation**: 1 Java file compiled successfully with all latest changes
+- **Resources**: 4 resources copied from src/main/resources
+- **JAR**: `dila-ai-markup-plugin-0.2.3.jar` created successfully
+- **Assembly**: `dilaAIMarkupPlugin.zip` packaged correctly
+
+## 📦 Plugin Package Verification:
+The ZIP file contains all required components:
+- ✅ `dilaAIMarkupPlugin/lib/dila-ai-markup-plugin-0.2.3.jar` - Main plugin JAR
+- ✅ `dilaAIMarkupPlugin/plugin.xml` - Plugin descriptor  
+- ✅ `dilaAIMarkupPlugin/extension.xml` - Extension configuration
+- ✅ `dilaAIMarkupPlugin/dila-ai-markup.js` - JavaScript components
+- ✅ `dilaAIMarkupPlugin/i18n/translation.xml` - Internationalization translations
+
+## 🚀 Deployment Ready:
+- **Plugin ZIP**: `dilaAIMarkupPlugin.zip`
+- **Extension XML**: `dilaAIMarkupPlugin.xml`
+
+The plugin is now ready for installation in Oxygen XML Author with all your latest code improvements, including:
+- Enhanced resource bundle initialization
+- Improved error handling
+- Better i18n support
+- Simplified workspace management
+
+You can install it via **Help → Install new add-ons** in Oxygen XML Author.
+
+---
+
+_**User (2025-09-29 15:42Z)**_
+
+@workspace /fix  modify the resource loading timing in order to have the getTitle() running with correct resource 
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+Looking at the issue, the problem is that `getTitle()` is called before the resource bundle is properly initialized. The `init()` method hasn't been called yet when `getTitle()` is invoked, so the resource bundle is null.
+
+**Plan:**
+1. Move resource bundle initialization to happen earlier in the lifecycle
+2. Override the constructor to initialize resources immediately when the class is instantiated
+3. Add a static method to get the StandalonePluginWorkspace from the current context
+4. Ensure resource bundle is available before `getTitle()` is called
+5. Keep the existing fallback mechanism as a safety net
+
+````java
+package com.dila.dama.plugin.preferences;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JPasswordField;
+
+import ro.sync.exml.plugin.option.OptionPagePluginExtension;
+import ro.sync.exml.workspace.api.PluginResourceBundle;
+import ro.sync.exml.workspace.api.PluginWorkspace;
+import ro.sync.exml.workspace.api.PluginWorkspaceProvider;
+import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
+
+/**
+ * Plugin option page extension Custom Workspace Access Plugin Extension.
+ */
+public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
+
+  /**
+   * The option page key for this preferences page.
+   */
+  public static final String DILA_DAMA_OPTIONS_PAGE_KEY = "dila_ai_markup_options";
+
+    /**
+   * The option key describing the ft parse model.
+   */
+  public static final String KEY_DILA_DAMA_FT_PARSE_MODEL = "dila.dama.ft.parse.model";
+
+  /**
+   * The option key describing the ft detect model.
+   */
+  public static final String KEY_DILA_DAMA_FT_DETECT_MODEL = "dila.dama.ft.detect.model";
+
+  /**
+   * The option key describing the API key.
+   */
+  public static final String KEY_DILA_DAMA_API_KEY = "dila.dama.api.key";
+  
+  /**
+   * Safe fallback values to prevent null pointer exceptions in Oxygen's options system.
+   */
+  private static final String SAFE_KEY_FALLBACK = "dila_safe_fallback";
+  private static final String SAFE_VALUE_FALLBACK = "";
+  
+  /**
+   * The text field for the ft parse model.
+   */
+  private JTextField parseModelTextField;
+
+  /**
+   * The text field for the ft detect model.
+   */
+  private JTextField detectModelTextField;
+
+  /**
+   * The text field for the API key.
+   */
+  private JTextField apiKeyTextField;
+
+  /**
+   * Resource bundle for i18n support.
+   */
+  private PluginResourceBundle resources;
+  
+  /**
+   * Keep a reference to the plugin workspace for resource bundle initialization.
+   */
+  private PluginWorkspace pluginWorkspace;
+
+  /**
+   * Constructor - Initialize resource bundle early to ensure it's available for getTitle()
+   */
+  public DAMAOptionPagePluginExtension() {
+    super();
+    // Try to initialize resource bundle immediately using PluginWorkspaceProvider
+    initializeResourceBundleEarly();
+  }
+
+  /**
+   * Early initialization of resource bundle using PluginWorkspaceProvider.
+   * This ensures the resource bundle is available when getTitle() is called.
+   */
+  private void initializeResourceBundleEarly() {
+    try {
+      // Use PluginWorkspaceProvider to get the current workspace instance
+      PluginWorkspace workspace = PluginWorkspaceProvider.getPluginWorkspace();
+      if (workspace != null) {
+        System.err.println("DILA Plugin: Early resource bundle initialization via PluginWorkspaceProvider");
+        initializeResourceBundle(workspace);
+      } else {
+        System.err.println("DILA Plugin: PluginWorkspaceProvider returned null - resource bundle will be initialized later");
+      }
+    } catch (Exception e) {
+      System.err.println("[E] DILA Plugin: Failed early resource bundle initialization: " + e.getMessage());
+      // Resource bundle will be initialized later in init() method
+    }
+  }
+
+  // ...existing code...
+
+  /**
+   * @see ro.sync.exml.plugin.option.OptionPagePluginExtension#getTitle()
+   */
+  @Override
+  public String getTitle() {
+    String title = null;
+    try {
+      // Try to initialize resource bundle if not already done
+      if (resources == null) {
+        // Try using PluginWorkspaceProvider first
+        PluginWorkspace workspace = PluginWorkspaceProvider.getPluginWorkspace();
+        if (workspace != null) {
+          System.err.println("DILA Plugin: Initializing resource bundle in getTitle() via PluginWorkspaceProvider");
+          initializeResourceBundle(workspace);
+        } else if (pluginWorkspace != null) {
+          System.err.println("DILA Plugin: Initializing resource bundle in getTitle() via stored workspace");
+          initializeResourceBundle(pluginWorkspace);
+        }
+      }
+      
+      // Only catch exceptions from getMessage for clarity
+      title = getMessage("preferences.page.title");
+      System.err.println("DILA Plugin: getTitle() returning: " + title);
+    } catch (Exception e) {
+      System.err.println("[E] DILA Plugin: Error in getMessage() in getTitle(): " + e.getMessage());
+      e.printStackTrace();
+    }
+    // Ensure we NEVER return null - this prevents NPE in Oxygen's options dialog
+    return (title != null && !title.trim().isEmpty()) ? title : "DILA Plugin";
+  }
+
+  /**
+   * Initialize the resource bundle for i18n support.
+   * This method should be called early to ensure translations are available.
+   */
+  private void initializeResourceBundle(PluginWorkspace pluginWorkspace) {
+    // Store the workspace reference for later use
+    this.pluginWorkspace = pluginWorkspace;
+    
+    // Store the resource bundle as an instance variable
+    // According to Oxygen SDK, cast to StandalonePluginWorkspace to access getResourceBundle()
+    try {
+      if (pluginWorkspace instanceof StandalonePluginWorkspace) {
+        this.resources = ((StandalonePluginWorkspace) pluginWorkspace).getResourceBundle();
+        if (this.resources != null) {
+          System.err.println("DILA Plugin: Resource bundle loaded successfully");
+          // Test the resource bundle with a known key
+          try {
+            String testMessage = this.resources.getMessage("preferences.page.title");
+            System.err.println("DILA Plugin: Test message for 'preferences.page.title': " + testMessage);
+          } catch (Exception e) {
+            System.err.println("DILA Plugin: Test message failed: " + e.getMessage());
+          }
+        } else {
+          System.err.println("DILA Plugin: Resource bundle is null - i18n translations may not work");
+        }
+      } else {
+        System.err.println("DILA Plugin: PluginWorkspace is not StandalonePluginWorkspace - cannot access resource bundle");
+        this.resources = null;
+      }
+    } catch (Exception e) {
+      System.err.println("[E] DILA Plugin: Failed to load resource bundle: " + e.getMessage());
+      e.printStackTrace();
+      this.resources = null;
+    }
+  }
+
+  // ...existing code...
+}
+````
+
+**Key Changes:**
+
+1. **Constructor initialization**: Added a constructor that calls `initializeResourceBundleEarly()` to set up the resource bundle immediately when the class is instantiated.
+
+2. **PluginWorkspaceProvider usage**: Uses `PluginWorkspaceProvider.getPluginWorkspace()` to get the current workspace instance without waiting for the `init()` method.
+
+3. **Enhanced getTitle()**: Modified `getTitle()` to attempt resource bundle initialization if it hasn't happened yet, with multiple fallback strategies.
+
+4. **Better debugging**: Added more detailed logging to track when and how the resource bundle is being initialized.
+
+5. **Test message**: Added a test call to verify the resource bundle is working correctly after initialization.
+
+This ensures the resource bundle is available when `getTitle()` is called during the preferences dialog setup, which should resolve the issue of showing keys instead of translated strings.
+
+---
+
+_**User (2025-09-29 15:47Z)**_
+
+please modify the code according to the above suggection
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll modify the code to implement early resource bundle initialization using PluginWorkspaceProvider. Let me make the necessary changes: Now let me implement the changes according to the suggestion: 
+```
+
+```
+Now let me also remove the now redundant workspace storage line from the init() method since it's already done in initializeResourceBundle: 
+```
+
+```
+Perfect! Now let's rebuild the project to ensure all changes compile correctly: The code has been successfully modified according to the suggestion. Here's a summary of the key changes made:
+
+## ✅ **Key Modifications Made:**
+
+### 1. **Added PluginWorkspaceProvider Import**
+- Added `import ro.sync.exml.workspace.api.PluginWorkspaceProvider;` for early workspace access
+
+### 2. **Constructor with Early Initialization**
+- Added a constructor that calls `initializeResourceBundleEarly()` when the class is instantiated
+- This ensures resource bundle setup happens as early as possible
+
+### 3. **Early Resource Bundle Initialization Method**
+- `initializeResourceBundleEarly()` uses `PluginWorkspaceProvider.getPluginWorkspace()` to get workspace access immediately
+- Provides better timing for resource bundle setup before `getTitle()` is called
+
+### 4. **Enhanced getTitle() Method**
+- Multiple fallback strategies: PluginWorkspaceProvider first, then stored workspace
+- Added detailed logging to track resource bundle initialization timing
+- Added debug output to show what title is being returned
+
+### 5. **Improved initializeResourceBundle() Method**
+- Now stores workspace reference for later use
+- Added test message retrieval to verify resource bundle is working
+- Enhanced error handling and logging
+
+## 🎯 **Expected Behavior:**
+
+1. **Constructor Phase**: When the class is instantiated, it immediately tries to get the workspace and initialize the resource bundle
+2. **getTitle() Phase**: If resource bundle isn't available yet, it tries multiple methods to initialize it
+3. **Fallback Protection**: If all initialization attempts fail, it uses hardcoded fallback text
+
+This should resolve the issue where the title displays "preferences.page.title" instead of the translated "DILA AI Markup Assistant Options" by ensuring the resource bundle is available much earlier in the plugin lifecycle.
+
+You can now rebuild the project with `mvn clean install` to test these changes.
+
+---
+
+_**User (2025-09-29 15:48Z)**_
+
+does the javaScript have to change according to your suggestion?
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+Looking at my previous suggestion, the JavaScript file (`dila-ai-markup.js`) does **NOT** need to change. Here's why:
+
+## 🔍 **Analysis of Changes:**
+
+### **Java Changes (DAMAOptionPagePluginExtension.java):**
+- Added `PluginWorkspaceProvider` import and usage
+- Added constructor with early resource bundle initialization
+- Enhanced `getTitle()` method with better timing
+- Improved `initializeResourceBundle()` method
+
+### **JavaScript Impact:**
+The JavaScript file (`dila-ai-markup.js`) is **completely separate** from the resource bundle initialization issue. The JavaScript handles:
+- Workspace access for the main plugin functionality
+- AI markup operations
+- Debug logging
+- TEI XML processing
+
+## ✅ **Why JavaScript Doesn't Need Changes:**
+
+1. **Different Scope**: The i18n resource bundle issue is specific to the **Java options page** extension, not the JavaScript workspace extension
+2. **Separate Components**: 
+   - Java: Handles the preferences/options UI with i18n translations
+   - JavaScript: Handles the main plugin functionality and AI operations
+3. **No Resource Bundle Dependency**: The JavaScript doesn't use the Java resource bundle system for translations
+
+## 📋 **Current Architecture:**
+```
+dila-ai-markup.js          → Main plugin functionality (unchanged)
+DAMAOptionPagePluginExtension.java → Options page with i18n (modified)
+translation.xml            → Translation resources (unchanged)
+plugin.xml                 → Plugin descriptor (unchanged)
+```
+
+## 🎯 **Conclusion:**
+**No changes needed** to the JavaScript file. The resource bundle timing fix is purely a Java-side enhancement to ensure the options page title displays correctly. The JavaScript functionality remains completely independent and unaffected.
+
+You can proceed with rebuilding the Maven project without modifying the JavaScript file.
+
+---
+
+_**User (2025-09-29 15:48Z)**_
+
+rebuild the project with mvn clean install to test these changes
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll rebuild the Maven project to test the enhanced resource bundle initialization changes: Excellent! The build was successful. Now let me copy the updated plugin files to the deployment location: Perfect! Let me also verify the plugin package contents to ensure everything is properly included: ## ✅ **Build Success - Enhanced Resource Bundle Timing**
+
+The Maven project has been successfully rebuilt with all the enhanced resource bundle initialization changes! Here's the comprehensive summary:
+
+### **Build Results:**
+- **Status**: BUILD SUCCESS ✅
+- **Build Time**: 4.936 seconds
+- **Compilation**: 1 Java file compiled with enhanced timing logic
+- **Resources**: 4 resources copied successfully
+- **Assembly**: Plugin ZIP created with updated components
+
+### **Key Enhancements Implemented:**
+1. **Early Constructor Initialization**: Resource bundle setup happens immediately when class is instantiated
+2. **PluginWorkspaceProvider Integration**: Uses Oxygen's provider pattern for early workspace access
+3. **Enhanced getTitle() Logic**: Multiple fallback strategies for resource bundle access
+4. **Improved Error Handling**: Better logging and debugging for resource bundle timing issues
+5. **Test Message Verification**: Validates resource bundle functionality after initialization
+
+### **Plugin Package Contents Verified:**
+- ✅ `dilaAIMarkupPlugin/lib/dila-ai-markup-plugin-0.2.3.jar` - Updated with timing fixes
+- ✅ `dilaAIMarkupPlugin/plugin.xml` - Plugin descriptor
+- ✅ `dilaAIMarkupPlugin/extension.xml` - Extension configuration  
+- ✅ `dilaAIMarkupPlugin/dila-ai-markup.js` - JavaScript components (unchanged)
+- ✅ `dilaAIMarkupPlugin/i18n/translation.xml` - Translation resources
+
+### **Ready for Testing:**
+The plugin is now ready for installation with significantly improved resource bundle timing. The title should now display **"DILA AI Markup Assistant Options"** instead of 
 
 ---
 
