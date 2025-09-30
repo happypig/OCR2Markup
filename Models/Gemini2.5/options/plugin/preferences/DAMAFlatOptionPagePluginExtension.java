@@ -4,6 +4,6 @@ import com.dila.dama.plugin.preferences.DAMAOptionPagePluginExtension;
 
 public class DAMAFlatOptionPagePluginExtension extends DAMAOptionPagePluginExtension {
     public String getTitle() {
-        return "DILA AI Markup Assistant Options";
+        return "DILA AI Markup Assistant";
     }
 }

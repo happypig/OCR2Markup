@@ -72,7 +72,6 @@ function applicationStarted(pluginWorkspaceAccess) {
             var jsApiKey = String(apiKey);
             maskedApiKey = jsApiKey.replace(/.(?=.{4})/g, '*');
         }
-        logDebug("API Key (masked): " + jsApiKey);
         logDebug("API Key (masked except last 4 chars): " + maskedApiKey);
     }
 
@@ -99,7 +98,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                     
                     // Try to load icon with proper null checking
                     try {
-                        var pluginDescriptor = pluginWorkspaceAccess.getPluginDescriptor("com.dila.ai.markup");
+                        var pluginDescriptor = pluginWorkspaceAccess.getDescriptor("com.dila.ai.markup");
                         var pluginDir = pluginDescriptor.getBaseDir(); // java.io.File
                         var imagesDir = new Packages.java.io.File(pluginDir, "images");
                         var iconFile = new Packages.java.io.File(imagesDir, "options.png");
@@ -353,9 +352,6 @@ function applicationStarted(pluginWorkspaceAccess) {
                     // Add action listener to the Tag Removal menu item
                     menuItemActionTagRemoval.addActionListener(function() {
                         logDebug("Tag Removal action triggered");
-
-                        // Switch back to main view if options panel is currently showing
-                        // cardLayout.show(cardPanel, "MAIN"); // Commented out - cardLayout not used
 
                         infoArea.setText(i18nFn("action.tag.removal.selected"));
                         var selectedText = fetchAndDisplaySelectedText(infoArea);
