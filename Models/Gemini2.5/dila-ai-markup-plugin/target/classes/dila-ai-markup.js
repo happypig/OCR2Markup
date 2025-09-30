@@ -93,31 +93,52 @@ function applicationStarted(pluginWorkspaceAccess) {
                     var menuItemActionAIMarkup = new JMenuItem(i18nFn("ai.markup.action")); // load action from local
                     var menuItemActionTagRemoval = new JMenuItem(i18nFn("tag.removal.action")); // load action from local
 
-                    // Create options menu with proper null handling for icon
+                    // Create options menu with comprehensive icon loading
                     var menuOptions = new JMenu();
                     
-                    // Try to load icon with proper null checking
-                    try {
-                        var pluginDescriptor = pluginWorkspaceAccess.getDescriptor("com.dila.ai.markup");
-                        var pluginDir = pluginDescriptor.getBaseDir(); // java.io.File
-                        var imagesDir = new Packages.java.io.File(pluginDir, "images");
-                        var iconFile = new Packages.java.io.File(imagesDir, "options.png");
-                        var iconPath = iconFile.getAbsolutePath();
-
-                        if (iconPath != null) {
-                            var optionsIcon = new ImageIcon(iconPath);
-                            menuOptions.setIcon(optionsIcon);
-                            menuOptions.setToolTipText(i18nFn("options.menu")); // Set tooltip text for accessibility
-                            logDebug("Options icon loaded successfully");
-                        } else {
-                            logDebug("Warning: options.png not found in system resources - menu will display without icon");
-                            menuOptions.setToolTipText(i18nFn("options.menu")); // Set tooltip text for accessibility
+                    // Ensure menuOptions is properly initialized before proceeding
+                    if (menuOptions != null) {
+                        var iconPath = "images/options.png"; // Default icon path
+                        logDebug("jsDirURL: " + jsDirURL);
+                        
+                        try {
+                            var iconURI = new Packages.java.net.URI(jsDirURL + iconPath);
+                            logDebug("Icon URI: " + iconURI);
+                            var iconFile = new Packages.java.io.File(iconURI);
+                            
+                            if (iconFile.exists()) {
+                                // Method 1: Try creating ImageIcon directly from File
+                                var icon = new Packages.javax.swing.ImageIcon(iconFile.getAbsolutePath());
+                                
+                                // Verify the icon loaded properly
+                                if (icon != null && icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
+                                    menuOptions.setIcon(icon);
+                                    logDebug("Options icon loaded successfully from file: " + iconFile.getAbsolutePath() + 
+                                            " (Size: " + icon.getIconWidth() + "x" + icon.getIconHeight() + ")");
+                                } else {
+                                    menuOptions.setText(i18nFn("options.menu"));
+                                    logDebug("Icon file exists but failed to load properly, using text fallback");
+                                }
+                            } else {
+                                menuOptions.setText(i18nFn("options.menu"));
+                                logDebug("Icon file does not exist at path: " + iconFile.getAbsolutePath());
+                            }
+                        } catch (e) {
+                            menuOptions.setText(i18nFn("options.menu"));
+                            logDebug("Error loading icon from file: " + e.message);
                         }
-                    } catch (e) {
-                        logDebug("Error loading options icon: " + e.message);
+
+                        // Set tooltip text for accessibility - with null safety check
+                        menuOptions.setToolTipText(i18nFn("options.menu"));
+                    } else {
+                        logDebug("Error: menuOptions is null, cannot proceed with menu creation");
+                        // Create a new instance if somehow it became null
+                        menuOptions = new JMenu(i18nFn("options.menu"));
+                        if (menuOptions != null) {
+                            menuOptions.setToolTipText(i18nFn("options.menu"));
+                        }
                     }
                     
-                    menuOptions.setToolTipText(i18nFn("options.menu")); // Set tooltip text for accessibility
                     var menuItemOption = new JMenuItem(i18nFn("preferences.action")); // go to options dialog
 
                     // Assemble the menu bar - Actions on left, Options on right
@@ -383,7 +404,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                 }
             }
         }
-    ))
+    ));
 
     function fetchAndDisplaySelectedText(area) {
         var editorAccess = pluginWorkspaceAccess.getCurrentEditorAccess(Packages.ro.sync.exml.workspace.api.PluginWorkspace.MAIN_EDITING_AREA);

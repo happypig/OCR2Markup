@@ -215,7 +215,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       }
       
       // Only catch exceptions from getMessage for clarity
-      title = getMessage("preferences.page.title");
+      title = "DILA AI Markup Assistant";
       System.err.println("DILA Plugin: getTitle() returning: " + title);
     } catch (Exception e) {
       System.err.println("[E] DILA Plugin: Error in getMessage() in getTitle(): " + e.getMessage());
