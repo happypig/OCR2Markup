@@ -52,7 +52,7 @@ function applicationStarted(pluginWorkspaceAccess) {
     logDebug("debug mode: " + getDebugMode());
 
     var resources = pluginWorkspaceAccess.getResourceBundle();
-    var optionsPageKey = "dila.dama.options.page.key"; // should match the key in DAMAWorkspaceAccessOptionPagePluginExtension since there's no way to get it
+    var optionsPageKey = "dila_ai_markup_options_page_key"; // should match the key in DAMAWorkspaceAccessOptionPagePluginExtension since there's no way to get it
 
     function i18nFn(key) {
         return resources.getMessage(key);
@@ -86,26 +86,66 @@ function applicationStarted(pluginWorkspaceAccess) {
                     var JMenuBar = Packages.javax.swing.JMenuBar;
                     var JMenu = Packages.javax.swing.JMenu;
                     var JMenuItem = Packages.javax.swing.JMenuItem;
+                    var ImageIcon = Packages.javax.swing.ImageIcon;
+                    var Box = Packages.javax.swing.Box;
+                    
                     var menuBar = new JMenuBar();
                     var menuActions = new JMenu(i18nFn("actions.menu")); // "Actions"
                     var menuItemActionAIMarkup = new JMenuItem(i18nFn("ai.markup.action")); // load action from local
                     var menuItemActionTagRemoval = new JMenuItem(i18nFn("tag.removal.action")); // load action from local
 
-                    var menuOptions = new JMenu(i18nFn("options.menu")); // "Options"
+                    // Create options menu with proper null handling for icon
+                    var menuOptions = new JMenu();
+                    
+                    // Try to load icon with proper null checking
+                    try {
+                        var pluginDescriptor = pluginWorkspaceAccess.getPluginDescriptor("com.dila.ai.markup");
+                        var pluginDir = pluginDescriptor.getBaseDir(); // java.io.File
+                        var imagesDir = new Packages.java.io.File(pluginDir, "images");
+                        var iconFile = new Packages.java.io.File(imagesDir, "options.png");
+                        var iconPath = iconFile.getAbsolutePath();
+
+                        if (iconPath != null) {
+                            var optionsIcon = new ImageIcon(iconPath);
+                            menuOptions.setIcon(optionsIcon);
+                            menuOptions.setToolTipText(i18nFn("options.menu")); // Set tooltip text for accessibility
+                            logDebug("Options icon loaded successfully");
+                        } else {
+                            logDebug("Warning: options.png not found in system resources - menu will display without icon");
+                            menuOptions.setToolTipText(i18nFn("options.menu")); // Set tooltip text for accessibility
+                        }
+                    } catch (e) {
+                        logDebug("Error loading options icon: " + e.message);
+                    }
+                    
+                    menuOptions.setToolTipText(i18nFn("options.menu")); // Set tooltip text for accessibility
                     var menuItemOption = new JMenuItem(i18nFn("preferences.action")); // go to options dialog
 
-                    // Assemble the menu bar
+                    // Assemble the menu bar - Actions on left, Options on right
                     menuBar.add(menuActions);
                     menuActions.add(menuItemActionAIMarkup);
                     menuActions.add(menuItemActionTagRemoval);
-
+                    
+                    // Add horizontal glue to push Options menu to the right
+                    menuBar.add(Box.createHorizontalGlue());
+                    
                     menuBar.add(menuOptions);
                     menuOptions.add(menuItemOption);
 
                     // Plugin panel of BorderLayout with menu bar
                     var JPanel = Packages.javax.swing.JPanel;
                     var BorderLayout = Packages.java.awt.BorderLayout;
+                    var Dimension = Packages.java.awt.Dimension;
+                    var Toolkit = Packages.java.awt.Toolkit;
+                    
                     var pluginPanel = new JPanel(new BorderLayout());
+                    
+                    // Set the width to 1/5 of the application width
+                    var screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                    var panelWidth = Math.floor(screenSize.width / 5);
+                    var panelHeight = screenSize.height; // Use full height
+                    pluginPanel.setPreferredSize(new Dimension(panelWidth, panelHeight));
+                    
                     pluginPanel.add(menuBar, BorderLayout.NORTH);
 
                     // Text areas for info and results

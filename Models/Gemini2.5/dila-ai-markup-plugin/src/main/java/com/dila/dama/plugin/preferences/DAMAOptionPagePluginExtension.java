@@ -24,7 +24,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
   /**
    * The option page key for this preferences page.
    */
-  public static final String DILA_DAMA_OPTIONS_PAGE_KEY = "dila_ai_markup_options";
+  public static final String DILA_DAMA_OPTIONS_PAGE_KEY = "dila_ai_markup_options_page_key";
 
     /**
    * The option key describing the ft parse model.
