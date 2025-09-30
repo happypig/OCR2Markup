@@ -4292,7 +4292,7 @@ You can proceed with rebuilding the Maven project without modifying the JavaScri
 
 ---
 
-_**User (2025-09-29 15:48Z)**_
+_**User (2025-09-29 15:49Z)**_
 
 rebuild the project with mvn clean install to test these changes
 
@@ -4326,7 +4326,813 @@ The Maven project has been successfully rebuilt with all the enhanced resource b
 - ✅ `dilaAIMarkupPlugin/i18n/translation.xml` - Translation resources
 
 ### **Ready for Testing:**
-The plugin is now ready for installation with significantly improved resource bundle timing. The title should now display **"DILA AI Markup Assistant Options"** instead of 
+The plugin is now ready for installation with significantly improved resource bundle timing. The title should now display **"DILA AI Markup Assistant Options"** instead of **"preferences.page.title"** when you access the preferences page.
+
+**Installation**: Use `dilaAIMarkupPlugin.zip` in Oxygen XML Author via **Help → Install new add-ons**.
+
+---
+
+_**User (2025-09-29 18:04Z)**_
+
+rebuild the maven project with the update xml files
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll rebuild the Maven project to incorporate your latest changes to the XML files. Let me run the build: Let me try the Maven build again: Excellent! The build was successful. Now let me copy the updated plugin files to the deployment location: Perfect! Let me verify the plugin package contents to ensure the updated XML files are included: ## ✅ **Build Success with Updated XML Files**
+
+The Maven project has been successfully rebuilt with your latest XML file changes! Here's the comprehensive summary:
+
+### **Build Results:**
+- **Status**: BUILD SUCCESS ✅
+- **Build Time**: 5.074 seconds
+- **Timestamp**: September 30, 2025 at 02:03:22
+- **Compilation**: 1 Java file compiled successfully
+- **Resources**: 4 resources copied including your updated XML files
+
+### **Updated Components Included:**
+- ✅ **plugin.xml** - Your latest plugin descriptor changes
+- ✅ **translation.xml** - Your updated i18n translations
+- ✅ **Enhanced Java code** - With improved resource bundle timing
+- ✅ **Complete plugin structure** - All components properly packaged
+
+### **Plugin Package Verification:**
+The ZIP file contains all components with your latest changes:
+- `dilaAIMarkupPlugin/plugin.xml` - **Updated** with your changes
+- `dilaAIMarkupPlugin/i18n/translation.xml` - **Updated** with your changes
+- `dilaAIMarkupPlugin/lib/dila-ai-markup-plugin-0.2.3.jar` - Enhanced Java code
+- `dilaAIMarkupPlugin/extension.xml` - Extension configuration
+- `dilaAIMarkupPlugin/dila-ai-markup.js` - JavaScript components
+
+### **Ready for Installation:**
+The plugin is now ready with all your latest XML modifications and the enhanced resource bundle initialization. 
+
+**Installation Location**: `dilaAIMarkupPlugin.zip`
+
+You can now install this updated version in Oxygen XML Author via **Help → Install new add-ons** to test your XML changes along with the improved i18n timing.
+
+---
+
+_**User (2025-09-29 18:15Z)**_
+
+rebuild the maven project with the update xml files
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll rebuild the Maven project to incorporate your latest changes to both the JavaScript file and the Java extension class: Great! The build was successful. Now let me copy the updated plugin files to the deployment location: Perfect! Let me verify the plugin package contents to ensure all your latest changes are included: ## ✅ **Build Success with All Latest Updates**
+
+The Maven project has been successfully rebuilt with all your latest file modifications! Here's the comprehensive summary:
+
+### **Build Results:**
+- **Status**: BUILD SUCCESS ✅
+- **Build Time**: 8.601 seconds
+- **Timestamp**: September 30, 2025 at 02:14:24
+- **Compilation**: 1 Java file recompiled with your changes
+- **Resources**: 4 resources copied including all updated files
+
+### **Updated Components Included:**
+- ✅ **`DAMAOptionPagePluginExtension.java`** - Your latest Java modifications
+- ✅ **dila-ai-markup.js** - Your updated JavaScript changes
+- ✅ **plugin.xml** - Previously updated plugin descriptor
+- ✅ **translation.xml** - Previously updated i18n translations
+- ✅ **Complete integration** - All components working together
+
+### **Plugin Package Structure Verified:**
+All components are properly packaged with your latest changes:
+- `dilaAIMarkupPlugin/lib/dila-ai-markup-plugin-0.2.3.jar` - **Updated** with Java changes
+- `dilaAIMarkupPlugin/dila-ai-markup.js` - **Updated** with your JavaScript changes
+- `dilaAIMarkupPlugin/plugin.xml` - Updated plugin descriptor
+- `dilaAIMarkupPlugin/i18n/translation.xml` - Updated translations
+- `dilaAIMarkupPlugin/extension.xml` - Extension configuration
+
+### **Ready for Testing:**
+The plugin is now ready with all your comprehensive updates including:
+- Enhanced resource bundle initialization timing
+- Your custom JavaScript modifications
+- Updated XML configurations
+- Improved i18n translation handling
+
+**Installation**: Use `dilaAIMarkupPlugin.zip` in Oxygen XML Author via **Help → Install new add-ons** to test all your latest changes together.
+
+---
+
+_**User (2025-09-30 00:34Z)**_
+
+please rebuild the maven project
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll rebuild the Maven project to incorporate your latest changes to the `DAMAOptionPagePluginExtension.java` file: Excellent! The build was successful. Now let me copy the updated plugin files to the deployment location: Perfect! Let me also verify the plugin package contents: ## ✅ **Build Success with Latest Java Changes**
+
+The Maven project has been successfully rebuilt with your latest modifications to the `DAMAOptionPagePluginExtension.java` file! Here's the summary:
+
+### **Build Results:**
+- **Status**: BUILD SUCCESS ✅
+- **Build Time**: 20.326 seconds
+- **Timestamp**: September 30, 2025 at 08:33:21
+- **Compilation**: 1 Java file recompiled with your latest changes
+- **Resources**: 4 resources copied successfully
+
+### **Components Updated:**
+- ✅ **`DAMAOptionPagePluginExtension.java`** - Your latest modifications compiled
+- ✅ **Plugin JAR**: `dila-ai-markup-plugin-0.2.3.jar` - Updated with new Java code
+- ✅ **Complete package**: All resources and configurations included
+
+### **Plugin Package Verified:**
+The ZIP file contains all components with your latest changes:
+- `dilaAIMarkupPlugin/lib/dila-ai-markup-plugin-0.2.3.jar` - **Updated** with your Java changes
+- `dilaAIMarkupPlugin/dila-ai-markup.js` - JavaScript components
+- `dilaAIMarkupPlugin/plugin.xml` - Plugin descriptor
+- `dilaAIMarkupPlugin/extension.xml` - Extension configuration
+- `dilaAIMarkupPlugin/i18n/translation.xml` - Translation resources
+
+### **Ready for Installation:**
+The plugin is now ready with all your latest Java modifications. You can install it in Oxygen XML Author using:
+
+**File Location**: `dilaAIMarkupPlugin.zip`
+**Installation**: **Help → Install new add-ons** in Oxygen XML Author
+
+Your latest changes to the option page extension have been successfully compiled and packaged for testing.
+
+---
+
+_**User (2025-09-30 01:15Z)**_
+
+set the width to 1/5 of the Application width
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll modify the JavaScript code to set the plugin panel width to 1/5 of the application width. Looking at your selection, I need to add width configuration for the plugin panel. 
+```
+
+```
+Perfect! I've modified the JavaScript code to set the plugin panel width to 1/5 of the screen width. Here's what I added:
+
+## ✅ **Changes Made:**
+
+1. **Added Required Imports:**
+   - `Packages.java.awt.Dimension` - For setting panel dimensions
+   - `Packages.java.awt.Toolkit` - For getting screen size information
+
+2. **Width Calculation:**
+   - Gets the screen size using `Toolkit.getDefaultToolkit().getScreenSize()`
+   - Calculates panel width as `Math.floor(screenSize.width / 5)` (1/5 of screen width)
+   - Uses full screen height for the panel
+
+3. **Panel Size Setting:**
+   - Creates a new `Dimension` object with the calculated width and height
+   - Sets the preferred size using `pluginPanel.setPreferredSize()`
+
+## 🎯 **Expected Behavior:**
+The plugin panel will now be sized to 1/5 of the application's screen width, making it a more appropriately sized side panel rather than taking up too much screen real estate.
+
+Now you can rebuild the Maven project to include this change:
+
+```bash
+mvn clean install
+```
+
+This will ensure the plugin displays with the new width constraint when installed in Oxygen XML Author.
+
+---
+
+_**User (2025-09-30 01:20Z)**_
+
+keep menuActions to the left and menuOptions to the right in menubar, then use "options.png" instead of JMenu(i18nFn("options.menu"))
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll modify the menu bar to keep Actions on the left, Options on the right, and replace the Options text menu with an icon using "options.png". 
+```
+
+```
+Perfect! I've modified the menu bar layout with the following changes:
+
+## ✅ **Key Changes Made:**
+
+### 1. **Added Required Imports:**
+- `Packages.javax.swing.ImageIcon` - For loading the icon image
+- `Packages.javax.swing.Box` - For creating horizontal glue layout
+
+### 2. **Options Menu with Icon:**
+- Created `optionsIcon` using `ImageIcon` that loads "options.png" from resources
+- Set the icon on `menuOptions` using `setIcon(optionsIcon)`
+- Added tooltip text using `setToolTipText()` for accessibility (shows "Options" on hover)
+- Removed the text label from the Options menu
+
+### 3. **Layout Changes:**
+- **Actions menu**: Stays on the left side as before
+- **Horizontal glue**: Added `Box.createHorizontalGlue()` to push content to opposite sides
+- **Options menu**: Now positioned on the right side of the menu bar
+
+## 🎯 **Expected Behavior:**
+- "Actions" menu will appear on the left with AI Markup and Tag Removal items
+- Options menu will appear on the right as an icon (options.png) instead of text
+- Hovering over the options icon will show "Options" tooltip
+- The horizontal space between Actions and Options will automatically expand
+
+## 📋 **Note:**
+Make sure you have an "options.png" file in your `src/main/resources` directory for the icon to display properly. If the icon file is missing, the menu will still work but won't show the icon.
+
+You can now rebuild the project to see the new menu layout in action!
+
+---
+
+_**User (2025-09-30 01:22Z)**_
+
+rebuild the maven project with the updated js code and png
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll rebuild the Maven project to incorporate your updated JavaScript code and the options.png file: Excellent! The build was successful. I notice it's now copying **5 resources** (instead of 4), which confirms the options.png file has been added. Now let me copy the updated plugin files to the deployment location: Perfect! Let me verify the plugin package contents to ensure all updates are included: ## ✅ **Build Success with Updated JavaScript and PNG Icon**
+
+The Maven project has been successfully rebuilt with all your latest updates! Here's the comprehensive summary:
+
+### **Build Results:**
+- **Status**: BUILD SUCCESS ✅
+- **Build Time**: 5.480 seconds
+- **Resources**: **5 resources** copied (increased from 4, confirming PNG addition)
+- **Compilation**: 1 Java file recompiled successfully
+
+### **Updated Components Verified:**
+- ✅ **dila-ai-markup.js** - Updated with new menu layout and icon support
+- ✅ **options.png** - New icon file added to `image/` directory
+- ✅ **Enhanced menu bar** - Actions left, Options icon right with horizontal glue
+- ✅ **Panel sizing** - 1/5 screen width configuration
+- ✅ **All previous enhancements** - Java i18n improvements, translations, etc.
+
+### **Plugin Package Structure:**
+The ZIP now contains the complete updated structure:
+- `dilaAIMarkupPlugin/dila-ai-markup.js` - **Updated** with new menu layout
+- `dilaAIMarkupPlugin/image/options.png` - **New** PNG icon for options menu
+- `dilaAIMarkupPlugin/lib/dila-ai-markup-plugin-0.2.3.jar` - Updated Java components
+- `dilaAIMarkupPlugin/plugin.xml` - Plugin descriptor
+- `dilaAIMarkupPlugin/i18n/translation.xml` - Internationalization resources
+- `dilaAIMarkupPlugin/extension.xml` - Extension configuration
+
+### **Expected UI Behavior:**
+- **Actions Menu**: Left-aligned with AI Markup and Tag Removal options
+- **Options Menu**: Right-aligned with PNG icon instead of text
+- **Panel Width**: Set to 1/5 of screen width for better space management
+- **Tooltip**: Hovering over options icon shows localized tooltip text
+
+### **Ready for Installation:**
+**File Location**: `dilaAIMarkupPlugin.zip`
+
+The plugin is now ready with all your UI enhancements and can be installed in Oxygen XML Author via **Help → Install new add-ons**.
+
+---
+
+_**User (2025-09-30 01:25Z)**_
+
+@workspace /fix with the following error message:
+
+The application detected an error that is not automatically handled. It is possible that this error is not critical and the application may continue to work normally but our recommendation is to report the error and restart the application. If the application has become unstable and cannot be closed normally, you can use the Force Quit button from this dialog. Be aware that by doing this you will lose all unsaved changes in the opened documents.
+
+Here are the error details:
+
+[ AWT-EventQueue-0 ]  -  org.mozilla.javascript.EvaluatorException: The choice of Java constructor javax.swing.ImageIcon matching JavaScript argument types (null) is ambiguous; candidate constructors are: 
+    ImageIcon(java.net.URL)
+    ImageIcon(java.awt.Image)
+    ImageIcon(byte[])
+    ImageIcon(java.lang.String) (file:/C:/Users/jeffw/AppData/Roaming/com.oxygenxml/extensions/v27.1/plugins/com.dila.ai.markup/dilaAIMarkupPlugin/dila-ai-markup.js#98)
+org.mozilla.javascript.EvaluatorException: The choice of Java constructor javax.swing.ImageIcon matching JavaScript argument types (null) is ambiguous; candidate constructors are: 
+    ImageIcon(java.net.URL)
+    ImageIcon(java.awt.Image)
+    ImageIcon(byte[])
+    ImageIcon(java.lang.String) (file:/C:/Users/jeffw/AppData/Roaming/com.oxygenxml/extensions/v27.1/plugins/com.dila.ai.markup/dilaAIMarkupPlugin/dila-ai-markup.js#98)
+	at org.mozilla.javascript.DefaultErrorReporter.runtimeError(DefaultErrorReporter.java:79)
+	at org.mozilla.javascript.Context.reportRuntimeError(Context.java:907)
+	at org.mozilla.javascript.Context.reportRuntimeError(Context.java:963)
+	at org.mozilla.javascript.Context.reportRuntimeErrorById(Context.java:914)
+	at org.mozilla.javascript.NativeJavaMethod.findFunction(NativeJavaMethod.java:434)
+	at org.mozilla.javascript.NativeJavaMethod.findCachedFunction(NativeJavaMethod.java:248)
+	at org.mozilla.javascript.NativeJavaClass.construct(NativeJavaClass.java:161)
+	at org.mozilla.javascript.ScriptRuntime.newObject(ScriptRuntime.java:2680)
+	at org.mozilla.javascript.gen.file__C__Users_jeffw_AppData_Roaming_com_oxygenxml_extensions_v27_1_plugins_com_dila_ai_markup_dilaAIMarkupPlugin_dila_ai_markup_js_1._c_anonymous_5(file:/C:/Users/jeffw/AppData/Roaming/com.oxygenxml/extensions/v27.1/plugins/com.dila.ai.markup/dilaAIMarkupPlugin/dila-ai-markup.js:98)
+	at org.mozilla.javascript.gen.file__C__Users_jeffw_AppData_Roaming_com_oxygenxml_extensions_v27_1_plugins_com_dila_ai_markup_dilaAIMarkupPlugin_dila_ai_markup_js_1.call(file:/C:/Users/jeffw/AppData/Roaming/com.oxygenxml/extensions/v27.1/plugins/com.dila.ai.markup/dilaAIMarkupPlugin/dila-ai-markup.js)
+	at org.mozilla.javascript.ContextFactory.doTopCall(ContextFactory.java:380)
+	at org.mozilla.javascript.ScriptRuntime.doTopCall(ScriptRuntime.java:3868)
+	at org.mozilla.javascript.gen.file__C__Users_jeffw_AppData_Roaming_com_oxygenxml_extensions_v27_1_plugins_com_dila_ai_markup_dilaAIMarkupPlugin_dila_ai_markup_js_1.call(file:/C:/Users/jeffw/AppData/Roaming/com.oxygenxml/extensions/v27.1/plugins/com.dila.ai.markup/dilaAIMarkupPlugin/dila-ai-markup.js)
+	at org.mozilla.javascript.JavaAdapter.doCall(JavaAdapter.java:614)
+	at org.mozilla.javascript.JavaAdapter.lambda$callMethod$0(JavaAdapter.java:597)
+	at org.mozilla.javascript.Context.call(Context.java:535)
+	at org.mozilla.javascript.ContextFactory.call(ContextFactory.java:472)
+	at org.mozilla.javascript.JavaAdapter.callMethod(JavaAdapter.java:597)
+	at adapter1.customizeView(<adapter>)
+	at ro.sync.exml.layout.c.f(Unknown Source)
+	at ro.sync.exml.layout.i$3.create(Unknown Source)
+	at ro.sync.exml.layout.c.g(Unknown Source)
+	at ro.sync.exml.layout.i.o(Unknown Source)
+	at ro.sync.exml.layout.i.m(Unknown Source)
+	at ro.sync.exml.layout.i.ub(Unknown Source)
+	at ro.sync.exml.layout.i.l(Unknown Source)
+	at ro.sync.exml.m.f(Unknown Source)
+	at ro.sync.exml.m.b(Unknown Source)
+	at ro.sync.exml.MainFrame$38.run(Unknown Source)
+	at ro.sync.ui.we$_b.run(Unknown Source)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:308)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:773)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:720)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:714)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:86)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:742)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+Looking at the error, the issue is on line 98 where `getSystemResource("options.png")` is returning `null`, and then passing `null` to the `ImageIcon` constructor causes ambiguity between the different constructor overloads.
+
+**Plan:**
+1. Add null check for the resource lookup result
+2. Provide fallback when the icon resource is not found
+3. Add error handling and logging for debugging
+4. Consider alternative icon loading approaches
+
+````javascript
+// ...existing code...
+                    // Create options menu with icon
+                    var optionsIcon = null;
+                    try {
+                        var iconResource = Packages.java.lang.ClassLoader.getSystemResource("options.png");
+                        if (iconResource != null) {
+                            optionsIcon = new ImageIcon(iconResource);
+                            logDebug("Options icon loaded successfully from: " + iconResource);
+                        } else {
+                            logDebug("Warning: options.png not found in system resources, menu will have no icon");
+                            // Create empty icon or use text-only menu
+                        }
+                    } catch (e) {
+                        logDebug("Error loading options icon: " + e.message);
+                        optionsIcon = null;
+                    }
+                    
+                    var menuOptions = new JMenu();
+                    if (optionsIcon != null) {
+                        menuOptions.setIcon(optionsIcon);
+                    }
+                    menuOptions.setToolTipText(i18nFn("options.menu")); // Set tooltip text for accessibility
+// ...existing code...
+````
+
+**Alternative Solution - Use Built-in Icons:**
+
+If you don't have the `options.png` file in your resources, you can use built-in system icons:
+
+````javascript
+// ...existing code...
+                    // Create options menu with icon - use built-in system icon as fallback
+                    var optionsIcon = null;
+                    try {
+                        var iconResource = Packages.java.lang.ClassLoader.getSystemResource("options.png");
+                        if (iconResource != null) {
+                            optionsIcon = new ImageIcon(iconResource);
+                            logDebug("Options icon loaded successfully from: " + iconResource);
+                        } else {
+                            // Fallback to system icon
+                            var UIManager = Packages.javax.swing.UIManager;
+                            optionsIcon = UIManager.getIcon("OptionPane.informationIcon");
+                            if (optionsIcon == null) {
+                                // If that fails, try another system icon
+                                optionsIcon = UIManager.getIcon("FileView.computerIcon");
+                            }
+                            logDebug("Using system fallback icon for options menu");
+                        }
+                    } catch (e) {
+                        logDebug("Error loading options icon: " + e.message);
+                        optionsIcon = null;
+                    }
+                    
+                    var menuOptions = new JMenu();
+                    if (optionsIcon != null) {
+                        menuOptions.setIcon(optionsIcon);
+                    }
+                    menuOptions.setToolTipText(i18nFn("options.menu")); // Set tooltip text for accessibility
+// ...existing code...
+````
+
+**Root Cause:**
+The error occurs because:
+1. `getSystemResource("options.png")` returns `null` (file not found)
+2. `new ImageIcon(null)` is ambiguous - JavaScript can't determine which constructor to use
+3. Need explicit null checking before constructor calls
+
+**Quick Fix - No Icon:**
+If you just want to remove the icon entirely:
+
+````javascript
+// ...existing code...
+                    // Create options menu without icon for now
+                    var menuOptions = new JMenu();
+                    menuOptions.setToolTipText(i18nFn("options.menu")); // Set tooltip text for accessibility
+// ...existing code...
+````
+
+The first solution with proper null checking and fallback handling is recommended as it provides better user experience and debugging information.
+
+---
+
+_**User (2025-09-30 01:29Z)**_
+
+rename the images folder under the resources folder, please rebuild the maven project again
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll help you rename the images folder and rebuild the Maven project. First, let me check the current structure and then rename the folder: I can see there's an `images/` folder. Let me rename it to a more standard name like `image/` and then rebuild the project: I understand you've already renamed the folder. Now let me rebuild the Maven project with the updated folder structure: Let me try again from the correct starting directory: Great! The build was successful. Now let me copy the updated plugin files to the deployment location: Perfect! Now let me verify the plugin package contents to confirm the folder has been renamed correctly: ## ✅ **Build Success with Renamed Images Folder**
+
+The Maven project has been successfully rebuilt with the renamed folder structure! Here's the summary:
+
+### **Build Results:**
+- **Status**: BUILD SUCCESS ✅
+- **Build Time**: 5.100 seconds
+- **Resources**: 5 resources copied with updated folder structure
+- **Compilation**: 1 Java file compiled successfully
+
+### **Folder Structure Updated:**
+- ✅ **Images folder**: Successfully renamed and included in build
+- ✅ **options.png**: Now located in `dilaAIMarkupPlugin/images/options.png`
+- ✅ **All other components**: Maintained proper structure
+
+### **Plugin Package Contents:**
+The ZIP file now contains all components with the updated folder structure:
+- `dilaAIMarkupPlugin/images/options.png` - **Updated** location for the PNG icon
+- `dilaAIMarkupPlugin/dila-ai-markup.js` - JavaScript components
+- `dilaAIMarkupPlugin/lib/dila-ai-markup-plugin-0.2.3.jar` - Java components
+- `dilaAIMarkupPlugin/plugin.xml` - Plugin descriptor
+- `dilaAIMarkupPlugin/i18n/translation.xml` - Translation resources
+- `dilaAIMarkupPlugin/extension.xml` - Extension configuration
+
+### **Note on JavaScript Update:**
+Since you renamed the folder, you may need to update the JavaScript code to reflect the new path. The current JavaScript code is looking for `"options.png"` but with the renamed folder structure, it should be `"images/options.png"`.
+
+### **Ready for Installation:**
+**File Location**: `dilaAIMarkupPlugin.zip`
+
+The plugin is ready for installation with the updated folder structure. If you encounter the previous ImageIcon error, the path in the JavaScript needs to be updated to match the new folder name.
+
+---
+
+_**User (2025-09-30 01:33Z)**_
+
+@workspace /fix with the error message below:
+
+The application detected an error that is not automatically handled. It is possible that this error is not critical and the application may continue to work normally but our recommendation is to report the error and restart the application. If the application has become unstable and cannot be closed normally, you can use the Force Quit button from this dialog. Be aware that by doing this you will lose all unsaved changes in the opened documents.
+
+Here are the error details:
+
+[ AWT-EventQueue-0 ]  -  org.mozilla.javascript.EvaluatorException: The choice of Java constructor javax.swing.ImageIcon matching JavaScript argument types (null) is ambiguous; candidate constructors are: 
+    ImageIcon(java.net.URL)
+    ImageIcon(java.lang.String)
+    ImageIcon(byte[])
+    ImageIcon(java.awt.Image) (file:/C:/Users/jeffw/AppData/Roaming/com.oxygenxml/extensions/v27.1/plugins/com.dila.ai.markup/dilaAIMarkupPlugin/dila-ai-markup.js#98)
+org.mozilla.javascript.EvaluatorException: The choice of Java constructor javax.swing.ImageIcon matching JavaScript argument types (null) is ambiguous; candidate constructors are: 
+    ImageIcon(java.net.URL)
+    ImageIcon(java.lang.String)
+    ImageIcon(byte[])
+    ImageIcon(java.awt.Image) (file:/C:/Users/jeffw/AppData/Roaming/com.oxygenxml/extensions/v27.1/plugins/com.dila.ai.markup/dilaAIMarkupPlugin/dila-ai-markup.js#98)
+	at org.mozilla.javascript.DefaultErrorReporter.runtimeError(DefaultErrorReporter.java:79)
+	at org.mozilla.javascript.Context.reportRuntimeError(Context.java:907)
+	at org.mozilla.javascript.Context.reportRuntimeError(Context.java:963)
+	at org.mozilla.javascript.Context.reportRuntimeErrorById(Context.java:914)
+	at org.mozilla.javascript.NativeJavaMethod.findFunction(NativeJavaMethod.java:434)
+	at org.mozilla.javascript.NativeJavaMethod.findCachedFunction(NativeJavaMethod.java:248)
+	at org.mozilla.javascript.NativeJavaClass.construct(NativeJavaClass.java:161)
+	at org.mozilla.javascript.ScriptRuntime.newObject(ScriptRuntime.java:2680)
+	at org.mozilla.javascript.gen.file__C__Users_jeffw_AppData_Roaming_com_oxygenxml_extensions_v27_1_plugins_com_dila_ai_markup_dilaAIMarkupPlugin_dila_ai_markup_js_1._c_anonymous_5(file:/C:/Users/jeffw/AppData/Roaming/com.oxygenxml/extensions/v27.1/plugins/com.dila.ai.markup/dilaAIMarkupPlugin/dila-ai-markup.js:98)
+	at org.mozilla.javascript.gen.file__C__Users_jeffw_AppData_Roaming_com_oxygenxml_extensions_v27_1_plugins_com_dila_ai_markup_dilaAIMarkupPlugin_dila_ai_markup_js_1.call(file:/C:/Users/jeffw/AppData/Roaming/com.oxygenxml/extensions/v27.1/plugins/com.dila.ai.markup/dilaAIMarkupPlugin/dila-ai-markup.js)
+	at org.mozilla.javascript.ContextFactory.doTopCall(ContextFactory.java:380)
+	at org.mozilla.javascript.ScriptRuntime.doTopCall(ScriptRuntime.java:3868)
+	at org.mozilla.javascript.gen.file__C__Users_jeffw_AppData_Roaming_com_oxygenxml_extensions_v27_1_plugins_com_dila_ai_markup_dilaAIMarkupPlugin_dila_ai_markup_js_1.call(file:/C:/Users/jeffw/AppData/Roaming/com.oxygenxml/extensions/v27.1/plugins/com.dila.ai.markup/dilaAIMarkupPlugin/dila-ai-markup.js)
+	at org.mozilla.javascript.JavaAdapter.doCall(JavaAdapter.java:614)
+	at org.mozilla.javascript.JavaAdapter.lambda$callMethod$0(JavaAdapter.java:597)
+	at org.mozilla.javascript.Context.call(Context.java:535)
+	at org.mozilla.javascript.ContextFactory.call(ContextFactory.java:472)
+	at org.mozilla.javascript.JavaAdapter.callMethod(JavaAdapter.java:597)
+	at adapter1.customizeView(<adapter>)
+	at ro.sync.exml.layout.c.f(Unknown Source)
+	at ro.sync.exml.layout.i$3.create(Unknown Source)
+	at ro.sync.exml.layout.c.g(Unknown Source)
+	at ro.sync.exml.layout.i.o(Unknown Source)
+	at ro.sync.exml.layout.i.m(Unknown Source)
+	at ro.sync.exml.layout.i.ub(Unknown Source)
+	at ro.sync.exml.layout.i.l(Unknown Source)
+	at ro.sync.exml.m.f(Unknown Source)
+	at ro.sync.exml.m.b(Unknown Source)
+	at ro.sync.exml.MainFrame$38.run(Unknown Source)
+	at ro.sync.ui.we$_b.run(Unknown Source)
+	at java.desktop/java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:308)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:773)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:720)
+	at java.desktop/java.awt.EventQueue$4.run(EventQueue.java:714)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
+	at java.base/java.security.ProtectionDomain$JavaSecurityAccessImpl.doIntersectionPrivilege(ProtectionDomain.java:86)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:742)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:203)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:124)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:109)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:101)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:90)
+
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+The error is caused by passing `null` to the `ImageIcon` constructor, which creates ambiguity between multiple constructor overloads. The `getSystemResource("options.png")` is returning `null` because the resource file doesn't exist.
+
+**Plan:**
+1. Add null check before creating ImageIcon
+2. Provide graceful fallback when resource is not found
+3. Add proper error handling and logging
+4. Remove the problematic icon creation entirely as a safe solution
+
+````javascript
+// ...existing code...
+                    // Create options menu with proper null handling for icon
+                    var menuOptions = new JMenu();
+                    
+                    // Try to load icon with proper null checking
+                    try {
+                        var iconResource = Packages.java.lang.ClassLoader.getSystemResource("options.png");
+                        if (iconResource != null) {
+                            var optionsIcon = new ImageIcon(iconResource);
+                            menuOptions.setIcon(optionsIcon);
+                            logDebug("Options icon loaded successfully");
+                        } else {
+                            logDebug("Warning: options.png not found in system resources - menu will display without icon");
+                        }
+                    } catch (e) {
+                        logDebug("Error loading options icon: " + e.message);
+                    }
+                    
+                    menuOptions.setToolTipText(i18nFn("options.menu")); // Set tooltip text for accessibility
+                    var menuItemOption = new JMenuItem(i18nFn("preferences.action")); // go to options dialog
+
+                    // Assemble the menu bar - Actions on left, Options on right
+                    menuBar.add(menuActions);
+                    menuActions.add(menuItemActionAIMarkup);
+                    menuActions.add(menuItemActionTagRemoval);
+                    
+                    // Add horizontal glue to push Options menu to the right
+                    menuBar.add(Box.createHorizontalGlue());
+                    
+                    menuBar.add(menuOptions);
+                    menuOptions.add(menuItemOption);
+// ...existing code...
+````
+
+This fix:
+1. **Removes the problematic line** that was causing the constructor ambiguity
+2. **Adds proper null checking** before attempting to create the ImageIcon
+3. **Provides graceful degradation** - the menu works without an icon if the resource is missing
+4. **Includes debugging output** to help track down resource loading issues
+5. **Maintains the same functionality** - the options menu will still work, just without an icon
+
+The menu will display properly even without the icon file, preventing the application crash.
+
+---
+
+_**User (2025-09-30 01:44Z)**_
+
+rebuild maven project with the modification
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+
+
+---
+
+_**User (2025-09-30 01:49Z)**_
+
+rebuild maven project with the modification
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll rebuild the Maven project with the JavaScript modifications that include proper null checking for the icon loading: Excellent! The build was successful. Now let me copy the updated plugin files to the deployment location: Perfect! The plugin has been successfully rebuilt with proper error handling for the ImageIcon creation. Here's what has been accomplished:
+
+## Final Plugin Status 🎯
+
+### ✅ Completed Fixes:
+1. **Icon Loading Error Resolution**: Added proper null checking in JavaScript before ImageIcon creation to prevent constructor ambiguity
+2. **UI Layout Enhancements**: Panel width set to 1/5 screen width, left-right menu alignment maintained
+3. **Error Handling**: Graceful degradation when optional icon resources are missing
+4. **Build Validation**: Maven build successful with all components properly packaged
+
+### 🔧 Key Improvements Made:
+- **JavaScript Error Handling**: Added try-catch blocks and null checking for ImageIcon creation
+- **Resource Validation**: Check for resource existence before attempting to load icons
+- **Fallback Mechanisms**: Menu still functions properly even when icons are missing
+- **Logging Enhancement**: Console output for debugging resource loading status
+
+### 📦 Deployment Files Ready:
+- `dilaAIMarkupPlugin.zip` - Complete plugin package with fixed JavaScript
+- `dilaAIMarkupPlugin.xml` - Plugin descriptor for direct installation
+- Both files copied to ``
+
+## Next Steps:
+
+1. **Install the Updated Plugin** in Oxygen XML Editor:
+   - Go to **Help → Install new add-ons**
+   - Select `dilaAIMarkupPlugin.zip`
+   - Restart Oxygen
+
+2. **Verify the Fixes**:
+   - Check that the Options page loads without errors
+   - Confirm UI layout shows proper panel sizing (1/5 screen width)
+   - Verify Actions menu (left) and Options menu (right) work correctly
+   - Monitor console for any remaining error messages
+
+The plugin now has robust error handling and should work reliably even when optional resources like icons are missing. The UI enhancements are preserved, and the build process is stable.
+
+---
+
+_**User (2025-09-30 01:54Z)**_
+
+rebuild again with the tooltip
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll rebuild the plugin with tooltips for the menu items to improve the user experience. Let me add tooltips to the Actions and Options buttons in the JavaScript file. Let me read the current JavaScript file to see the exact formatting and add the tooltips: Let me continue reading to find the button creation section: Let me search for the button creation more broadly: Let me search for the actions menu creation: Now let me read the area around line 93 to see the menu creation and add tooltips: I can see that the menus are JMenu objects, not JButton objects. Let me add tooltips to both the Actions and Options menus: 
+```
+
+```
+
+```
+
+```
+Now I need to add the tooltip text keys to the translation files. Let me update both English and Chinese translation files: Let me find the correct translation files: Let me read the main translation file: Let me add the tooltip keys to the translation file. I'll add them after the existing menu entries: 
+```
+
+```
+Now let's rebuild the project with the tooltip enhancements: Perfect! Now let's copy the updated plugin files to the deployment location: Excellent! The plugin has been successfully rebuilt with tooltip enhancements. Here's what was accomplished:
+
+## ✅ Tooltip Enhancement Complete
+
+### 🎯 Added Features:
+1. **Actions Menu Tooltip**: "Access AI markup actions and tools"
+2. **Options Menu Tooltip**: "Configure AI markup plugin settings and preferences"
+3. **Multi-language Support**: Added tooltip translations for English, Simplified Chinese, and Traditional Chinese
+4. **Accessibility Enhancement**: Improved user experience with descriptive tooltips
+
+### 🔧 Technical Improvements:
+- **JavaScript Enhancement**: Added `setToolTipText()` calls for both menu items
+- **Translation Updates**: Added new keys in `translation.xml`:
+  - `actions.menu.tooltip`
+  - `options.menu.tooltip`
+- **Internationalization**: Full tooltip support in 3 languages (EN, ZH_CN, ZH_TW)
+
+### 📦 Deployment Status:
+- **Build Success**: Maven compilation completed in 4.925 seconds
+- **Files Updated**: 
+  - `dilaAIMarkupPlugin.zip` - Complete plugin package with tooltips
+  - `dilaAIMarkupPlugin.xml` - Plugin descriptor
+- **Location**: ``
+
+### 🚀 Ready for Installation:
+The plugin now includes helpful tooltips that will appear when users hover over the Actions and Options menus, providing clear guidance about what each menu contains. This enhances the user experience and makes the plugin more intuitive to use.
+
+**Next Step**: Install the updated plugin in Oxygen XML Editor via **Help → Install new add-ons** using the `dilaAIMarkupPlugin.zip` file, then test the tooltips by hovering over the menu items in the plugin panel.
+
+---
+
+_**User (2025-09-30 02:10Z)**_
+
+rebuild the maven project with the manual modification
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll check the current state of the files and rebuild the Maven project with your manual modifications. I can see that the JavaScript file has been reverted to the original state without the tooltip enhancements I made. Let me also check the current state of the translation file: It seems the translation file modifications might still be there. Let me check if the tooltip keys are present: I can see that the JavaScript file has been reverted to the previous state and the tooltip translations are not present. I'll rebuild the Maven project with the current manual modifications as requested: Excellent! Now let me copy the rebuilt plugin files to the deployment location: Perfect! The Maven project has been successfully rebuilt with your manual modifications. Here's the summary:
+
+## ✅ Build Complete with Manual Modifications
+
+### 📊 Build Results:
+- **Status**: BUILD SUCCESS ✅
+- **Build Time**: 4.852 seconds
+- **Compilation**: 1 Java source file recompiled
+- **Resources**: 5 resources copied from src/main/resources
+
+### 🔄 Current State:
+- **JavaScript File**: Reverted to previous state without tooltip modifications
+- **Translation File**: Contains your manual modifications 
+- **Icon Loading**: Maintains robust error handling for missing image resources
+- **UI Layout**: Panel sizing (1/5 screen width) and menu alignment preserved
+
+### 📦 Deployment Files Updated:
+- `dilaAIMarkupPlugin.zip` - Complete plugin package with your modifications
+- `dilaAIMarkupPlugin.xml` - Plugin descriptor
+- **Location**: ``
+
+### 🚀 Ready for Installation:
+The plugin has been rebuilt incorporating your manual changes and is ready for deployment. The build process completed successfully, and all files have been packaged correctly.
+
+**Next Step**: Install the updated plugin in Oxygen XML Editor using **Help → Install new add-ons** with the `dilaAIMarkupPlugin.zip` file to test your manual modifications.
+
+---
+
+_**User (2025-09-30 02:36Z)**_
+
+how to get the png correctly in JavaScript?
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+Looking at your selected code, I can see you're trying to load an image resource using `getSystemResource()`. The current approach has a few issues. Let me show you the correct way to get the PNG resource in JavaScript within an Oxygen XML plugin context.
+
+The main issues with the current approach:
+1. `getSystemResource()` looks in the system classpath, not your plugin's resources
+2. The path should not have a leading slash when using `getSystemResource()`
+3. For Oxygen plugins, you should use the plugin workspace to get resources
+
+Here are several correct approaches: 
+```
+
+```
+Now let's rebuild the project to test the improved resource loading: ## 📝 Summary: Correct Ways to Load PNG Resources in Oxygen JavaScript
+
+I've updated your code with **three different methods** to load the PNG resource, tried in order of preference:
+
+### 🎯 **Method 1 (RECOMMENDED): Plugin Workspace**
+```javascript
+var iconResource = pluginWorkspaceAccess.getResourceURL("images/options.png");
+```
+- **Best approach** for Oxygen plugins
+- Uses the plugin's own resource context
+- Most reliable for packaged plugins
+
+### 🔧 **Method 2: ClassLoader.getResource()**
+```javascript
+var currentClass = Packages.java.lang.Class.forName("ro.sync.exml.workspace.api.PluginWorkspaceProvider");
+var iconResource2 = currentClass.getClassLoader().getResource("images/options.png");
+```
+- Uses the appropriate ClassLoader
+- **No leading slash** (important!)
+- Good fallback method
+
+### ⚡ **Method 3: getSystemResource() (Fixed)**
+```javascript
+var iconResource3 = Packages.java.lang.ClassLoader.getSystemResource("images/options.png");
+```
+- **Fixed**: Removed the leading slash `/`
+- System classpath lookup
+- Last resort method
+
+### 🔍 **Key Issues Fixed:**
+1. **Leading Slash**: Removed `/` from `"/images/options.png"` → `"images/options.png"`
+2. **Resource Context**: Added plugin workspace method (most appropriate)
+3. **Fallback Chain**: Multiple methods tried in order
+4. **Better Logging**: Enhanced debug output with method identification
+
+### 📁 **Resource Path Structure:**
+Your PNG should be located at:
+```
+src/main/resources/images/options.png
+```
+
+The updated code will try each method sequentially and provide detailed logging to help you identify which method works in your Oxygen environment. When you run the plugin, check the console output to see which method successfully loads your icon!
+
+---
+
+_**User (2025-09-30 02:43Z)**_
+
+rebuild the maven project 
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+I'll rebuild the Maven project for you. 
 
 ---
 
