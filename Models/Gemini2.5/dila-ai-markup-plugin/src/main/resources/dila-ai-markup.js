@@ -98,7 +98,14 @@ function applicationStarted(pluginWorkspaceAccess) {
                     
                     // Ensure menuOptions is properly initialized before proceeding
                     if (menuOptions != null) {
+                        var colorTheme = pluginWorkspaceAccess.getColorTheme();
+                        logDebug("Color theme: " + colorTheme);
+                        var darkTheme = (colorTheme != null && colorTheme.isDarkTheme());
+                        logDebug("Dark theme: " + darkTheme);
                         var iconPath = "images/options.png"; // Default icon path
+                        if (darkTheme) {
+                            iconPath = "images/options_dark.png"; // Dark theme icon path
+                        }
                         logDebug("jsDirURL: " + jsDirURL);
                         
                         try {
@@ -107,35 +114,35 @@ function applicationStarted(pluginWorkspaceAccess) {
                             var iconFile = new Packages.java.io.File(iconURI);
                             
                             if (iconFile.exists()) {
-                                // Method 1: Try creating ImageIcon directly from File
-                                var icon = new Packages.javax.swing.ImageIcon(iconFile.getAbsolutePath());
+                                // Load icon directly without color manipulation
+                                var originalIcon = new ImageIcon(iconFile.getAbsolutePath());
                                 
                                 // Verify the icon loaded properly
-                                if (icon != null && icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
-                                    menuOptions.setIcon(icon);
+                                if (originalIcon != null && originalIcon.getIconWidth() > 0 && originalIcon.getIconHeight() > 0) {
+                                    menuOptions.setIcon(originalIcon);
                                     logDebug("Options icon loaded successfully from file: " + iconFile.getAbsolutePath() + 
-                                            " (Size: " + icon.getIconWidth() + "x" + icon.getIconHeight() + ")");
+                                            " (Size: " + originalIcon.getIconWidth() + "x" + originalIcon.getIconHeight() + ")");
                                 } else {
-                                    menuOptions.setText(i18nFn("options.menu"));
+                                    menuOptions.setText(i18nFn("preferences.action"));
                                     logDebug("Icon file exists but failed to load properly, using text fallback");
                                 }
                             } else {
-                                menuOptions.setText(i18nFn("options.menu"));
+                                menuOptions.setText(i18nFn("preferences.action"));
                                 logDebug("Icon file does not exist at path: " + iconFile.getAbsolutePath());
                             }
                         } catch (e) {
-                            menuOptions.setText(i18nFn("options.menu"));
+                            menuOptions.setText(i18nFn("preferences.action"));
                             logDebug("Error loading icon from file: " + e.message);
                         }
 
                         // Set tooltip text for accessibility - with null safety check
-                        menuOptions.setToolTipText(i18nFn("options.menu"));
+                        menuOptions.setToolTipText(i18nFn("preferences.action"));
                     } else {
                         logDebug("Error: menuOptions is null, cannot proceed with menu creation");
                         // Create a new instance if somehow it became null
-                        menuOptions = new JMenu(i18nFn("options.menu"));
+                        menuOptions = new JMenu(i18nFn("preferences.action"));
                         if (menuOptions != null) {
-                            menuOptions.setToolTipText(i18nFn("options.menu"));
+                            menuOptions.setToolTipText(i18nFn("preferences.action"));
                         }
                     }
                     
