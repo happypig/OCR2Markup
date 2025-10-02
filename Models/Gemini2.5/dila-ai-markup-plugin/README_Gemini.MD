@@ -400,11 +400,13 @@ To keep the code organized, all logic for the new feature should be in its own f
 The `src/main/resources/plugin.xml` file must be modified to load the new JavaScript file after the main script.
 
 ```xml
-<!-- In plugin.xml, inside the <extension> for the custom view -->
-<script src="dila-ai-markup.js"/>
-<script src="utf8-tool.js"/>
+<!-- In plugin.xml, below <extension> for the type="WorkspaceAccessJS" -->
+       <extension 
+              type="WorkspaceAccessJSModule" 
+              href="utf8-tool.js"/>
 ```
+#### 5. Ensure the key files include the new version
 
----
+Ensure the version in `pom.xml`, `plugin.xml`, `extension.xml` is updated to `0.2.4` to reflect the new feature addition.
 
 *This plugin is designed for scholarly TEI XML document editing workflows, specifically for automating reference and citation markup tasks.*

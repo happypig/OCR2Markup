@@ -5,7 +5,7 @@
 <plugin 
        id="com.dila.ai.markup" 
        name="DILA AI Markup Assistant"
-       version="0.2.3" 
+       version="0.2.4" 
        vendor="DILA"
        class="ro.sync.exml.plugin.Plugin" 
        classLoaderType="preferReferencedResources">
@@ -38,12 +38,16 @@
        </description>
 
        <runtime>
-              <library name="lib/dila-ai-markup-plugin-0.2.3.jar" />
+              <library name="lib/dila-ai-markup-plugin-0.2.4.jar" />
        </runtime>
 
        <extension 
               type="WorkspaceAccessJS" 
               href="dila-ai-markup.js"/>
+
+       <extension 
+              type="WorkspaceAccessJSModule" 
+              href="utf8-tool.js"/>
 
        <extension 
               type="OptionPage" 
