@@ -3,6 +3,14 @@ package com.dila.dama.plugin.preferences;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.io.IOException;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -459,5 +467,79 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       // Return a guaranteed non-null, non-empty string
       return SAFE_KEY_FALLBACK;
     }
+  }
+  
+  // ========================================
+  // Encoding Utility Methods (Integrated)
+  // ========================================
+  
+  /**
+   * Robustly checks if a file is valid UTF-8 using strict validation.
+   * Uses CharsetDecoder with strict error reporting to ensure accurate detection.
+   * 
+   * @param path The path to the file to validate
+   * @return true if the file is valid UTF-8, false otherwise
+   */
+  public static boolean isValidUtf8(Path path) {
+      try {
+          byte[] bytes = Files.readAllBytes(path);
+          CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
+          decoder.onMalformedInput(CodingErrorAction.REPORT);
+          decoder.onUnmappableCharacter(CodingErrorAction.REPORT);
+          decoder.decode(ByteBuffer.wrap(bytes));
+          return true;
+      } catch (CharacterCodingException e) {
+          return false; // Invalid UTF-8 encoding detected
+      } catch (IOException e) {
+          return false; // File I/O error
+      } catch (Exception e) {
+          return false; // Any other error
+      }
+  }
+  
+  /**
+   * Get available character encodings for the dropdown selection.
+   * Returns common encodings that users are likely to encounter.
+   * 
+   * @return Array of common encoding names
+   */
+  public static String[] getCommonEncodings() {
+      return new String[] {
+          "Windows-1252",
+          "ISO-8859-1", 
+          "GBK",
+          "Big5",
+          "Shift_JIS",
+          "EUC-KR",
+          "Windows-1251"
+      };
+  }
+  
+  /**
+   * Bridge method for JavaScript compatibility - Check if a file is valid UTF-8.
+   * 
+   * @param path The path to the file to validate
+   * @return true if the file is valid UTF-8, false otherwise
+   */
+  public static boolean checkUtf8(Path path) {
+      return isValidUtf8(path);
+  }
+  
+  /**
+   * Bridge method for JavaScript compatibility - Get common encodings.
+   * 
+   * @return Array of common encoding names
+   */
+  public static String[] getEncodings() {
+      return getCommonEncodings();
+  }
+  
+  /**
+   * Bridge method for JavaScript compatibility - Test availability.
+   * 
+   * @return Always returns true since methods are integrated
+   */
+  public static boolean isAvailable() {
+      return true;
   }
 }

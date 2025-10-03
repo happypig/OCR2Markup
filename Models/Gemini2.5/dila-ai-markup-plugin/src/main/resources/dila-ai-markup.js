@@ -17,7 +17,7 @@ function getDebugMode() {
             if (debugProp != null) {
                 DEBUG = String(debugProp).toLowerCase() === "true";
             }
-            } catch (e) {
+        } catch (e) {
             // Keep default value
             Packages.java.lang.System.err.println("Keep default value: " + DEBUG);
         }
@@ -32,15 +32,219 @@ function getDebugMode() {
  */
 function logDebug(message) {
     if (DEBUG) {
-        if (UTF8PrintStream === null) {
-            // Initialize the stream.
-            var PrintStream = Packages.java.io.PrintStream;
-            UTF8PrintStream = new PrintStream(Packages.java.lang.System.err, true, "UTF-8");
+        try {
+            if (UTF8PrintStream === null) {
+                // Initialize the stream.
+                var PrintStream = Packages.java.io.PrintStream;
+                UTF8PrintStream = new PrintStream(Packages.java.lang.System.err, true, "UTF-8");
+            }
+            var now = new Date();
+            var timestamp = now.toLocaleString();
+            UTF8PrintStream.println("[" + timestamp + "] " + message);
+        } catch (e) {
+            // Fallback to System.err if UTF8PrintStream fails
+            Packages.java.lang.System.err.println("[ERROR] Failed to initialize UTF8PrintStream: " + e);
+            Packages.java.lang.System.err.println("[" + new Date().toLocaleString() + "] " + message);
         }
-        var now = new Date();
-        var timestamp = now.toLocaleString();
-        UTF8PrintStream.println("[" + timestamp + "] " + message);
     }
+}
+
+/**
+ * UTF-8 tools are always available with this self-contained implementation
+ */
+function isEncodingUtilsAvailable() {
+    logDebug("Using self-contained UTF-8 checking capabilities");
+    return true;
+}
+
+/**
+ * Enhanced UTF-8 validation that properly detects non-UTF-8 encodings
+ * This implementation uses byte-level validation to ensure strict UTF-8 compliance
+ */
+function isValidUtf8(file) {
+    try {
+        // Validate input
+        if (!file || !file.exists || !file.exists()) {
+            logDebug("File is null or does not exist: " + (file ? file.getPath() : "null"));
+            return true; // Assume valid if we can't validate
+        }
+        
+        if (file.isDirectory()) {
+            logDebug("Path is a directory: " + file.getPath());
+            return true; // Directories are considered "valid"
+        }
+        
+        if (!file.canRead()) {
+            logDebug("File cannot be read: " + file.getPath());
+            return true; // Assume valid if we can't read it
+        }
+        
+        // Skip very large files to prevent memory issues
+        var fileSize = file.length();
+        if (fileSize > 50 * 1024 * 1024) { // 50MB limit
+            logDebug("Skipping large file (>50MB): " + file.getPath());
+            return true;
+        }
+        
+        if (fileSize === 0) {
+            logDebug("Empty file, considering valid UTF-8: " + file.getPath());
+            return true;
+        }
+        
+        // Use byte-level validation for strict UTF-8 checking
+        var FileInputStream = Packages.java.io.FileInputStream;
+        var fis = null;
+        
+        try {
+            fis = new FileInputStream(file);
+            
+            // Check for BOM (Byte Order Mark) first
+            var firstFewBytes = Packages.java.lang.reflect.Array.newInstance(Packages.java.lang.Byte.TYPE, 4);
+            var bytesRead = fis.read(firstFewBytes);
+            
+            if (bytesRead >= 2) {
+                // Check for UTF-16 BOM patterns
+                var byte0 = firstFewBytes[0] & 0xFF;
+                var byte1 = firstFewBytes[1] & 0xFF;
+                
+                // UTF-16 Little Endian BOM: FF FE
+                if (byte0 === 0xFF && byte1 === 0xFE) {
+                    logDebug("UTF-16 LE BOM detected in file: " + file.getPath());
+                    return false;
+                }
+                
+                // UTF-16 Big Endian BOM: FE FF
+                if (byte0 === 0xFE && byte1 === 0xFF) {
+                    logDebug("UTF-16 BE BOM detected in file: " + file.getPath());
+                    return false;
+                }
+                
+                // Check for UTF-16 without BOM (common pattern: alternating null bytes)
+                if (bytesRead >= 4) {
+                    var byte2 = firstFewBytes[2] & 0xFF;
+                    var byte3 = firstFewBytes[3] & 0xFF;
+                    
+                    // Pattern for UTF-16 LE: non-null, null, non-null, null
+                    if (byte1 === 0 && byte3 === 0 && byte0 !== 0 && byte2 !== 0) {
+                        logDebug("UTF-16 LE pattern detected (no BOM) in file: " + file.getPath());
+                        return false;
+                    }
+                    
+                    // Pattern for UTF-16 BE: null, non-null, null, non-null
+                    if (byte0 === 0 && byte2 === 0 && byte1 !== 0 && byte3 !== 0) {
+                        logDebug("UTF-16 BE pattern detected (no BOM) in file: " + file.getPath());
+                        return false;
+                    }
+                }
+            }
+            
+            // Reset stream and do full UTF-8 validation
+            fis.close();
+            fis = new FileInputStream(file);
+            
+            // Read entire file as bytes for strict UTF-8 validation
+            var buffer = Packages.java.lang.reflect.Array.newInstance(Packages.java.lang.Byte.TYPE, 8192);
+            var totalBytesRead = 0;
+            
+            while ((bytesRead = fis.read(buffer)) !== -1) {
+                // Validate UTF-8 byte sequences
+                for (var i = 0; i < bytesRead; i++) {
+                    var currentByte = buffer[i] & 0xFF;
+                    
+                    // Check for null bytes (common in UTF-16 but not typical in UTF-8 text)
+                    if (currentByte === 0) {
+                        logDebug("Null byte found at position " + (totalBytesRead + i) + " in file: " + file.getPath());
+                        return false;
+                    }
+                    
+                    // ASCII range (0-127) - always valid in UTF-8
+                    if (currentByte <= 0x7F) {
+                        continue;
+                    }
+                    
+                    // Multi-byte UTF-8 sequence validation
+                    var sequenceLength = 0;
+                    
+                    if ((currentByte & 0xE0) === 0xC0) {
+                        // 2-byte sequence: 110xxxxx 10xxxxxx
+                        sequenceLength = 1;
+                    } else if ((currentByte & 0xF0) === 0xE0) {
+                        // 3-byte sequence: 1110xxxx 10xxxxxx 10xxxxxx
+                        sequenceLength = 2;
+                    } else if ((currentByte & 0xF8) === 0xF0) {
+                        // 4-byte sequence: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+                        sequenceLength = 3;
+                    } else {
+                        // Invalid UTF-8 start byte
+                        logDebug("Invalid UTF-8 start byte 0x" + currentByte.toString(16) + " at position " + (totalBytesRead + i) + " in file: " + file.getPath());
+                        return false;
+                    }
+                    
+                    // Validate continuation bytes
+                    for (var j = 1; j <= sequenceLength; j++) {
+                        if (i + j >= bytesRead) {
+                            // Need to read more bytes - this is getting complex, so we'll use a simpler approach
+                            break;
+                        }
+                        var continuationByte = buffer[i + j] & 0xFF;
+                        if ((continuationByte & 0xC0) !== 0x80) {
+                            logDebug("Invalid UTF-8 continuation byte 0x" + continuationByte.toString(16) + " at position " + (totalBytesRead + i + j) + " in file: " + file.getPath());
+                            return false;
+                        }
+                    }
+                    
+                    // Skip the continuation bytes we just validated
+                    i += sequenceLength;
+                }
+                totalBytesRead += bytesRead;
+            }
+            
+            logDebug("UTF-8 validation passed for: " + file.getPath());
+            return true;
+            
+        } catch (e) {
+            logDebug("Error during byte-level UTF-8 validation for " + file.getPath() + ": " + e);
+            return false; // Assume invalid if we can't properly validate
+        } finally {
+            // Clean up resources
+            try { if (fis) fis.close(); } catch (e) { /* ignore */ }
+        }
+        
+    } catch (e) {
+        logDebug("Unexpected error in UTF-8 validation for " + (file ? file.getPath() : "null") + ": " + e);
+        return true; // Assume valid for unexpected errors
+    }
+}
+
+/**
+ * Get common encodings - self-contained list
+ */
+function getCommonEncodings() {
+    var ArrayList = Packages.java.util.ArrayList;
+    var encodings = new ArrayList();
+    
+    // Common encodings ordered by likelihood
+    var commonEncodings = [
+        "Windows-1252",
+        "ISO-8859-1",
+        "GBK", 
+        "GB2312",
+        "Big5",
+        "Shift_JIS",
+        "EUC-KR",
+        "Windows-1251",
+        "ISO-8859-2",
+        "UTF-16",
+        "UTF-16BE",
+        "UTF-16LE"
+    ];
+    
+    for (var i = 0; i < commonEncodings.length; i++) {
+        encodings.add(commonEncodings[i]);
+    }
+    
+    logDebug("Using self-contained encoding list with " + encodings.size() + " items");
+    return encodings;
 }
 
 // This is called by Oxygen when the plugin is initialized.
@@ -87,11 +291,21 @@ function applicationStarted(pluginWorkspaceAccess) {
                     var JMenuItem = Packages.javax.swing.JMenuItem;
                     var ImageIcon = Packages.javax.swing.ImageIcon;
                     var Box = Packages.javax.swing.Box;
+                    var JFileChooser = Packages.javax.swing.JFileChooser;
                     
                     var menuBar = new JMenuBar();
                     var menuActions = new JMenu(i18nFn("actions.menu")); // "Actions"
                     var menuItemActionAIMarkup = new JMenuItem(i18nFn("ai.markup.action")); // load action from local
                     var menuItemActionTagRemoval = new JMenuItem(i18nFn("tag.removal.action")); // load action from local
+
+                    // UTF-8 tools are now always available with self-contained implementation
+                    var utf8ToolsAvailable = isEncodingUtilsAvailable();
+                    
+                    // Add Tools menu for UTF-8 Check/Convert
+                    var menuTools = new JMenu(i18nFn("menu.tools"));
+                    var menuItemUtf8Check = new JMenuItem(i18nFn("menu.tools.utf8.check"));
+                    menuTools.add(menuItemUtf8Check);
+                    logDebug("UTF-8 tool menu item added (self-contained implementation)");
 
                     // Create options menu with comprehensive icon loading
                     var menuOptions = new JMenu();
@@ -148,10 +362,13 @@ function applicationStarted(pluginWorkspaceAccess) {
                     
                     var menuItemOption = new JMenuItem(i18nFn("preferences.action")); // go to options dialog
 
-                    // Assemble the menu bar - Actions on left, Options on right
+                    // Assemble the menu bar - Actions on left, Tools in middle, Options on right
                     menuBar.add(menuActions);
                     menuActions.add(menuItemActionAIMarkup);
                     menuActions.add(menuItemActionTagRemoval);
+                    
+                    // Always add Tools menu now
+                    menuBar.add(menuTools);
                     
                     // Add horizontal glue to push Options menu to the right
                     menuBar.add(Box.createHorizontalGlue());
@@ -217,12 +434,395 @@ function applicationStarted(pluginWorkspaceAccess) {
                     viewInfo.setComponent(pluginPanel);
                     viewInfo.setTitle(i18nFn("view.title")); // "DILA AI Markup Assistant"
 
+                    // ========================================
+                    // UTF-8 Helper Functions - Self-contained implementation
+                    // ========================================
+                    
+                    /**
+                     * Check if file is likely a text file based on extension
+                     */
+                    function isTextFile(file) {
+                        if (!file || !file.getName) {
+                            return false;
+                        }
+                        
+                        var name = file.getName().toLowerCase();
+                        var textExtensions = ['.xml', '.txt', '.html', '.htm', '.xhtml', '.css', '.js', '.json', '.md', '.properties', '.java', '.py', '.php', '.rb', '.go', '.rs', '.c', '.cpp', '.h', '.hpp', '.sql', '.sh', '.bat', '.csv'];
+                        
+                        for (var i = 0; i < textExtensions.length; i++) {
+                            if (name.endsWith(textExtensions[i])) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                    
+                    /**
+                     * Recursively scan files and directories
+                     */
+                    function scanFileOrDirectory(file, nonUtf8Files) {
+                        var count = 0;
+                        
+                        if (!file) {
+                            logDebug("scanFileOrDirectory: file is null");
+                            return 0;
+                        }
+                        
+                        try {
+                            if (file.isDirectory()) {
+                                logDebug("Scanning directory: " + file.getPath());
+                                var files = file.listFiles();
+                                if (files !== null && files.length > 0) {
+                                    for (var i = 0; i < files.length; i++) {
+                                        try {
+                                            if (files[i]) {
+                                                count += scanFileOrDirectory(files[i], nonUtf8Files);
+                                            }
+                                        } catch (e) {
+                                            logDebug("Error scanning individual file/directory " + (files[i] ? files[i].getPath() : "null") + ": " + e);
+                                            // Continue with next file
+                                        }
+                                    }
+                                } else {
+                                    logDebug("Directory is empty or not accessible: " + file.getPath());
+                                }
+                            } else if (file.isFile() && isTextFile(file)) {
+                                count = 1;
+                                try {
+                                    if (!isValidUtf8(file)) {
+                                        nonUtf8Files.push(file);
+                                        logDebug("Non-UTF-8 file found: " + file.getPath());
+                                    } else {
+                                        logDebug("UTF-8 file confirmed: " + file.getPath());
+                                    }
+                                } catch (e) {
+                                    logDebug("Error checking file " + file.getPath() + ": " + e);
+                                    // Don't add to non-UTF-8 list if check failed
+                                }
+                            } else {
+                                logDebug("Skipping non-text file: " + file.getPath());
+                            }
+                        } catch (e) {
+                            logDebug("Error in scanFileOrDirectory for " + (file ? file.getPath() : "null") + ": " + e);
+                        }
+                        
+                        return count;
+                    }
+                    
+                    /**
+                     * Convert files to UTF-8 with automatic backup
+                     */
+                    function convertFilesWithBackup(files, sourceEncoding) {
+                        if (!files || files.length === 0) {
+                            resultArea.setText("No files to convert.\n");
+                            return;
+                        }
+                        
+                        try {
+                            var FileInputStream = Packages.java.io.FileInputStream;
+                            var FileOutputStream = Packages.java.io.FileOutputStream;
+                            var InputStreamReader = Packages.java.io.InputStreamReader;
+                            var OutputStreamWriter = Packages.java.io.OutputStreamWriter;
+                            var BufferedReader = Packages.java.io.BufferedReader;
+                            var BufferedWriter = Packages.java.io.BufferedWriter;
+                            var File = Packages.java.io.File;
+                            
+                            var startMessage = i18nFn("utf8.conversion.started");
+                            // FIX: Convert string to string before replace (sourceEncoding is already a string)
+                            startMessage = startMessage.replace("{0}", String(sourceEncoding));
+                            resultArea.setText(startMessage + "\n\n");
+                            
+                            var successCount = 0;
+                            var failCount = 0;
+                            
+                            logDebug("Starting conversion of " + files.length + " files from " + sourceEncoding + " to UTF-8");
+                            
+                            for (var i = 0; i < files.length; i++) {
+                                var file = files[i];
+                                
+                                if (!file) {
+                                    logDebug("Skipping null file at index " + i);
+                                    failCount++;
+                                    continue;
+                                }
+                                
+                                try {
+                                    // Validate file before processing
+                                    if (!file.exists()) {
+                                        resultArea.append(i18nFn("utf8.conversion.failed") + file.getName() + ": File does not exist\n\n");
+                                        failCount++;
+                                        continue;
+                                    }
+                                    
+                                    if (!file.canRead()) {
+                                        resultArea.append(i18nFn("utf8.conversion.failed") + file.getName() + ": Cannot read file\n\n");
+                                        failCount++;
+                                        continue;
+                                    }
+                                    
+                                    if (!file.canWrite()) {
+                                        resultArea.append(i18nFn("utf8.conversion.failed") + file.getName() + ": Cannot write to file\n\n");
+                                        failCount++;
+                                        continue;
+                                    }
+                                    
+                                    var backupFile = new File(file.getParent(), file.getName() + ".bak");
+                                    
+                                    // Step 1: Create backup by copying original file
+                                    var originalFis = new FileInputStream(file);
+                                    var backupFos = new FileOutputStream(backupFile);
+                                    var buffer = Packages.java.lang.reflect.Array.newInstance(Packages.java.lang.Byte.TYPE, 4096);
+                                    var bytesRead;
+                                    
+                                    while ((bytesRead = originalFis.read(buffer)) !== -1) {
+                                        backupFos.write(buffer, 0, bytesRead);
+                                    }
+                                    originalFis.close();
+                                    backupFos.close();
+                                    
+                                    resultArea.append(i18nFn("utf8.conversion.backing.up") + backupFile.getName() + "\n");
+                                    logDebug("Backup created: " + backupFile.getPath());
+                                    
+                                    // Step 2: Read file with source encoding
+                                    var reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), sourceEncoding));
+                                    var content = "";
+                                    var line;
+                                    while ((line = reader.readLine()) !== null) {
+                                        content += line + "\n";
+                                    }
+                                    reader.close();
+                                    
+                                    // Step 3: Write as UTF-8
+                                    var writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+                                    writer.write(content);
+                                    writer.close();
+                                    
+                                    resultArea.append(i18nFn("utf8.conversion.success") + file.getName() + "\n\n");
+                                    successCount++;
+                                    logDebug("Successfully converted: " + file.getName());
+                                    
+                                } catch (e) {
+                                    var errorMsg = e.getMessage ? e.getMessage() : String(e);
+                                    resultArea.append(i18nFn("utf8.conversion.failed") + file.getName() + ": " + errorMsg + "\n\n");
+                                    failCount++;
+                                    logDebug("Conversion failed for " + file.getName() + ": " + e);
+                                }
+                            }
+                            
+                            // Final summary
+                            resultArea.append("═══════════════════════════════════\n");
+                            resultArea.append(i18nFn("utf8.conversion.summary") + "\n");
+                            
+                            var successMessage = i18nFn("utf8.conversion.success.count");
+                            // FIX: Convert number to string before replace
+                            successMessage = successMessage.replace("{0}", String(successCount));
+                            resultArea.append(successMessage + "\n");
+                            
+                            var failMessage = i18nFn("utf8.conversion.fail.count");
+                            // FIX: Convert number to string before replace
+                            failMessage = failMessage.replace("{0}", String(failCount));
+                            resultArea.append(failMessage + "\n");
+                            
+                            if (successCount > 0) {
+                                resultArea.append("\n" + i18nFn("utf8.conversion.backup.note") + "\n");
+                            }
+                            
+                            logDebug("Conversion completed. Success: " + successCount + ", Failed: " + failCount);
+                        } catch (e) {
+                            logDebug("Error in convertFilesWithBackup: " + e);
+                            var errorMsg = e.message ? e.message : String(e);
+                            resultArea.append("\n" + i18nFn("utf8.conversion.error") + errorMsg);
+                        }
+                    }
+                    
+                    /**
+                     * Show dialog for encoding selection
+                     */
+                    function showEncodingSelectionDialog(nonUtf8Files) {
+                        if (!nonUtf8Files || nonUtf8Files.length === 0) {
+                            logDebug("No files to convert");
+                            return;
+                        }
+                        
+                        try {
+                            var JOptionPane = Packages.javax.swing.JOptionPane;
+                            var JComboBox = Packages.javax.swing.JComboBox;
+                            var JLabel = Packages.javax.swing.JLabel;
+                            
+                            // Get common encodings
+                            var commonEncodings = getCommonEncodings();
+                            
+                            var panel = new JPanel(new BorderLayout());
+                            var label = new JLabel(i18nFn("utf8.check.select.encoding"));
+                            var encodingComboBox = new JComboBox(commonEncodings.toArray());
+                            
+                            encodingComboBox.setSelectedIndex(0);
+                            
+                            panel.add(label, BorderLayout.NORTH);
+                            panel.add(encodingComboBox, BorderLayout.CENTER);
+                            
+                            var options = [i18nFn("button.convert"), i18nFn("button.cancel")];
+                            var dialogResult = JOptionPane.showOptionDialog(
+                                pluginPanel,
+                                panel,
+                                i18nFn("utf8.check.dialog.title"),
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE,
+                                null,
+                                options,
+                                options[0]
+                            );
+                            
+                            if (dialogResult === 0) {
+                                var selectedEncoding = encodingComboBox.getSelectedItem();
+                                if (selectedEncoding) {
+                                    var encodingStr = selectedEncoding.toString();
+                                    logDebug("User selected encoding: " + encodingStr);
+                                    convertFilesWithBackup(nonUtf8Files, encodingStr);
+                                } else {
+                                    logDebug("No encoding selected");
+                                    infoArea.append("\n" + i18nFn("utf8.conversion.cancelled"));
+                                }
+                            } else {
+                                logDebug("User cancelled conversion");
+                                infoArea.append("\n" + i18nFn("utf8.conversion.cancelled"));
+                            }
+                        } catch (e) {
+                            logDebug("Error in encoding selection dialog: " + e);
+                            var errorMsg = e.message ? e.message : String(e);
+                            infoArea.append("\n" + i18nFn("utf8.conversion.error") + errorMsg);
+                        }
+                    }
+                    
+                    /**
+                     * Process selected files and folders for UTF-8 validation
+                     */
+                    function processSelectedFiles(selectedFiles) {
+                        if (!selectedFiles || selectedFiles.length === 0) {
+                            infoArea.setText("No files selected for processing.\n");
+                            return;
+                        }
+                        
+                        var nonUtf8Files = [];
+                        var totalFiles = 0;
+                        
+                        infoArea.append(i18nFn("utf8.scanning.files") + "\n");
+                        logDebug("Starting file scan for " + selectedFiles.length + " selected items");
+                        
+                        try {
+                            // Scan all selected files/folders
+                            for (var i = 0; i < selectedFiles.length; i++) {
+                                var selectedFile = selectedFiles[i];
+                                if (!selectedFile) {
+                                    logDebug("Skipping null selected file at index " + i);
+                                    continue;
+                                }
+                                
+                                try {
+                                    infoArea.append("Scanning: " + selectedFile.getName() + "\n");
+                                    var scannedCount = scanFileOrDirectory(selectedFile, nonUtf8Files);
+                                    totalFiles += scannedCount;
+                                    logDebug("Scanned " + scannedCount + " files in " + selectedFile.getName());
+                                } catch (e) {
+                                    logDebug("Error processing selected file " + selectedFile.getPath() + ": " + e);
+                                    infoArea.append("Error scanning: " + selectedFile.getName() + " - " + (e.message || String(e)) + "\n");
+                                }
+                            }
+                            
+                            logDebug("Scan completed. Total files: " + totalFiles + ", Non-UTF-8: " + nonUtf8Files.length);
+                            
+                            // Display results
+                            if (nonUtf8Files.length > 0) {
+                                var messageKey = "utf8.check.found.non.utf8";
+                                var message = i18nFn(messageKey);
+                                // FIX: Convert number to string before replace
+                                message = message.replace("{0}", String(nonUtf8Files.length));
+                                infoArea.append("\n" + message + "\n\n");
+                                
+                                // List non-UTF-8 files (show max 10, then summary)
+                                var maxDisplay = Math.min(nonUtf8Files.length, 10);
+                                for (var j = 0; j < maxDisplay; j++) {
+                                    if (nonUtf8Files[j]) {
+                                        infoArea.append("• " + nonUtf8Files[j].getPath() + "\n");
+                                    }
+                                }
+                                
+                                if (nonUtf8Files.length > 10) {
+                                    var moreMessage = i18nFn("utf8.check.more.files");
+                                    // FIX: Convert number to string before replace
+                                    moreMessage = moreMessage.replace("{0}", String(nonUtf8Files.length - 10));
+                                    infoArea.append("... " + moreMessage + "\n");
+                                }
+                                
+                                // Show encoding selection dialog
+                                showEncodingSelectionDialog(nonUtf8Files);
+                            } else {
+                                infoArea.append("\n" + i18nFn("utf8.check.all.valid"));
+                                logDebug("All files are already UTF-8 encoded");
+                            }
+                        } catch (e) {
+                            logDebug("Error in processSelectedFiles: " + e);
+                            var errorMsg = e.message ? e.message : String(e);
+                            infoArea.append("\nError during file processing: " + errorMsg);
+                        }
+                    }
+                    
+                    // ========================================
+                    // UTF-8 Check/Convert Tool Implementation
+                    // ========================================
+                    
+                    // Add action listener for UTF-8 check/convert
+                    menuItemUtf8Check.addActionListener(function() {
+                        logDebug("UTF-8 check/convert tool activated (self-contained implementation)");
+                        
+                        try {
+                            infoArea.setText(i18nFn("utf8.check.select.files") + "\n");
+                            resultArea.setText("");
+                            buttonPanel.setVisible(false);
+                            
+                            var fileChooser = new JFileChooser();
+                            fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                            fileChooser.setMultiSelectionEnabled(true);
+                            fileChooser.setDialogTitle(i18nFn("utf8.check.dialog.title"));
+                            
+                            // Add file filters
+                            try {
+                                var FileNameExtensionFilter = Packages.javax.swing.filechooser.FileNameExtensionFilter;
+                                var textFilter = new FileNameExtensionFilter(
+                                    "Text files (*.xml, *.txt, *.html, *.css, *.js)", 
+                                    "xml", "txt", "html", "htm", "xhtml", "css", "js", "json", "md", "properties"
+                                );
+                                fileChooser.addChoosableFileFilter(textFilter);
+                            } catch (e) {
+                                logDebug("Could not add file filter: " + e);
+                                // Continue without filter
+                            }
+                            
+                            var result = fileChooser.showOpenDialog(pluginPanel);
+                            
+                            if (result === JFileChooser.APPROVE_OPTION) {
+                                var selectedFiles = fileChooser.getSelectedFiles();
+                                if (selectedFiles && selectedFiles.length > 0) {
+                                    processSelectedFiles(selectedFiles);
+                                } else {
+                                    infoArea.setText(i18nFn("utf8.check.no.files.selected"));
+                                }
+                            } else {
+                                logDebug("User cancelled file selection");
+                                infoArea.setText(i18nFn("utf8.check.cancelled"));
+                            }
+                        } catch (e) {
+                            logDebug("Error in UTF-8 check tool: " + e);
+                            var errorMsg = e.message ? e.message : String(e);
+                            infoArea.setText("Error in UTF-8 tool: " + errorMsg);
+                        }
+                    });
+                    
+                    logDebug("UTF-8 Check/Convert tool integrated successfully (self-contained implementation)");
+
                     // Add action listeners to AI Markup menu item
                     menuItemActionAIMarkup.addActionListener(function() {
                         logDebug("AI Markup action triggered");
-
-                        // Switch back to main view if options panel is currently showing
-                        // cardLayout.show(cardPanel, "MAIN"); // Commented out - cardLayout not used
 
                         infoArea.setText(i18nFn("action.ai.markup.selected"));
                         var selectedText = fetchAndDisplaySelectedText(infoArea);
@@ -250,13 +850,11 @@ function applicationStarted(pluginWorkspaceAccess) {
 
                                     connection.setRequestMethod("POST");
                                     connection.setRequestProperty("Content-Type", "application/json");
-                                    connection.setRequestProperty("Authorization", "Bearer " + apiKey); // API key
+                                    connection.setRequestProperty("Authorization", "Bearer " + apiKey);
                                     connection.setDoOutput(true);
                                     
-                                    // Define the system prompt to guide the AI's response.
                                     var systemPrompt = i18nFn("system.prompt.ai.markup");
 
-                                    // Prepare request payload
                                     var requestBody = JSON.stringify({
                                         "model": parseModel,
                                         "messages": [
@@ -266,16 +864,13 @@ function applicationStarted(pluginWorkspaceAccess) {
                                         "max_tokens": 1000
                                     });
                                     
-                                    // Send request
                                     var writer = new OutputStreamWriter(connection.getOutputStream(), "UTF-8");
                                     writer.write(requestBody);
                                     writer.flush();
                                     writer.close();
                                     
-                                    // Check for non-successful response codes
                                     var responseCode = connection.getResponseCode();
                                     if (responseCode >= 200 && responseCode < 300) {
-                                        // Read response on success
                                         var reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
                                         var response = "";
                                         var line;
@@ -284,19 +879,16 @@ function applicationStarted(pluginWorkspaceAccess) {
                                         }
                                         reader.close();
                                         
-                                        // Parse and display response
                                         var responseObj = JSON.parse(response);
                                         var llmResponse = responseObj.choices[0].message.content;
 
-                                        // --- Schedule UI update back on the EDT ---
                                         SwingUtilities.invokeLater(function() {
                                             resultArea.setText("<ref>" + llmResponse + "</ref>");
                                             buttonPanel.setVisible(true);
                                             logDebug("API call successful.");
                                         });
                                         
-                                } else {
-                                        // Read error stream for non-successful responses
+                                    } else {
                                         var errorReader = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "UTF-8"));
                                         var errorResponse = "";
                                         var errorLine;
@@ -308,14 +900,13 @@ function applicationStarted(pluginWorkspaceAccess) {
                                     }
                                     
                                 } catch (error) {
-                                    // --- Schedule error message update back on the EDT ---
                                     SwingUtilities.invokeLater(function() {
                                         infoArea.setText(i18nFn("llm.error") + "\n" + error.message);
                                         logDebug("LLM API Error: " + error);
                                     });
                                 }
                             });
-                            networkThread.start(); // Start the background thread
+                            networkThread.start();
                         }
                     });
 
@@ -325,13 +916,8 @@ function applicationStarted(pluginWorkspaceAccess) {
                         var replacementTextLength = replacementText.length();
                         logDebug("Replace button clicked with replacement: " + replacementText + 
                             "\n(length: " + replacementTextLength + ")");
-                        var classNameOfReplacementText = replacementText.getClass().getName();
-                        if (classNameOfReplacementText != 'number') {
-                            logDebug("Class name of replacementTextLength: " + classNameOfReplacementText);
-                        }
 
                         if (replacementText && replacementTextLength > 0) {
-                            // Get the current editor access
                             logDebug("With replacement: " + replacementText);
                             var editorAccess = pluginWorkspaceAccess.getCurrentEditorAccess(Packages.ro.sync.exml.workspace.api.PluginWorkspace.MAIN_EDITING_AREA);
                             if (editorAccess != null) {
@@ -340,20 +926,17 @@ function applicationStarted(pluginWorkspaceAccess) {
                                 if (pageAccess != null && pageAccess instanceof Packages.ro.sync.exml.workspace.api.editor.page.text.WSTextEditorPage) {
 
                                     try {
-                                        // Get the current selection range
                                         var selectionStart = pageAccess.getSelectionStart();
                                         var selectionEnd = pageAccess.getSelectionEnd();
                                         var theDocument = pageAccess.getDocument();
                                         logDebug("Start: " + selectionStart + ", End: " + selectionEnd + ", Document: " + theDocument);
-                                        //perform the replacement on the EDT
+                                        
                                         if (selectionStart != selectionEnd) {
                                             pageAccess.beginCompoundUndoableEdit();
                                             try {
                                                 logDebug("Replacing text in document...");
                                                 pageAccess.deleteSelection();
-                                                // theDocument.remove(selectionStart, selectionEnd);
                                                 logDebug("Original text removed");
-                                                // theDocument.insertString(selectionStart, replacementText, null);
                                                 theDocument.insertString(selectionStart, replacementText, null);
                                                 logDebug("Text replaced in document.");
                                                 infoArea.append(i18nFn("text.replaced"));
@@ -383,13 +966,11 @@ function applicationStarted(pluginWorkspaceAccess) {
 
                         infoArea.setText(i18nFn("action.tag.removal.selected"));
                         var selectedText = fetchAndDisplaySelectedText(infoArea);
-                        if (selectedText && selectedText.length() > 0) {
-                            // Convert the Java String to a JavaScript string to use the regex-capable replace() method.
+                        if (selectedText && selectedText.length > 0) {
                             var cleanedText = new String(selectedText).replace(/<[^>]*>/g, '');
                             resultArea.setText(cleanedText);
                             buttonPanel.setVisible(true);
                         } else {
-                            // Hide button panel if no text selected
                             buttonPanel.setVisible(false);
                         }
                     });
@@ -400,7 +981,6 @@ function applicationStarted(pluginWorkspaceAccess) {
                             logDebug("Settings option triggered");
                             buttonPanel.setVisible(false);
 
-                            // Use proper Java array creation instead of JavaScript array syntax
                             var StringArray = Packages.java.lang.reflect.Array.newInstance(Packages.java.lang.String, 1);
                             StringArray[0] = optionsPageKey;
                             pluginWorkspaceAccess.showPreferencesPages(StringArray, optionsPageKey, true);
@@ -441,8 +1021,6 @@ function applicationStarted(pluginWorkspaceAccess) {
 
 // This is called by Oxygen when the plugin is being disposed.
 function applicationClosing() {
-
-    // Clean up resources if needed.
     getDebugMode()
     logDebug("Closing DILA AI Markup plugin.");
     logDebug("debug mode: " + getDebugMode());

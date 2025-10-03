@@ -160,5 +160,116 @@
     <val lang="zh_CN">DILA AI 標記助手偏好設定</val>
     <val lang="zh_TW">DILA AI 標記助手偏好設定</val>
   </key>
+  <!-- UTF-8 Tool Translations -->
+  <key value="menu.tools">
+    <val lang="en_US">Tools</val>
+    <val lang="zh_CN">工具</val>
+    <val lang="zh_TW">工具</val>
+  </key>
+  <key value="menu.tools.utf8.check">
+    <val lang="en_US">UTF-8 Check/Convert</val>
+    <val lang="zh_CN">UTF-8 检查/转换</val>
+    <val lang="zh_TW">UTF-8 檢查/轉換</val>
+  </key>
+  <key value="utf8.check.select.files">
+    <val lang="en_US">Please select files or folders to check for UTF-8 encoding...</val>
+    <val lang="zh_CN">请选择要检查 UTF-8 编码的文件或文件夹...</val>
+    <val lang="zh_TW">請選擇要檢查 UTF-8 編碼的檔案或資料夾...</val>
+  </key>
+  <key value="utf8.check.cancelled">
+    <val lang="en_US">File selection cancelled.</val>
+    <val lang="zh_CN">文件选择已取消。</val>
+    <val lang="zh_TW">檔案選擇已取消。</val>
+  </key>
+  <key value="utf8.check.dialog.title">
+    <val lang="en_US">UTF-8 Encoding Tool</val>
+    <val lang="zh_CN">UTF-8 编码工具</val>
+    <val lang="zh_TW">UTF-8 編碼工具</val>
+  </key>
+  <key value="utf8.scanning.files">
+    <val lang="en_US">Scanning files for UTF-8 compliance...</val>
+    <val lang="zh_CN">正在扫描文件的 UTF-8 兼容性...</val>
+    <val lang="zh_TW">正在掃描檔案的 UTF-8 相容性...</val>
+  </key>
+  <key value="utf8.check.found.non.utf8">
+    <val lang="en_US">Found {0} files that are not valid UTF-8:</val>
+    <val lang="zh_CN">发现 {0} 个非有效 UTF-8 编码的文件：</val>
+    <val lang="zh_TW">發現 {0} 個非有效 UTF-8 編碼的檔案：</val>
+  </key>
+  <key value="utf8.check.more.files">
+    <val lang="en_US">and {0} more files</val>
+    <val lang="zh_CN">还有 {0} 个文件</val>
+    <val lang="zh_TW">還有 {0} 個檔案</val>
+  </key>
+  <key value="utf8.check.all.valid">
+    <val lang="en_US">✓ All selected files are already valid UTF-8.</val>
+    <val lang="zh_CN">✓ 所有选定文件都已是有效的 UTF-8 编码。</val>
+    <val lang="zh_TW">✓ 所有選定檔案都已是有效的 UTF-8 編碼。</val>
+  </key>
+  <key value="utf8.check.select.encoding">
+    <val lang="en_US">Select the source encoding for conversion:</val>
+    <val lang="zh_CN">请选择转换的源编码：</val>
+    <val lang="zh_TW">請選擇轉換的源編碼：</val>
+  </key>
+  <key value="utf8.conversion.started">
+    <val lang="en_US">Starting UTF-8 conversion from {0} encoding...</val>
+    <val lang="zh_CN">开始从 {0} 编码转换为 UTF-8...</val>
+    <val lang="zh_TW">開始從 {0} 編碼轉換為 UTF-8...</val>
+  </key>
+  <key value="utf8.conversion.backing.up">
+    <val lang="en_US">✓ Backed up: </val>
+    <val lang="zh_CN">✓ 已备份：</val>
+    <val lang="zh_TW">✓ 已備份：</val>
+  </key>
+  <key value="utf8.conversion.success">
+    <val lang="en_US">✓ Converted: </val>
+    <val lang="zh_CN">✓ 已转换：</val>
+    <val lang="zh_TW">✓ 已轉換：</val>
+  </key>
+  <key value="utf8.conversion.failed">
+    <val lang="en_US">✗ Failed: </val>
+    <val lang="zh_CN">✗ 失败：</val>
+    <val lang="zh_TW">✗ 失敗：</val>
+  </key>
+  <key value="utf8.conversion.summary">
+    <val lang="en_US">Conversion Summary:</val>
+    <val lang="zh_CN">转换摘要：</val>
+    <val lang="zh_TW">轉換摘要：</val>
+  </key>
+  <key value="utf8.conversion.success.count">
+    <val lang="en_US">Successfully converted: {0} files</val>
+    <val lang="zh_CN">成功转换：{0} 个文件</val>
+    <val lang="zh_TW">成功轉換：{0} 個檔案</val>
+  </key>
+  <key value="utf8.conversion.fail.count">
+    <val lang="en_US">Failed: {0} files</val>
+    <val lang="zh_CN">失败：{0} 个文件</val>
+    <val lang="zh_TW">失敗：{0} 個檔案</val>
+  </key>
+  <key value="utf8.conversion.cancelled">
+    <val lang="en_US">UTF-8 conversion cancelled by user.</val>
+    <val lang="zh_CN">用户取消了 UTF-8 转换。</val>
+    <val lang="zh_TW">使用者取消了 UTF-8 轉換。</val>
+  </key>
+  <key value="utf8.conversion.error">
+    <val lang="en_US">Error in UTF-8 conversion: </val>
+    <val lang="zh_CN">UTF-8 转换错误：</val>
+    <val lang="zh_TW">UTF-8 轉換錯誤：</val>
+  </key>
+  <key value="utf8.conversion.backup.note">
+    <val lang="en_US">Note: Original files backed up with .bak extension</val>
+    <val lang="zh_CN">注意：原文件已备份为 .bak 扩展名</val>
+    <val lang="zh_TW">注意：原檔案已備份為 .bak 副檔名</val>
+  </key>
+  <key value="button.convert">
+    <val lang="en_US">Convert</val>
+    <val lang="zh_CN">转换</val>
+    <val lang="zh_TW">轉換</val>
+  </key>
+  <key value="button.cancel">
+    <val lang="en_US">Cancel</val>
+    <val lang="zh_CN">取消</val>
+    <val lang="zh_TW">取消</val>
+  </key>
 </translation>
 

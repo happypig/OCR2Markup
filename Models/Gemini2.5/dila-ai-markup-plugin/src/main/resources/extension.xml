@@ -11,7 +11,10 @@
             <p>This plugin provides an AI-empowered markup assistant for editing TEI XML documents.</p>
               <h3>Release Notes v0.2.4:</h3>
               <ul>
-                     <li>Tool to check and convert UTF-8 encoding</li>
+                     <li>UTF-8 Check/Convert tool for file encoding validation and conversion</li>
+                     <li>Automatic backup creation before encoding conversion</li>
+                     <li>Support for common text file formats and recursive directory scanning</li>
+                     <li>User-driven encoding selection with comprehensive error handling</li>
               </ul>
               <h3>Release Notes v0.2.3:</h3>
               <ul>
