@@ -58,8 +58,8 @@ function isEncodingUtilsAvailable() {
 }
 
 /**
- * Enhanced UTF-8 validation that properly detects non-UTF-8 encodings
- * This implementation uses byte-level validation to ensure strict UTF-8 compliance
+ * Enhanced UTF-8 validation using Java implementation for superior accuracy.
+ * This bridges to the Java DAMAOptionPagePluginExtension class for enhanced validation.
  */
 function isValidUtf8(file) {
     try {
@@ -91,7 +91,42 @@ function isValidUtf8(file) {
             return true;
         }
         
-        // Use byte-level validation for strict UTF-8 checking
+        logDebug("Using enhanced Java UTF-8 validation for: " + file.getPath());
+        
+        try {
+            // Convert Java File to Path for the enhanced Java method
+            var Paths = Packages.java.nio.file.Paths;
+            var path = Paths.get(file.getAbsolutePath());
+            
+            // Call the enhanced Java implementation
+            var DAMAExtension = Packages.com.dila.dama.plugin.preferences.DAMAOptionPagePluginExtension;
+            var isValid = DAMAExtension.isValidUtf8(path);
+            
+            logDebug("Enhanced Java validation result for " + file.getPath() + ": " + isValid);
+            return isValid;
+            
+        } catch (e) {
+            logDebug("Error calling enhanced Java UTF-8 validation for " + file.getPath() + ": " + e);
+            
+            // Fallback to self-contained JavaScript validation if Java method fails
+            logDebug("Falling back to JavaScript validation for: " + file.getPath());
+            return isValidUtf8Fallback(file);
+        }
+        
+    } catch (e) {
+        logDebug("Unexpected error in UTF-8 validation for " + (file ? file.getPath() : "null") + ": " + e);
+        return true; // Assume valid for unexpected errors
+    }
+}
+
+/**
+ * Fallback self-contained UTF-8 validation (original JavaScript implementation).
+ * Used when the enhanced Java method is unavailable.
+ */
+function isValidUtf8Fallback(file) {
+    logDebug("Using fallback JavaScript UTF-8 validation for: " + file.getPath());
+    
+    try {
         var FileInputStream = Packages.java.io.FileInputStream;
         var fis = null;
         
@@ -199,11 +234,11 @@ function isValidUtf8(file) {
                 totalBytesRead += bytesRead;
             }
             
-            logDebug("UTF-8 validation passed for: " + file.getPath());
+            logDebug("Fallback UTF-8 validation passed for: " + file.getPath());
             return true;
             
         } catch (e) {
-            logDebug("Error during byte-level UTF-8 validation for " + file.getPath() + ": " + e);
+            logDebug("Error during fallback byte-level UTF-8 validation for " + file.getPath() + ": " + e);
             return false; // Assume invalid if we can't properly validate
         } finally {
             // Clean up resources
@@ -211,40 +246,65 @@ function isValidUtf8(file) {
         }
         
     } catch (e) {
-        logDebug("Unexpected error in UTF-8 validation for " + (file ? file.getPath() : "null") + ": " + e);
+        logDebug("Unexpected error in fallback UTF-8 validation for " + (file ? file.getPath() : "null") + ": " + e);
         return true; // Assume valid for unexpected errors
     }
 }
 
 /**
- * Get common encodings - self-contained list
+ * Get common encodings using enhanced Java implementation with fallback.
+ * Tries to use the Java method first, falls back to self-contained list.
  */
 function getCommonEncodings() {
-    var ArrayList = Packages.java.util.ArrayList;
-    var encodings = new ArrayList();
-    
-    // Common encodings ordered by likelihood
-    var commonEncodings = [
-        "Windows-1252",
-        "ISO-8859-1",
-        "GBK", 
-        "GB2312",
-        "Big5",
-        "Shift_JIS",
-        "EUC-KR",
-        "Windows-1251",
-        "ISO-8859-2",
-        "UTF-16",
-        "UTF-16BE",
-        "UTF-16LE"
-    ];
-    
-    for (var i = 0; i < commonEncodings.length; i++) {
-        encodings.add(commonEncodings[i]);
+    try {
+        logDebug("Using enhanced Java encoding list");
+        
+        // Try to call the enhanced Java implementation
+        var DAMAExtension = Packages.com.dila.dama.plugin.preferences.DAMAOptionPagePluginExtension;
+        var javaEncodings = DAMAExtension.getCommonEncodings();
+        
+        // Convert Java array to JavaScript ArrayList for compatibility
+        var ArrayList = Packages.java.util.ArrayList;
+        var encodings = new ArrayList();
+        
+        for (var i = 0; i < javaEncodings.length; i++) {
+            encodings.add(javaEncodings[i]);
+        }
+        
+        logDebug("Enhanced Java encoding list loaded with " + encodings.size() + " items");
+        return encodings;
+        
+    } catch (e) {
+        logDebug("Error calling enhanced Java encoding list: " + e);
+        logDebug("Falling back to self-contained encoding list");
+        
+        // Fallback to self-contained list
+        var ArrayList = Packages.java.util.ArrayList;
+        var encodings = new ArrayList();
+        
+        // Common encodings ordered by likelihood
+        var commonEncodings = [
+            "Windows-1252",
+            "ISO-8859-1",
+            "GBK", 
+            "GB2312",
+            "Big5",
+            "Shift_JIS",
+            "EUC-KR",
+            "Windows-1251",
+            "ISO-8859-2",
+            "UTF-16",
+            "UTF-16BE",
+            "UTF-16LE"
+        ];
+        
+        for (var i = 0; i < commonEncodings.length; i++) {
+            encodings.add(commonEncodings[i]);
+        }
+        
+        logDebug("Fallback encoding list loaded with " + encodings.size() + " items");
+        return encodings;
     }
-    
-    logDebug("Using self-contained encoding list with " + encodings.size() + " items");
-    return encodings;
 }
 
 // This is called by Oxygen when the plugin is initialized.
