@@ -11,6 +11,12 @@
             <p>This plugin provides an AI-empowered markup assistant for editing TEI XML documents.</p>
               <h3>Release Notes v0.3.0:</h3>
               <ul>
+                     <li>Complete JavaScript-to-Java conversion for improved performance and maintainability</li>
+                     <li>Native Java AI Markup Assistant extension with enhanced UI integration</li>
+                     <li>Dual-extension architecture: AI Markup Assistant + Options/Preferences</li>
+                     <li>Enhanced UTF-8 validation with comprehensive file processing capabilities</li>
+                     <li>Multi-threaded operations with proper background processing</li>
+                     <li>Improved error handling and user feedback mechanisms</li>
                      <li>UTF-8 Check/Convert tool for file encoding validation and conversion</li>
                      <li>Automatic backup creation before encoding conversion</li>
                      <li>Support for common text file formats and recursive directory scanning</li>

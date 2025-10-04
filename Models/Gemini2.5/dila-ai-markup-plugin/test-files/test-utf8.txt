@@ -1,7 +1,0 @@
-This is a valid UTF-8 file.
-It contains basic ASCII text.
-Unicode characters: café, résumé, naïve.
-Emoji: 🚀 📝 ✅
-Chinese: 中文测试
-Japanese: テスト
-Arabic: اختبار

@@ -1,1 +1,7 @@
+com\dila\dama\plugin\utf8\UTF8ValidationService$ConversionSuccess.class
+com\dila\dama\plugin\util\EncodingUtils.class
 com\dila\dama\plugin\preferences\DAMAOptionPagePluginExtension.class
+com\dila\dama\plugin\utf8\UTF8ValidationService$ConversionResult.class
+com\dila\dama\plugin\utf8\UTF8ValidationService$ConversionFailure.class
+com\dila\dama\plugin\utf8\UTF8ValidationService.class
+com\dila\dama\plugin\workspace\DAMAWorkspaceAccessPlugin.class

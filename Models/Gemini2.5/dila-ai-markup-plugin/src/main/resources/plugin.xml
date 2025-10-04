@@ -5,14 +5,14 @@
 <plugin 
        id="com.dila.ai.markup" 
        name="DILA AI Markup Assistant"
-       version="0.2.4" 
+       version="0.3.0" 
        vendor="DILA"
-       class="ro.sync.exml.plugin.Plugin" 
+       class="com.dila.dama.plugin.workspace.DAMAWorkspaceAccessPlugin" 
        classLoaderType="preferReferencedResources">
 
        <description>
               <p>This plugin provides an AI-empowered markup assistant for editing TEI XML documents.</p>
-              <h3>Release Notes v0.2.4:</h3>
+              <h3>Release Notes v0.3.0:</h3>
               <ul>
                      <li>UTF-8 Check/Convert tool for file encoding validation and conversion</li>
                      <li>Automatic backup creation before encoding conversion</li>
@@ -48,8 +48,8 @@
        </runtime>
 
        <extension 
-              type="WorkspaceAccessJS" 
-              href="dila-ai-markup.js"/>
+              type="WorkspaceAccess" 
+              class="com.dila.dama.plugin.workspace.DAMAWorkspaceAccessPluginExtension"/>
               
        <!-- Note: UTF-8 Check/Convert Tool is now integrated in dila-ai-markup.js (v0.2.4+) -->
 

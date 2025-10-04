@@ -50,16 +50,16 @@ function logDebug(message) {
 }
 
 /**
- * UTF-8 tools are always available with this self-contained implementation
+ * UTF-8 tools are always available with enhanced Java implementation
  */
 function isEncodingUtilsAvailable() {
-    logDebug("Using self-contained UTF-8 checking capabilities");
+    logDebug("Using enhanced Java UTF-8 validation service");
     return true;
 }
 
 /**
  * Enhanced UTF-8 validation using Java implementation for superior accuracy.
- * This bridges to the Java DAMAOptionPagePluginExtension class for enhanced validation.
+ * This bridges to the Java UTF8ValidationService class for enhanced validation.
  */
 function isValidUtf8(file) {
     try {
@@ -79,18 +79,6 @@ function isValidUtf8(file) {
             return true; // Assume valid if we can't read it
         }
         
-        // Skip very large files to prevent memory issues
-        var fileSize = file.length();
-        if (fileSize > 50 * 1024 * 1024) { // 50MB limit
-            logDebug("Skipping large file (>50MB): " + file.getPath());
-            return true;
-        }
-        
-        if (fileSize === 0) {
-            logDebug("Empty file, considering valid UTF-8: " + file.getPath());
-            return true;
-        }
-        
         logDebug("Using enhanced Java UTF-8 validation for: " + file.getPath());
         
         try {
@@ -99,8 +87,8 @@ function isValidUtf8(file) {
             var path = Paths.get(file.getAbsolutePath());
             
             // Call the enhanced Java implementation
-            var DAMAExtension = Packages.com.dila.dama.plugin.preferences.DAMAOptionPagePluginExtension;
-            var isValid = DAMAExtension.isValidUtf8(path);
+            var UTF8ValidationService = Packages.com.dila.dama.plugin.utf8.UTF8ValidationService;
+            var isValid = UTF8ValidationService.isValidUtf8(path);
             
             logDebug("Enhanced Java validation result for " + file.getPath() + ": " + isValid);
             return isValid;
@@ -755,7 +743,7 @@ function applicationStarted(pluginWorkspaceAccess) {
                     }
                     
                     /**
-                     * Process selected files and folders for UTF-8 validation
+                     * Process selected files and folders for UTF-8 validation using enhanced Java service
                      */
                     function processSelectedFiles(selectedFiles) {
                         if (!selectedFiles || selectedFiles.length === 0) {
@@ -763,33 +751,32 @@ function applicationStarted(pluginWorkspaceAccess) {
                             return;
                         }
                         
-                        var nonUtf8Files = [];
-                        var totalFiles = 0;
-                        
                         infoArea.append(i18nFn("utf8.scanning.files") + "\n");
-                        logDebug("Starting file scan for " + selectedFiles.length + " selected items");
+                        logDebug("Starting enhanced Java file scan for " + selectedFiles.length + " selected items");
                         
                         try {
-                            // Scan all selected files/folders
+                            // Convert File objects to Path objects for Java service
+                            var Paths = Packages.java.nio.file.Paths;
+                            var selectedPaths = Packages.java.lang.reflect.Array.newInstance(Packages.java.nio.file.Path, selectedFiles.length);
+                            
                             for (var i = 0; i < selectedFiles.length; i++) {
-                                var selectedFile = selectedFiles[i];
-                                if (!selectedFile) {
-                                    logDebug("Skipping null selected file at index " + i);
-                                    continue;
-                                }
-                                
-                                try {
-                                    infoArea.append("Scanning: " + selectedFile.getName() + "\n");
-                                    var scannedCount = scanFileOrDirectory(selectedFile, nonUtf8Files);
-                                    totalFiles += scannedCount;
-                                    logDebug("Scanned " + scannedCount + " files in " + selectedFile.getName());
-                                } catch (e) {
-                                    logDebug("Error processing selected file " + selectedFile.getPath() + ": " + e);
-                                    infoArea.append("Error scanning: " + selectedFile.getName() + " - " + (e.message || String(e)) + "\n");
-                                }
+                                infoArea.append("Scanning: " + selectedFiles[i].getName() + "\n");
+                                selectedPaths[i] = Paths.get(selectedFiles[i].getAbsolutePath());
                             }
                             
-                            logDebug("Scan completed. Total files: " + totalFiles + ", Non-UTF-8: " + nonUtf8Files.length);
+                            // Use Java service for superior scanning accuracy
+                            var UTF8ValidationService = Packages.com.dila.dama.plugin.utf8.UTF8ValidationService;
+                            var nonUtf8PathsList = UTF8ValidationService.scanForNonUtf8Files(selectedPaths);
+                            
+                            // Convert Path objects back to File objects for UI compatibility
+                            var nonUtf8Files = [];
+                            var File = Packages.java.io.File;
+                            for (var j = 0; j < nonUtf8PathsList.size(); j++) {
+                                var path = nonUtf8PathsList.get(j);
+                                nonUtf8Files.push(new File(path.toString()));
+                            }
+                            
+                            logDebug("Enhanced Java scan completed. Non-UTF-8 files found: " + nonUtf8Files.length);
                             
                             // Display results
                             if (nonUtf8Files.length > 0) {
@@ -801,9 +788,9 @@ function applicationStarted(pluginWorkspaceAccess) {
                                 
                                 // List non-UTF-8 files (show max 10, then summary)
                                 var maxDisplay = Math.min(nonUtf8Files.length, 10);
-                                for (var j = 0; j < maxDisplay; j++) {
-                                    if (nonUtf8Files[j]) {
-                                        infoArea.append("• " + nonUtf8Files[j].getPath() + "\n");
+                                for (var k = 0; k < maxDisplay; k++) {
+                                    if (nonUtf8Files[k]) {
+                                        infoArea.append("• " + nonUtf8Files[k].getPath() + "\n");
                                     }
                                 }
                                 
@@ -814,16 +801,183 @@ function applicationStarted(pluginWorkspaceAccess) {
                                     infoArea.append("... " + moreMessage + "\n");
                                 }
                                 
-                                // Show encoding selection dialog
-                                showEncodingSelectionDialog(nonUtf8Files);
+                                // Show enhanced conversion dialog
+                                showEnhancedConversionDialog(nonUtf8Files);
                             } else {
-                                infoArea.append("\n" + i18nFn("utf8.check.all.valid"));
-                                logDebug("All files are already UTF-8 encoded");
+                                infoArea.append("\n" + i18nFn("utf8.check.all.valid") + "\n");
+                                logDebug("All files are already UTF-8 encoded (verified by enhanced Java service)");
                             }
                         } catch (e) {
-                            logDebug("Error in processSelectedFiles: " + e);
+                            logDebug("Error in enhanced processSelectedFiles: " + e);
                             var errorMsg = e.message ? e.message : String(e);
-                            infoArea.append("\nError during file processing: " + errorMsg);
+                            infoArea.append("\nError during enhanced file processing: " + errorMsg + "\n");
+                            
+                            // Fallback to original JavaScript scanning if Java service fails
+                            logDebug("Falling back to original JavaScript scanning");
+                            processSelectedFilesFallback(selectedFiles);
+                        }
+                    }
+                    
+                    /**
+                     * Enhanced conversion dialog without encoding selection (Java auto-detects)
+                     */
+                    function showEnhancedConversionDialog(nonUtf8Files) {
+                        if (!nonUtf8Files || nonUtf8Files.length === 0) {
+                            logDebug("No files to convert");
+                            return;
+                        }
+                        
+                        try {
+                            var JOptionPane = Packages.javax.swing.JOptionPane;
+                            var JLabel = Packages.javax.swing.JLabel;
+                            var JPanel = Packages.javax.swing.JPanel;
+                            var BorderLayout = Packages.java.awt.BorderLayout;
+                            
+                            var panel = new JPanel(new BorderLayout());
+                            var message = i18nFn("utf8.check.found.non.utf8").replace("{0}", String(nonUtf8Files.length)) + 
+                                         "\n\nThe system will automatically detect source encodings and convert to UTF-8.";
+                            var label = new JLabel("<html>" + message.replace(/\n/g, "<br>") + "</html>");
+                            
+                            panel.add(label, BorderLayout.CENTER);
+                            
+                            var options = [i18nFn("button.convert"), i18nFn("button.cancel")];
+                            var dialogResult = JOptionPane.showOptionDialog(
+                                pluginPanel,
+                                panel,
+                                i18nFn("utf8.check.dialog.title"),
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE,
+                                null,
+                                options,
+                                options[0]
+                            );
+                            
+                            if (dialogResult === 0) {
+                                logDebug("User approved enhanced conversion");
+                                convertFilesWithEnhancedJava(nonUtf8Files);
+                            } else {
+                                logDebug("User cancelled enhanced conversion");
+                                infoArea.append("\n" + i18nFn("utf8.conversion.cancelled") + "\n");
+                            }
+                        } catch (e) {
+                            logDebug("Error in enhanced conversion dialog: " + e);
+                            var errorMsg = e.message ? e.message : String(e);
+                            infoArea.append("\nError in conversion dialog: " + errorMsg + "\n");
+                        }
+                    }
+                    
+                    /**
+                     * Convert files using enhanced Java service with automatic encoding detection
+                     */
+                    function convertFilesWithEnhancedJava(nonUtf8Files) {
+                        if (!nonUtf8Files || nonUtf8Files.length === 0) {
+                            infoArea.append("\nNo files to convert.\n");
+                            return;
+                        }
+                        
+                        try {
+                            infoArea.append("\nStarting enhanced UTF-8 conversion...\n");
+                            
+                            // Convert File objects to Path objects for Java service
+                            var Paths = Packages.java.nio.file.Paths;
+                            var ArrayList = Packages.java.util.ArrayList;
+                            var pathsList = new ArrayList();
+                            
+                            for (var i = 0; i < nonUtf8Files.length; i++) {
+                                var path = Paths.get(nonUtf8Files[i].getAbsolutePath());
+                                pathsList.add(path);
+                            }
+                            
+                            // Use Java service for superior conversion with auto-detection
+                            var UTF8ValidationService = Packages.com.dila.dama.plugin.utf8.UTF8ValidationService;
+                            var conversionResult = UTF8ValidationService.convertFilesToUtf8(pathsList, null); // null = auto-detect
+                            
+                            // Display conversion results
+                            var successCount = conversionResult.getSuccessCount();
+                            var failureCount = conversionResult.getFailureCount();
+                            
+                            resultArea.setText(""); // Clear previous results
+                            resultArea.append("=== Enhanced UTF-8 Conversion Results ===\n\n");
+                            resultArea.append("Successfully converted: " + successCount + " files\n");
+                            resultArea.append("Failed conversions: " + failureCount + " files\n\n");
+                            
+                            // Show successful conversions
+                            if (successCount > 0) {
+                                resultArea.append("✓ Successfully converted files:\n");
+                                var successes = conversionResult.getSuccesses();
+                                for (var j = 0; j < successes.size(); j++) {
+                                    var success = successes.get(j);
+                                    resultArea.append("  • " + success.getFilePath().getFileName() + 
+                                                    " (from " + success.getSourceEncoding() + ")\n");
+                                    resultArea.append("    Backup: " + success.getBackupPath().getFileName() + "\n");
+                                }
+                            }
+                            
+                            // Show failed conversions
+                            if (failureCount > 0) {
+                                resultArea.append("\n✗ Failed conversions:\n");
+                                var failures = conversionResult.getFailures();
+                                for (var k = 0; k < failures.size(); k++) {
+                                    var failure = failures.get(k);
+                                    resultArea.append("  • " + failure.getFilePath().getFileName() + 
+                                                    " - " + failure.getError() + "\n");
+                                }
+                            }
+                            
+                            resultArea.append("\nConversion completed using enhanced Java service.\n");
+                            logDebug("Enhanced Java conversion completed: " + successCount + " success, " + failureCount + " failures");
+                            
+                        } catch (e) {
+                            logDebug("Error in enhanced Java conversion: " + e);
+                            var errorMsg = e.message ? e.message : String(e);
+                            resultArea.append("Error during enhanced conversion: " + errorMsg + "\n");
+                            
+                            // Fallback to original conversion method
+                            logDebug("Falling back to original conversion method");
+                            showEncodingSelectionDialog(nonUtf8Files);
+                        }
+                    }
+                    
+                    /**
+                     * Fallback to original JavaScript file scanning if Java service fails
+                     */
+                    function processSelectedFilesFallback(selectedFiles) {
+                        var nonUtf8Files = [];
+                        var totalFiles = 0;
+                        
+                        infoArea.append("Using fallback JavaScript scanning...\n");
+                        
+                        try {
+                            // Scan all selected files/folders using original method
+                            for (var i = 0; i < selectedFiles.length; i++) {
+                                var selectedFile = selectedFiles[i];
+                                if (!selectedFile) {
+                                    continue;
+                                }
+                                
+                                try {
+                                    var scannedCount = scanFileOrDirectory(selectedFile, nonUtf8Files);
+                                    totalFiles += scannedCount;
+                                } catch (e) {
+                                    logDebug("Error in fallback scan: " + e);
+                                }
+                            }
+                            
+                            // Display results
+                            if (nonUtf8Files.length > 0) {
+                                var messageKey = "utf8.check.found.non.utf8";
+                                var message = i18nFn(messageKey);
+                                message = message.replace("{0}", String(nonUtf8Files.length));
+                                infoArea.append("\n" + message + " (fallback scan)\n\n");
+                                
+                                // Show original encoding selection dialog
+                                showEncodingSelectionDialog(nonUtf8Files);
+                            } else {
+                                infoArea.append("\n" + i18nFn("utf8.check.all.valid") + " (fallback scan)\n");
+                            }
+                        } catch (e) {
+                            logDebug("Error in fallback processing: " + e);
+                            infoArea.append("\nError in fallback processing: " + e + "\n");
                         }
                     }
                     

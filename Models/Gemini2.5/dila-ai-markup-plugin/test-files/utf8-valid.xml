@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test>
+    <message>This is a valid UTF-8 XML file</message>
+    <special-chars>äöü ñ ©</special-chars>
+</test>

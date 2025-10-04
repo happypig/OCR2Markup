@@ -10,14 +10,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Arrays;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -477,182 +470,48 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
   }
   
   // ========================================
-  // Encoding Utility Methods (Enhanced)
+  // Encoding Utility Methods (Integrated)
   // ========================================
   
   /**
-   * Debug logging method for UTF-8 validation operations.
-   * Logs to System.err with timestamps for debugging purposes.
-   * 
-   * @param message The debug message to log
-   */
-  private static void logDebug(String message) {
-      // Simple debug logging - can be enhanced with proper logging framework
-      boolean debug = Boolean.parseBoolean(System.getProperty("dila.debug", "false"));
-      if (debug) {
-          System.err.println("[" + new java.util.Date() + "] DILA UTF-8: " + message);
-      }
-  }
-  
-  /**
-   * Enhanced UTF-8 validation with comprehensive BOM detection and UTF-16 pattern recognition.
-   * Provides superior accuracy compared to basic CharsetDecoder approach.
+   * Robustly checks if a file is valid UTF-8 using strict validation.
+   * Uses CharsetDecoder with strict error reporting to ensure accurate detection.
    * 
    * @param path The path to the file to validate
    * @return true if the file is valid UTF-8, false otherwise
    */
   public static boolean isValidUtf8(Path path) {
-      logDebug("Enhanced Java UTF-8 validation for: " + path);
-      
-      try (FileInputStream fis = new FileInputStream(path.toFile());
-           BufferedInputStream bis = new BufferedInputStream(fis)) {
-          
-          // Step 1: BOM Detection (first 4 bytes)
-          byte[] bomBuffer = new byte[4];
-          bis.mark(4);
-          int bomBytesRead = bis.read(bomBuffer);
-          bis.reset();
-          
-          if (bomBytesRead >= 2) {
-              // Check for UTF-16 BOM patterns
-              int byte0 = bomBuffer[0] & 0xFF;
-              int byte1 = bomBuffer[1] & 0xFF;
-              
-              // UTF-16 Little Endian BOM: FF FE
-              if (byte0 == 0xFF && byte1 == 0xFE) {
-                  logDebug("UTF-16 LE BOM detected in: " + path);
-                  return false;
-              }
-              
-              // UTF-16 Big Endian BOM: FE FF  
-              if (byte0 == 0xFE && byte1 == 0xFF) {
-                  logDebug("UTF-16 BE BOM detected in: " + path);
-                  return false;
-              }
-              
-              // UTF-16 pattern detection (alternating null bytes)
-              if (bomBytesRead >= 4) {
-                  int byte2 = bomBuffer[2] & 0xFF;
-                  int byte3 = bomBuffer[3] & 0xFF;
-                  
-                  // UTF-16 LE pattern: non-null, null, non-null, null
-                  if (byte1 == 0 && byte3 == 0 && byte0 != 0 && byte2 != 0) {
-                      logDebug("UTF-16 LE pattern detected (no BOM) in: " + path);
-                      return false;
-                  }
-                  
-                  // UTF-16 BE pattern: null, non-null, null, non-null
-                  if (byte0 == 0 && byte2 == 0 && byte1 != 0 && byte3 != 0) {
-                      logDebug("UTF-16 BE pattern detected (no BOM) in: " + path);
-                      return false;
-                  }
-              }
-          }
-          
-          // Step 2: Byte-level UTF-8 validation
-          byte[] buffer = new byte[8192];
-          int bytesRead;
-          long totalBytes = 0;
-          
-          while ((bytesRead = bis.read(buffer)) != -1) {
-              for (int i = 0; i < bytesRead; i++) {
-                  int currentByte = buffer[i] & 0xFF;
-                  
-                  // Null byte detection (common in UTF-16, rare in UTF-8 text)
-                  if (currentByte == 0) {
-                      logDebug("Null byte found at position " + (totalBytes + i) + " in: " + path);
-                      return false;
-                  }
-                  
-                  // ASCII range (0-127) - always valid
-                  if (currentByte <= 0x7F) {
-                      continue;
-                  }
-                  
-                  // Multi-byte UTF-8 sequence validation
-                  int sequenceLength = 0;
-                  
-                  if ((currentByte & 0xE0) == 0xC0) {
-                      // 2-byte sequence: 110xxxxx 10xxxxxx
-                      sequenceLength = 1;
-                  } else if ((currentByte & 0xF0) == 0xE0) {
-                      // 3-byte sequence: 1110xxxx 10xxxxxx 10xxxxxx
-                      sequenceLength = 2;
-                  } else if ((currentByte & 0xF8) == 0xF0) {
-                      // 4-byte sequence: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-                      sequenceLength = 3;
-                  } else {
-                      // Invalid UTF-8 start byte
-                      logDebug("Invalid UTF-8 start byte 0x" + Integer.toHexString(currentByte) + 
-                              " at position " + (totalBytes + i) + " in: " + path);
-                      return false;
-                  }
-                  
-                  // Validate continuation bytes
-                  for (int j = 1; j <= sequenceLength; j++) {
-                      if (i + j >= bytesRead) {
-                          // Read more data if needed - for simplicity, use CharsetDecoder fallback
-                          break;
-                      }
-                      int continuationByte = buffer[i + j] & 0xFF;
-                      if ((continuationByte & 0xC0) != 0x80) {
-                          logDebug("Invalid UTF-8 continuation byte 0x" + Integer.toHexString(continuationByte) + 
-                                  " at position " + (totalBytes + i + j) + " in: " + path);
-                          return false;
-                      }
-                  }
-                  
-                  // Skip validated continuation bytes
-                  i += sequenceLength;
-              }
-              totalBytes += bytesRead;
-          }
-          
-          // Step 3: Final validation with CharsetDecoder for edge cases
-          try {
-              byte[] allBytes = Files.readAllBytes(path);
-              CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
-              decoder.onMalformedInput(CodingErrorAction.REPORT);
-              decoder.onUnmappableCharacter(CodingErrorAction.REPORT);
-              decoder.decode(ByteBuffer.wrap(allBytes));
-          } catch (CharacterCodingException e) {
-              logDebug("CharsetDecoder validation failed for: " + path + " - " + e.getMessage());
-              return false;
-          }
-          
-          logDebug("Enhanced UTF-8 validation passed for: " + path);
+      try {
+          byte[] bytes = Files.readAllBytes(path);
+          CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
+          decoder.onMalformedInput(CodingErrorAction.REPORT);
+          decoder.onUnmappableCharacter(CodingErrorAction.REPORT);
+          decoder.decode(ByteBuffer.wrap(bytes));
           return true;
-          
+      } catch (CharacterCodingException e) {
+          return false; // Invalid UTF-8 encoding detected
       } catch (IOException e) {
-          logDebug("I/O error during UTF-8 validation: " + path + " - " + e.getMessage());
-          return false;
+          return false; // File I/O error
       } catch (Exception e) {
-          logDebug("Unexpected error during UTF-8 validation: " + path + " - " + e.getMessage());
-          return false;
+          return false; // Any other error
       }
   }
   
   /**
-   * Get comprehensive list of character encodings for conversion.
-   * Enhanced to match JavaScript implementation with expanded encoding support.
+   * Get available character encodings for the dropdown selection.
+   * Returns common encodings that users are likely to encounter.
    * 
-   * @return Array of common encoding names ordered by likelihood
+   * @return Array of common encoding names
    */
   public static String[] getCommonEncodings() {
-      logDebug("Providing enhanced encoding list from Java implementation");
       return new String[] {
           "Windows-1252",
-          "ISO-8859-1",
-          "GBK", 
-          "GB2312",
+          "ISO-8859-1", 
+          "GBK",
           "Big5",
           "Shift_JIS",
           "EUC-KR",
-          "Windows-1251",
-          "ISO-8859-2",
-          "UTF-16",
-          "UTF-16BE",
-          "UTF-16LE"
+          "Windows-1251"
       };
   }
   
