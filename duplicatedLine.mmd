@@ -1,0 +1,50 @@
+---
+references:
+  - "File:
+    /oxygenSDKSamples/oxygen-sample-plugins/oxygen-sample-plugin-duplicate-line\
+    s/src/main/java/ro/sync/sample/plugin/duplicateLine/DuplicateLineDownPlugin\
+    Extension.java"
+  - "File:
+    /oxygenSDKSamples/oxygen-sample-plugins/oxygen-sample-plugin-duplicate-line\
+    s/src/main/java/ro/sync/sample/plugin/duplicateLine/DuplicateLinePlugin.jav\
+    a"
+  - "File:
+    /oxygenSDKSamples/oxygen-sample-plugins/oxygen-sample-plugin-duplicate-line\
+    s/src/main/java/ro/sync/sample/plugin/duplicateLine/DuplicateLinePluginExte\
+    nsion.java"
+  - "File:
+    /oxygenSDKSamples/oxygen-sample-plugins/oxygen-sample-plugin-duplicate-line\
+    s/src/main/java/ro/sync/sample/plugin/duplicateLine/DuplicateLineUpPluginEx\
+    tension.java"
+generationTime: 2025-10-03T15:34:45.079Z
+---
+erDiagram
+    DUPLICATE_LINE_PLUGIN {
+        DuplicateLinePlugin instance PK
+        PluginDescriptor descriptor
+    }
+    DUPLICATE_LINE_PLUGIN_EXTENSION {
+        string className PK
+    }
+    DUPLICATE_LINE_DOWN_PLUGIN_EXTENSION {
+        string className PK, FK
+    }
+    DUPLICATE_LINE_UP_PLUGIN_EXTENSION {
+        string className PK, FK
+    }
+    DOCUMENT_PLUGIN_CONTEXT {
+        string contextId PK
+    }
+    DOCUMENT_PLUGIN_RESULT {
+        string resultId PK
+    }
+    PLUGIN_DESCRIPTOR {
+        string descriptorId PK
+    }
+    DOCUMENT_PLUGIN_CONTEXT ||--o{ DUPLICATE_LINE_DOWN_PLUGIN_EXTENSION : processes
+    DOCUMENT_PLUGIN_CONTEXT ||--o{ DUPLICATE_LINE_UP_PLUGIN_EXTENSION : processes
+    DUPLICATE_LINE_DOWN_PLUGIN_EXTENSION ||--o| DOCUMENT_PLUGIN_RESULT : returns
+    DUPLICATE_LINE_PLUGIN_EXTENSION ||--o{ DUPLICATE_LINE_DOWN_PLUGIN_EXTENSION : extends
+    DUPLICATE_LINE_PLUGIN_EXTENSION ||--o{ DUPLICATE_LINE_UP_PLUGIN_EXTENSION : extends
+    DUPLICATE_LINE_UP_PLUGIN_EXTENSION ||--o| DOCUMENT_PLUGIN_RESULT : returns
+    PLUGIN_DESCRIPTOR ||--|| DUPLICATE_LINE_PLUGIN : configures

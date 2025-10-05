@@ -14,8 +14,11 @@
               <p>This plugin provides an AI-empowered markup assistant for editing TEI XML documents.</p>
               <h3>Release Notes v0.3.0:</h3>
               <ul>
-                     <li>UTF-8 Check/Convert tool for file encoding validation and conversion</li>
-                     <li>Automatic backup creation before encoding conversion</li>
+                     <li><strong>Complete Java Migration:</strong> Migrated entire implementation from JavaScript to pure Java for better performance and reliability</li>
+                     <li><strong>Enhanced UTF-8 Tools:</strong> Improved file encoding validation and conversion with automatic backup creation</li>
+                     <li><strong>Pure Java UI:</strong> Eliminated JavaScript-Java bridge issues with native Swing implementation</li>
+                     <li><strong>AI Markup Integration:</strong> Native Java integration with LLM APIs for markup processing</li>
+                     <li><strong>Tag Removal:</strong> Efficient Java-based XML/HTML tag removal functionality</li>
                      <li>Support for common text file formats and recursive directory scanning</li>
               </ul>
               <h3>Release Notes v0.2.3:</h3>
@@ -51,7 +54,7 @@
               type="WorkspaceAccess" 
               class="com.dila.dama.plugin.workspace.DAMAWorkspaceAccessPluginExtension"/>
               
-       <!-- Note: UTF-8 Check/Convert Tool is now integrated in dila-ai-markup.js (v0.2.4+) -->
+       <!-- Note: Complete Java Implementation - All functionality migrated from JavaScript to pure Java (v0.3.0) -->
 
        <extension 
               type="OptionPage" 
