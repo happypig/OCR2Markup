@@ -44,7 +44,7 @@
        </description>
 
        <runtime>
-              <library name="lib/dila-ai-markup-plugin-0.2.4.jar" />
+              <library name="lib/dila-ai-markup-plugin-0.3.0.jar" />
        </runtime>
 
        <extension 

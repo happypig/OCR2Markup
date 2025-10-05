@@ -982,24 +982,31 @@ function applicationStarted(pluginWorkspaceAccess) {
                     }
                     
                     // ========================================
-                    // UTF-8 Check/Convert Tool Implementation
+                    // UTF-8 Check/Convert Tool Implementation - Enhanced Java Version
                     // ========================================
+                    
+                    // Global variables for UTF-8 workflow
+                    var currentNonUtf8Files = null;
+                    var transferButton = null;
+                    var cancelButton = null;
                     
                     // Add action listener for UTF-8 check/convert
                     menuItemUtf8Check.addActionListener(function() {
-                        logDebug("UTF-8 check/convert tool activated (self-contained implementation)");
+                        logDebug("Enhanced UTF-8 check/convert tool activated");
                         
                         try {
+                            // Clear previous results and hide transfer buttons
                             infoArea.setText(i18nFn("utf8.check.select.files") + "\n");
                             resultArea.setText("");
                             buttonPanel.setVisible(false);
+                            currentNonUtf8Files = null;
                             
                             var fileChooser = new JFileChooser();
                             fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                             fileChooser.setMultiSelectionEnabled(true);
                             fileChooser.setDialogTitle(i18nFn("utf8.check.dialog.title"));
                             
-                            // Add file filters
+                            // Add file filters for better user experience
                             try {
                                 var FileNameExtensionFilter = Packages.javax.swing.filechooser.FileNameExtensionFilter;
                                 var textFilter = new FileNameExtensionFilter(
@@ -1009,7 +1016,6 @@ function applicationStarted(pluginWorkspaceAccess) {
                                 fileChooser.addChoosableFileFilter(textFilter);
                             } catch (e) {
                                 logDebug("Could not add file filter: " + e);
-                                // Continue without filter
                             }
                             
                             var result = fileChooser.showOpenDialog(pluginPanel);
@@ -1017,22 +1023,128 @@ function applicationStarted(pluginWorkspaceAccess) {
                             if (result === JFileChooser.APPROVE_OPTION) {
                                 var selectedFiles = fileChooser.getSelectedFiles();
                                 if (selectedFiles && selectedFiles.length > 0) {
-                                    processSelectedFiles(selectedFiles);
+                                    checkUtf8FilesWithJava(selectedFiles);
                                 } else {
-                                    infoArea.setText(i18nFn("utf8.check.no.files.selected"));
+                                    infoArea.append("No files selected.\n");
                                 }
                             } else {
-                                logDebug("User cancelled file selection");
-                                infoArea.setText(i18nFn("utf8.check.cancelled"));
+                                infoArea.append("File selection cancelled.\n");
                             }
                         } catch (e) {
-                            logDebug("Error in UTF-8 check tool: " + e);
+                            logDebug("Error in enhanced UTF-8 check tool: " + e);
                             var errorMsg = e.message ? e.message : String(e);
-                            infoArea.setText("Error in UTF-8 tool: " + errorMsg);
+                            infoArea.append("Error in UTF-8 tool: " + errorMsg + "\n");
                         }
                     });
                     
-                    logDebug("UTF-8 Check/Convert tool integrated successfully (self-contained implementation)");
+                    /**
+                     * Check UTF-8 files using enhanced Java service and show results
+                     */
+                    function checkUtf8FilesWithJava(selectedFiles) {
+                        try {
+                            infoArea.append("Checking files with enhanced Java service...\n");
+                            
+                            // Convert File objects to Path objects for Java service
+                            var Paths = Packages.java.nio.file.Paths;
+                            var selectedPaths = Packages.java.lang.reflect.Array.newInstance(Packages.java.nio.file.Path, selectedFiles.length);
+                            
+                            for (var i = 0; i < selectedFiles.length; i++) {
+                                infoArea.append("Scanning: " + selectedFiles[i].getName() + "\n");
+                                selectedPaths[i] = Paths.get(selectedFiles[i].getAbsolutePath());
+                            }
+                            
+                            // Use Java service for superior scanning accuracy
+                            var UTF8ValidationService = Packages.com.dila.dama.plugin.utf8.UTF8ValidationService;
+                            var nonUtf8PathsList = UTF8ValidationService.scanForNonUtf8Files(selectedPaths);
+                            
+                            // Convert Path objects back to File objects for UI compatibility
+                            var nonUtf8Files = [];
+                            var File = Packages.java.io.File;
+                            for (var j = 0; j < nonUtf8PathsList.size(); j++) {
+                                var path = nonUtf8PathsList.get(j);
+                                nonUtf8Files.push(new File(path.toString()));
+                            }
+                            
+                            logDebug("Enhanced Java scan completed. Non-UTF-8 files found: " + nonUtf8Files.length);
+                            
+                            // Display check results in infoArea
+                            infoArea.append("\n=== UTF-8 Check Results ===\n");
+                            infoArea.append("Total files scanned: " + selectedFiles.length + "\n");
+                            infoArea.append("Non-UTF-8 files found: " + nonUtf8Files.length + "\n\n");
+                            
+                            if (nonUtf8Files.length > 0) {
+                                infoArea.append("Files that need conversion:\n");
+                                // Show up to 10 files
+                                var maxDisplay = Math.min(nonUtf8Files.length, 10);
+                                for (var k = 0; k < maxDisplay; k++) {
+                                    if (nonUtf8Files[k]) {
+                                        infoArea.append("• " + nonUtf8Files[k].getName() + "\n");
+                                    }
+                                }
+                                
+                                if (nonUtf8Files.length > 10) {
+                                    infoArea.append("... and " + (nonUtf8Files.length - 10) + " more files\n");
+                                }
+                                
+                                // Store for conversion
+                                currentNonUtf8Files = nonUtf8Files;
+                                
+                                // Show transfer/cancel buttons
+                                showTransferButtons();
+                            } else {
+                                infoArea.append("✓ All files are already UTF-8 encoded!\n");
+                                currentNonUtf8Files = null;
+                                buttonPanel.setVisible(false);
+                            }
+                            
+                        } catch (e) {
+                            logDebug("Error in enhanced UTF-8 checking: " + e);
+                            var errorMsg = e.message ? e.message : String(e);
+                            infoArea.append("\nError during file checking: " + errorMsg + "\n");
+                        }
+                    }
+                    
+                    /**
+                     * Show transfer/cancel buttons in the button panel
+                     */
+                    function showTransferButtons() {
+                        try {
+                            // Clear existing buttons
+                            buttonPanel.removeAll();
+                            buttonPanel.setComponentOrientation(Packages.java.awt.ComponentOrientation.LEFT_TO_RIGHT);
+                            
+                            // Create transfer and cancel buttons
+                            transferButton = new JButton("Transfer to UTF-8");
+                            cancelButton = new JButton("Cancel");
+                            
+                            // Add action listeners
+                            transferButton.addActionListener(function() {
+                                if (currentNonUtf8Files && currentNonUtf8Files.length > 0) {
+                                    convertFilesWithEnhancedJava(currentNonUtf8Files);
+                                }
+                            });
+                            
+                            cancelButton.addActionListener(function() {
+                                infoArea.append("\nConversion cancelled by user.\n");
+                                currentNonUtf8Files = null;
+                                buttonPanel.setVisible(false);
+                            });
+                            
+                            // Add buttons to panel
+                            buttonPanel.add(transferButton);
+                            buttonPanel.add(cancelButton);
+                            buttonPanel.setVisible(true);
+                            
+                            // Refresh the UI
+                            buttonPanel.revalidate();
+                            buttonPanel.repaint();
+                            
+                        } catch (e) {
+                            logDebug("Error showing transfer buttons: " + e);
+                        }
+                    }
+                    
+                    logDebug("Enhanced UTF-8 Check/Convert tool integrated successfully");
 
                     // Add action listeners to AI Markup menu item
                     menuItemActionAIMarkup.addActionListener(function() {
