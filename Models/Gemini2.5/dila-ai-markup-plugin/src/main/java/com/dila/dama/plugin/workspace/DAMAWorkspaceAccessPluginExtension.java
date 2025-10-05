@@ -199,22 +199,24 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                 }
             }
             
-            String iconPath = darkTheme ? "images/options-dark.png" : "images/options.png";
+            // Use consistent naming with JavaScript version
+            String iconPath = darkTheme ? "images/options_dark.png" : "images/options.png";
             logDebug("Loading options icon: " + iconPath + " (dark theme: " + darkTheme + ")");
             
-            // Try to load icon from resources
-            URL iconURL = getClass().getClassLoader().getResource(iconPath);
-            if (iconURL != null) {
-                ImageIcon icon = new ImageIcon(iconURL);
-                // Scale icon to appropriate size
+            // Try multiple approaches to load the icon
+            ImageIcon icon = loadPluginIcon(iconPath);
+            
+            if (icon != null && icon.getIconWidth() > 0 && icon.getIconHeight() > 0) {
+                // Scale icon to appropriate size for menu
                 Image img = icon.getImage();
                 Image scaledImg = img.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
                 menuOptions.setIcon(new ImageIcon(scaledImg));
-                logDebug("Options icon loaded successfully");
+                logDebug("Options icon loaded successfully (size: " + icon.getIconWidth() + "x" + icon.getIconHeight() + ")");
             } else {
-                logDebug("Options icon not found, using text label");
+                logDebug("Options icon not found or invalid, using text label");
                 menuOptions.setText(i18n("preferences.action"));
             }
+            
         } catch (Exception e) {
             logDebug("Error loading options icon: " + e.getMessage());
             menuOptions.setText(i18n("preferences.action"));
@@ -222,6 +224,109 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         
         menuOptions.setToolTipText(i18n("preferences.action"));
         return menuOptions;
+    }
+    
+    /**
+     * Load plugin icon with multiple fallback approaches
+     */
+    private ImageIcon loadPluginIcon(String iconPath) {
+        // Method 1: Try class loader resource
+        try {
+            URL iconURL = getClass().getClassLoader().getResource(iconPath);
+            if (iconURL != null) {
+                logDebug("Icon found via class loader: " + iconURL);
+                return new ImageIcon(iconURL);
+            }
+        } catch (Exception e) {
+            logDebug("Class loader approach failed: " + e.getMessage());
+        }
+        
+        // Method 2: Try direct class resource
+        try {
+            URL iconURL = getClass().getResource("/" + iconPath);
+            if (iconURL != null) {
+                logDebug("Icon found via class resource: " + iconURL);
+                return new ImageIcon(iconURL);
+            }
+        } catch (Exception e) {
+            logDebug("Class resource approach failed: " + e.getMessage());
+        }
+        
+        // Method 3: Try using plugin workspace to get plugin directory
+        try {
+            if (pluginWorkspaceAccess != null) {
+                // Get plugin directory from workspace access
+                String pluginDirPath = getPluginDirectory();
+                if (pluginDirPath != null) {
+                    File iconFile = new File(pluginDirPath, iconPath);
+                    if (iconFile.exists() && iconFile.canRead()) {
+                        logDebug("Icon found in plugin directory: " + iconFile.getAbsolutePath());
+                        return new ImageIcon(iconFile.getAbsolutePath());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logDebug("Plugin directory approach failed: " + e.getMessage());
+        }
+        
+        // Method 4: Try alternative naming patterns
+        try {
+            String[] alternativeNames = {
+                iconPath,
+                iconPath.replace("_", "-"),  // options_dark.png -> options-dark.png
+                iconPath.replace("-", "_"),  // options-dark.png -> options_dark.png
+                "icons/" + iconPath,         // Try icons/ subdirectory
+                "img/" + iconPath            // Try img/ subdirectory
+            };
+            
+            for (String altPath : alternativeNames) {
+                URL iconURL = getClass().getClassLoader().getResource(altPath);
+                if (iconURL != null) {
+                    logDebug("Icon found with alternative path: " + altPath);
+                    return new ImageIcon(iconURL);
+                }
+            }
+        } catch (Exception e) {
+            logDebug("Alternative naming approach failed: " + e.getMessage());
+        }
+        
+        logDebug("All icon loading methods failed for: " + iconPath);
+        return null;
+    }
+    
+    /**
+     * Get plugin directory path
+     */
+    private String getPluginDirectory() {
+        try {
+            // Try to get plugin directory using reflection on workspace access
+            java.lang.reflect.Method getPluginDirMethod = pluginWorkspaceAccess.getClass().getMethod("getPluginDirectory");
+            Object pluginDir = getPluginDirMethod.invoke(pluginWorkspaceAccess);
+            if (pluginDir != null) {
+                return pluginDir.toString();
+            }
+        } catch (Exception e) {
+            logDebug("Could not get plugin directory via reflection: " + e.getMessage());
+        }
+        
+        // Fallback: try to determine from code source
+        try {
+            java.security.CodeSource codeSource = getClass().getProtectionDomain().getCodeSource();
+            if (codeSource != null) {
+                URL location = codeSource.getLocation();
+                if (location != null) {
+                    File jarFile = new File(location.toURI());
+                    File pluginDir = jarFile.getParentFile();
+                    if (pluginDir != null && pluginDir.exists()) {
+                        return pluginDir.getAbsolutePath();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logDebug("Could not determine plugin directory from code source: " + e.getMessage());
+        }
+        
+        return null;
     }
     
     /**
