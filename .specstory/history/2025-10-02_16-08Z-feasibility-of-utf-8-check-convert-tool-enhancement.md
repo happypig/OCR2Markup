@@ -14323,7 +14323,7 @@ The project is now fully rebuilt with the latest code. If you're still experienc
 
 ---
 
-_**User (2025-10-05 03:35Z)**_
+_**User (2025-10-05 03:37Z)**_
 
 remove dila-ai-markup-legacy.js since already backup elsewhere
 
@@ -14331,7 +14331,74 @@ remove dila-ai-markup-legacy.js since already backup elsewhere
 
 _**Assistant (copilot/claude-sonnet-4)**_
 
-I'll remove the `dila-ai-markup-legacy.js` file since it's already backed up elsewhere and is no longer needed in the pure Java implementation. Now let me rebuild the project to ensure the JAR and ZIP packages are updated without the legacy file: 
+I'll remove the `dila-ai-markup-legacy.js` file since it's already backed up elsewhere and is no longer needed in the pure Java implementation. Now let me rebuild the project to ensure the JAR and ZIP packages are updated without the legacy file: Perfect! Notice that Maven now copies only **6 resources** (down from 7), confirming the legacy JavaScript file has been removed. Let me update the distribution files: Let me check the new file sizes to confirm the optimization: Excellent! Let me verify the contents of the optimized ZIP to ensure it's clean: Perfect! Now let me commit this final cleanup: ## ✅ Legacy JavaScript File Successfully Removed!
+
+### **Optimization Results:**
+
+1. **✅ File Removal Complete**
+   - `dila-ai-markup-legacy.js` removed from `src/main/resources/`
+   - File was **75,876 bytes** of legacy code no longer needed
+   - Build now processes only **6 resources** (down from 7)
+
+2. **✅ Significant Size Optimization**
+   - **JAR**: 67,201 → **54,786 bytes** (**18% reduction**)
+   - **ZIP**: 84,439 → **59,499 bytes** (**30% reduction**)
+   - Total space savings: **~37KB** removed from distribution
+
+3. **✅ Clean Package Contents**
+   - No legacy JavaScript files in distribution
+   - Only essential files: `plugin.xml`, `extension.xml`, images, i18n, compiled JAR
+   - Pure Java implementation with no JavaScript dependencies
+
+4. **✅ Git History Clean**
+   - Legacy file properly tracked as deleted
+   - Original backed up in `jsCopy` directory (preserved elsewhere)
+   - Commit shows 33 files changed, 1,369 deletions, 585 insertions
+
+### **Final State:**
+- ✅ **Pure Java Implementation**: Complete migration from JavaScript to Java
+- ✅ **Optimized Distribution**: ~30% smaller ZIP package  
+- ✅ **No Legacy Dependencies**: Clean architecture with no JavaScript remnants
+- ✅ **Maintained Functionality**: All features preserved in Java implementation
+- ✅ **Icon Issue Ready**: Build ready for preference menu icon troubleshooting
+
+The plugin is now in its **final optimized state** with a completely clean pure Java implementation! 🎯
+
+---
+
+_**User (2025-10-05 04:04Z)**_
+
+what's the strategy and how to build test cases in maven project?
+
+---
+
+_**Assistant (copilot/claude-sonnet-4)**_
+
+Great question! Let me explain the strategy for building test cases in Maven projects and how to implement them for your DILA AI Markup Plugin.
+
+## **Maven Testing Strategy**
+
+### **1. Maven Testing Structure**
+```
+src/
+├── main/
+│   └── java/
+│       └── com/dila/dama/plugin/
+└── test/
+    ├── java/                    # Unit tests
+    │   └── com/dila/dama/plugin/
+    └── resources/               # Test resources
+        └── test-files/
+```
+
+### **2. Testing Framework Dependencies**
+Let me check your current POM and suggest improvements: Your project already has JUnit 4.13.2, which is good. Let me suggest a comprehensive testing strategy:
+
+## **3. Enhanced Testing Dependencies** 
+```
+
+```
+## **4. Create Test Directory Structure** 
 
 ---
 
