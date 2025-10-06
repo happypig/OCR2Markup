@@ -296,7 +296,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       GridBagConstraints c = new GridBagConstraints();
       JPanel panel = new JPanel(new GridBagLayout());
 
-      JLabel parseModelLabel = new JLabel(getMessage("ft.parse.model.label"));
+      JLabel parseModelLabel = new JLabel(getMessage("ft.parse.model.label")); // "Parsing model:"
       c.gridx = 0;
       c.gridy = 0;
       c.weightx = 0;
@@ -313,7 +313,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       
       c.gridx = 0;
       c.gridy ++;
-      JLabel detectModelLabel = new JLabel(getMessage("ft.detect.model.label"));
+      JLabel detectModelLabel = new JLabel(getMessage("ft.detect.model.label")); // "Detection model:"
       panel.add(detectModelLabel, c);
 
       detectModelTextField = new JTextField();
@@ -325,7 +325,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       
       c.gridx = 0;
       c.gridy ++;
-      JLabel apiKeyLabel = new JLabel(getMessage("api.key.label"));
+      JLabel apiKeyLabel = new JLabel(getMessage("api.key.label")); // "API Key*: "
       panel.add(apiKeyLabel, c);
 
       apiKeyTextField = new JPasswordField();
@@ -515,31 +515,4 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       };
   }
   
-  /**
-   * Bridge method for JavaScript compatibility - Check if a file is valid UTF-8.
-   * 
-   * @param path The path to the file to validate
-   * @return true if the file is valid UTF-8, false otherwise
-   */
-  public static boolean checkUtf8(Path path) {
-      return isValidUtf8(path);
-  }
-  
-  /**
-   * Bridge method for JavaScript compatibility - Get common encodings.
-   * 
-   * @return Array of common encoding names
-   */
-  public static String[] getEncodings() {
-      return getCommonEncodings();
-  }
-  
-  /**
-   * Bridge method for JavaScript compatibility - Test availability.
-   * 
-   * @return Always returns true since methods are integrated
-   */
-  public static boolean isAvailable() {
-      return true;
-  }
 }

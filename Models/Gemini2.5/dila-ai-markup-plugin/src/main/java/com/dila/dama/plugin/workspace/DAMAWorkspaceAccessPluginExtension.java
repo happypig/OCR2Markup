@@ -32,6 +32,7 @@ import java.util.concurrent.Executors;
 public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPluginExtension {
     
     private static final boolean DEBUG = getDebugMode();
+    private static final String OPTIONS_PAGE_KEY = "dila_ai_markup_options_page_key";
     private StandalonePluginWorkspace pluginWorkspaceAccess;
     private Object resources; // PluginResourceBundle - using Object to avoid type issues
     private WSOptionsStorage optionStorage;
@@ -55,28 +56,43 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      */
     @Override
     public void applicationStarted(StandalonePluginWorkspace workspace) {
-        this.pluginWorkspaceAccess = workspace;
-        this.resources = workspace.getResourceBundle();
-        this.optionStorage = workspace.getOptionsStorage();
-        
-        logDebug("Starting DILA AI markup plugin (Pure Java Implementation)");
-        logDebug("Debug mode: " + DEBUG);
-        
-        if (optionStorage != null) {
-            logDebug("Options storage available.");
-            // Handle API key logging safely
-            String apiKey = optionStorage.getSecretOption("dila.dama.api.key", "");
-            String maskedApiKey = "";
-            if (apiKey != null && apiKey.length() > 0) {
-                maskedApiKey = apiKey.replaceAll(".(?=.{4})", "*");
+        try {
+            if (workspace == null) {
+                logDebug("Workspace is null, skipping initialization");
+                return;
             }
-            logDebug("API Key (masked except last 4 chars): " + maskedApiKey);
-        } else {
-            logDebug("No options storage available.");
+            
+            this.pluginWorkspaceAccess = workspace;
+            this.resources = workspace.getResourceBundle();
+            this.optionStorage = workspace.getOptionsStorage();
+            
+            logDebug("Starting DILA AI markup plugin (Pure Java Implementation)");
+            logDebug("Debug mode: " + DEBUG);
+            
+            if (optionStorage != null) {
+                logDebug("Options storage available.");
+                // // Handle API key logging safely
+                // String apiKey = optionStorage.getSecretOption("dila.dama.api.key", "");
+                // String maskedApiKey = "";
+                // if (apiKey != null && apiKey.length() > 0) {
+                //     maskedApiKey = apiKey.replaceAll(".(?=.{4})", "*");
+                // }
+                // logDebug("API Key (masked except last 4 chars): " + maskedApiKey);
+                
+                // // Load model configuration
+                // String model = optionStorage.getOption("dila.dama.llm.model", "");
+                // logDebug("LLM Model: " + model);
+            } else {
+                logDebug("No options storage available.");
+            }
+            
+            // Add view component customizer
+            workspace.addViewComponentCustomizer(new DAMAViewComponentCustomizer());
+        } catch (Exception e) {
+            // Handle exceptions gracefully during startup
+            logDebug("Exception during startup: " + e.getMessage());
+            // Don't propagate exceptions from startup
         }
-        
-        // Add view component customizer
-        workspace.addViewComponentCustomizer(new DAMAViewComponentCustomizer());
     }
     
     /**
@@ -94,7 +110,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                 
                 // Set component and title
                 viewInfo.setComponent(pluginPanel);
-                viewInfo.setTitle(i18n("view.title")); // "DILA AI Markup Assistant"
+                viewInfo.setTitle(i18n("view.title")); // "DILA AI Markup Assistant", with translation
                 
                 logDebug("DILA AI Markup view customization completed");
             }
@@ -130,9 +146,10 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
         
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, infoScrollPane, bottomPanel);
-        splitPane.setDividerLocation(0.5);
         splitPane.setResizeWeight(0.5);
         
+        // The split pane is added to the center of the main panel, dividing info and result areas.
+        // Layout: [MenuBar (NORTH)] [SplitPane (CENTER: infoArea above, resultArea+buttons below)]
         pluginPanel.add(splitPane, BorderLayout.CENTER);
         
         return pluginPanel;
@@ -146,16 +163,16 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         
         // Actions Menu
         JMenu menuActions = new JMenu(i18n("actions.menu")); // "Actions"
-        JMenuItem menuItemActionAIMarkup = new JMenuItem(i18n("ai.markup.action"));
-        JMenuItem menuItemActionTagRemoval = new JMenuItem(i18n("tag.removal.action"));
+        JMenuItem menuItemActionAIMarkup = new JMenuItem(i18n("ai.markup.action")); // "AI Markup"
+        JMenuItem menuItemActionTagRemoval = new JMenuItem(i18n("tag.removal.action")); // "Tag Removal"
         
         menuActions.add(menuItemActionAIMarkup);
         menuActions.add(menuItemActionTagRemoval);
         menuBar.add(menuActions);
         
         // Tools Menu  
-        JMenu menuTools = new JMenu(i18n("menu.tools"));
-        JMenuItem menuItemUtf8Check = new JMenuItem(i18n("menu.tools.utf8.check"));
+        JMenu menuTools = new JMenu(i18n("menu.tools")); // "Tools"
+        JMenuItem menuItemUtf8Check = new JMenuItem(i18n("utf8.check.convert.action")); // "UTF-8 Check/Convert"
         menuTools.add(menuItemUtf8Check);
         menuBar.add(menuTools);
         
@@ -164,7 +181,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         
         // Options Menu with icon
         JMenu menuOptions = createOptionsMenu();
-        JMenuItem menuItemOption = new JMenuItem(i18n("preferences.action"));
+        JMenuItem menuItemOption = new JMenuItem(i18n("preferences.action")); // "Preferences..."
         menuOptions.add(menuItemOption);
         menuBar.add(menuOptions);
         
@@ -214,15 +231,15 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                 logDebug("Options icon loaded successfully (size: " + icon.getIconWidth() + "x" + icon.getIconHeight() + ")");
             } else {
                 logDebug("Options icon not found or invalid, using text label");
-                menuOptions.setText(i18n("preferences.action"));
+                menuOptions.setText(i18n("options.menu"));  // "Options"
             }
             
         } catch (Exception e) {
             logDebug("Error loading options icon: " + e.getMessage());
-            menuOptions.setText(i18n("preferences.action"));
+            menuOptions.setText(i18n("options.menu"));  // "Options"
         }
         
-        menuOptions.setToolTipText(i18n("preferences.action"));
+        menuOptions.setToolTipText(i18n("options.menu")); // "Options"
         return menuOptions;
     }
     
@@ -241,99 +258,99 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             logDebug("Class loader approach failed: " + e.getMessage());
         }
         
-        // Method 2: Try direct class resource
-        try {
-            URL iconURL = getClass().getResource("/" + iconPath);
-            if (iconURL != null) {
-                logDebug("Icon found via class resource: " + iconURL);
-                return new ImageIcon(iconURL);
-            }
-        } catch (Exception e) {
-            logDebug("Class resource approach failed: " + e.getMessage());
-        }
+        // // Method 2: Try direct class resource
+        // try {
+        //     URL iconURL = getClass().getResource("/" + iconPath);
+        //     if (iconURL != null) {
+        //         logDebug("Icon found via class resource: " + iconURL);
+        //         return new ImageIcon(iconURL);
+        //     }
+        // } catch (Exception e) {
+        //     logDebug("Class resource approach failed: " + e.getMessage());
+        // }
         
-        // Method 3: Try using plugin workspace to get plugin directory
-        try {
-            if (pluginWorkspaceAccess != null) {
-                // Get plugin directory from workspace access
-                String pluginDirPath = getPluginDirectory();
-                if (pluginDirPath != null) {
-                    File iconFile = new File(pluginDirPath, iconPath);
-                    if (iconFile.exists() && iconFile.canRead()) {
-                        logDebug("Icon found in plugin directory: " + iconFile.getAbsolutePath());
-                        return new ImageIcon(iconFile.getAbsolutePath());
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logDebug("Plugin directory approach failed: " + e.getMessage());
-        }
+        // // Method 3: Try using plugin workspace to get plugin directory
+        // try {
+        //     if (pluginWorkspaceAccess != null) {
+        //         // Get plugin directory from workspace access
+        //         String pluginDirPath = getPluginDirectory();
+        //         if (pluginDirPath != null) {
+        //             File iconFile = new File(pluginDirPath, iconPath);
+        //             if (iconFile.exists() && iconFile.canRead()) {
+        //                 logDebug("Icon found in plugin directory: " + iconFile.getAbsolutePath());
+        //                 return new ImageIcon(iconFile.getAbsolutePath());
+        //             }
+        //         }
+        //     }
+        // } catch (Exception e) {
+        //     logDebug("Plugin directory approach failed: " + e.getMessage());
+        // }
         
-        // Method 4: Try alternative naming patterns
-        try {
-            String[] alternativeNames = {
-                iconPath,
-                iconPath.replace("_", "-"),  // options_dark.png -> options-dark.png
-                iconPath.replace("-", "_"),  // options-dark.png -> options_dark.png
-                "icons/" + iconPath,         // Try icons/ subdirectory
-                "img/" + iconPath            // Try img/ subdirectory
-            };
+        // // Method 4: Try alternative naming patterns
+        // try {
+        //     String[] alternativeNames = {
+        //         iconPath,
+        //         iconPath.replace("_", "-"),  // options_dark.png -> options-dark.png
+        //         iconPath.replace("-", "_"),  // options-dark.png -> options_dark.png
+        //         "icons/" + iconPath,         // Try icons/ subdirectory
+        //         "img/" + iconPath            // Try img/ subdirectory
+        //     };
             
-            for (String altPath : alternativeNames) {
-                URL iconURL = getClass().getClassLoader().getResource(altPath);
-                if (iconURL != null) {
-                    logDebug("Icon found with alternative path: " + altPath);
-                    return new ImageIcon(iconURL);
-                }
-            }
-        } catch (Exception e) {
-            logDebug("Alternative naming approach failed: " + e.getMessage());
-        }
+        //     for (String altPath : alternativeNames) {
+        //         URL iconURL = getClass().getClassLoader().getResource(altPath);
+        //         if (iconURL != null) {
+        //             logDebug("Icon found with alternative path: " + altPath);
+        //             return new ImageIcon(iconURL);
+        //         }
+        //     }
+        // } catch (Exception e) {
+        //     logDebug("Alternative naming approach failed: " + e.getMessage());
+        // }
         
         logDebug("All icon loading methods failed for: " + iconPath);
         return null;
     }
     
-    /**
-     * Get plugin directory path
-     */
-    private String getPluginDirectory() {
-        try {
-            // Try to get plugin directory using reflection on workspace access
-            java.lang.reflect.Method getPluginDirMethod = pluginWorkspaceAccess.getClass().getMethod("getPluginDirectory");
-            Object pluginDir = getPluginDirMethod.invoke(pluginWorkspaceAccess);
-            if (pluginDir != null) {
-                return pluginDir.toString();
-            }
-        } catch (Exception e) {
-            logDebug("Could not get plugin directory via reflection: " + e.getMessage());
-        }
+    // /**
+    //  * Get plugin directory path
+    //  */
+    // private String getPluginDirectory() {
+    //     try {
+    //         // Try to get plugin directory using reflection on workspace access
+    //         java.lang.reflect.Method getPluginDirMethod = pluginWorkspaceAccess.getClass().getMethod("getPluginDirectory");
+    //         Object pluginDir = getPluginDirMethod.invoke(pluginWorkspaceAccess);
+    //         if (pluginDir != null) {
+    //             return pluginDir.toString();
+    //         }
+    //     } catch (Exception e) {
+    //         logDebug("Could not get plugin directory via reflection: " + e.getMessage());
+    //     }
         
-        // Fallback: try to determine from code source
-        try {
-            java.security.CodeSource codeSource = getClass().getProtectionDomain().getCodeSource();
-            if (codeSource != null) {
-                URL location = codeSource.getLocation();
-                if (location != null) {
-                    File jarFile = new File(location.toURI());
-                    File pluginDir = jarFile.getParentFile();
-                    if (pluginDir != null && pluginDir.exists()) {
-                        return pluginDir.getAbsolutePath();
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logDebug("Could not determine plugin directory from code source: " + e.getMessage());
-        }
+    //     // Fallback: try to determine from code source
+    //     try {
+    //         java.security.CodeSource codeSource = getClass().getProtectionDomain().getCodeSource();
+    //         if (codeSource != null) {
+    //             URL location = codeSource.getLocation();
+    //             if (location != null) {
+    //                 File jarFile = new File(location.toURI());
+    //                 File pluginDir = jarFile.getParentFile();
+    //                 if (pluginDir != null && pluginDir.exists()) {
+    //                     return pluginDir.getAbsolutePath();
+    //                 }
+    //             }
+    //         }
+    //     } catch (Exception e) {
+    //         logDebug("Could not determine plugin directory from code source: " + e.getMessage());
+    //     }
         
-        return null;
-    }
+    //     return null;
+    // }
     
     /**
      * Create text areas for info and results
      */
     private void createTextAreas() {
-        infoArea = new JTextArea(i18n("initial.info"), 4, 0);
+        infoArea = new JTextArea(i18n("initial.info"), 4, 0); // "Please select a function from the Actions/Tools menu, or select Preferences from the Options menu to configure parameters."
         infoArea.setLineWrap(true);
         infoArea.setWrapStyleWord(true);
         infoArea.setEditable(false);
@@ -351,9 +368,9 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         buttonPanel = new JPanel();
         buttonPanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         
-        replaceButton = new JButton(i18n("replace.button")); // "Replace in Document"
-        transferButton = new JButton("Transfer to UTF-8");
-        cancelButton = new JButton("Cancel");
+        replaceButton = new JButton(i18n("button.replace")); // "Replace", with translation
+        transferButton = new JButton(i18n("button.transfer.utf8")); // "Transfer to UTF-8", with translation
+        cancelButton = new JButton(i18n("button.cancel")); // "Cancel", with translation
         
         buttonPanel.add(replaceButton);
         buttonPanel.add(transferButton);
@@ -386,14 +403,15 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             hideAllButtons();
             
             // Get selected text from current editor
-            String selectedText = fetchSelectedText();
+            String selectedText = fetchSelectedText(infoArea);
             if (selectedText.isEmpty()) {
-                infoArea.setText("No text selected or no editor open.");
+                infoArea.setText(i18n("no.text.selected")); // "No text selected in the editor."
                 return;
             }
             
-            infoArea.setText("Processing AI Markup for selected text...\n" + 
-                           "Text length: " + selectedText.length() + " characters");
+            infoArea.setText(i18n("action.ai.markup.selected") + // "Action selected: AI Markup (Use AI for reference tagging)\n"
+                            i18n("selected.text.label", selectedText) + // "\nSelected text: "
+                            i18n("ui.text.with.length", selectedText.length())); // "Text length: {0} characters"
             
             // Process AI markup in background
             CompletableFuture.supplyAsync(() -> processAIMarkup(selectedText), executor)
@@ -403,7 +421,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                 }))
                 .exceptionally(throwable -> {
                     SwingUtilities.invokeLater(() -> {
-                        resultArea.setText("Error processing AI markup: " + throwable.getMessage());
+                        resultArea.setText(i18n("ui.error.processing.ai.markup", throwable.getMessage())); // "Error processing AI Markup: {0}"
                     });
                     return null;
                 });
@@ -424,15 +442,16 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             hideAllButtons();
             
             // Get selected text from current editor
-            String selectedText = fetchSelectedText();
+            String selectedText = fetchSelectedText(infoArea);
             if (selectedText.isEmpty()) {
-                infoArea.setText("No text selected or no editor open.");
+                infoArea.setText(i18n("no.text.selected")); // "No text selected in the editor."
                 return;
             }
-            
-            infoArea.setText("Processing Tag Removal for selected text...\n" + 
-                           "Text length: " + selectedText.length() + " characters");
-            
+
+            infoArea.setText(i18n("action.tag.removal.selected") + // "Action selected: Tag Removal (Remove tags from selected text).\n"
+                            i18n("selected.text.label", selectedText) + // "\nSelected text: "
+                            i18n("ui.text.with.length", selectedText.length())); // "Text length: {0} characters"
+
             // Process tag removal
             String result = processTagRemoval(selectedText);
             resultArea.setText(result);
@@ -458,21 +477,20 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             fileChooser.setMultiSelectionEnabled(true);
-            fileChooser.setDialogTitle("Select files or directories to check UTF-8 encoding");
+            fileChooser.setDialogTitle(i18n("dialog.directories.files.selection")); // "Select files or directories to check UTF-8 encoding"
             
             int result = fileChooser.showOpenDialog(null);
             if (result == JFileChooser.APPROVE_OPTION) {
                 File[] selectedFiles = fileChooser.getSelectedFiles();
                 if (selectedFiles != null && selectedFiles.length > 0) {
-                    infoArea.setText("Checking UTF-8 encoding...");
-                    
+                    infoArea.setText(i18n("utf8.scanning.files")); // "Scanning files for UTF-8 compliance..."
                     // Check files in background
                     CompletableFuture.supplyAsync(() -> checkUtf8Files(selectedFiles), executor)
                         .thenAccept(nonUtf8Files -> SwingUtilities.invokeLater(() -> 
                             displayUtf8CheckResults(nonUtf8Files)))
                         .exceptionally(throwable -> {
                             SwingUtilities.invokeLater(() -> {
-                                infoArea.setText("Error checking UTF-8 files: " + throwable.getMessage());
+                                resultArea.setText(i18n("ui.error.checking.utf8", throwable.getMessage())); // "Error checking UTF-8 files: {0}"
                             });
                             return null;
                         });
@@ -492,8 +510,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             try {
                 if (pluginWorkspaceAccess != null) {
                     // Open options page using the same key as defined in plugin configuration
-                    String optionsPageKey = "dila_ai_markup_options_page_key";
-                    pluginWorkspaceAccess.showPreferencesPages(new String[]{optionsPageKey}, optionsPageKey, true);
+                    pluginWorkspaceAccess.showPreferencesPages(new String[]{OPTIONS_PAGE_KEY}, OPTIONS_PAGE_KEY, true);
                 } else {
                     logDebug("Plugin workspace access is null, cannot open options");
                 }
@@ -513,7 +530,14 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             
             String resultText = resultArea.getText();
             if (resultText == null || resultText.trim().isEmpty()) {
-                infoArea.setText("No replacement text available.");
+                infoArea.setText(i18n("no.text.to.replace")); // "\nNo text to replace."
+                return;
+            }
+            
+            // Check if we have selected text - reuse existing validation logic
+            String currentSelection = fetchSelectedText(infoArea);
+            if (currentSelection.isEmpty()) {
+                // Error message already set by fetchSelectedText
                 return;
             }
             
@@ -525,7 +549,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                     if (pageAccess instanceof WSTextEditorPage) {
                         WSTextEditorPage textPage = (WSTextEditorPage) pageAccess;
                         
-                        // Get current selection
+                        // Get current selection bounds
                         int selectionStart = textPage.getSelectionStart();
                         int selectionEnd = textPage.getSelectionEnd();
                         
@@ -543,37 +567,38 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                                     java.lang.reflect.Method insertMethod = textPage.getClass().getMethod(
                                         "insertTextAtOffset", String.class, int.class);
                                     insertMethod.invoke(textPage, resultText, currentOffset);
+                                    logDebug("Text replaced by insertTextAtOffset successfully");
                                 } catch (NoSuchMethodException nsme) {
                                     // Fallback: try using document insertion
                                     javax.swing.text.Document doc = textPage.getDocument();
                                     if (doc != null) {
                                         doc.insertString(currentOffset, resultText, null);
+                                        logDebug("Text replaced by document insertion successfully");
                                     } else {
-                                        infoArea.setText("Error: Could not access document for text replacement.");
+                                        infoArea.setText(i18n("no.editor.open")); // "\nNo open Text mode editor."
+                                        logDebug("No open Text mode editor.");
                                         return;
                                     }
                                 }
                                 
-                                infoArea.setText("Text replaced successfully in document.");
+                                infoArea.setText(i18n("text.replaced")); // "\nSelected text has been replaced."
                                 hideAllButtons();
                                 resultArea.setText(""); // Clear result area
                                 
                             } catch (Exception ex) {
                                 logDebug("Error during text replacement: " + ex.getMessage());
-                                infoArea.setText("Error replacing text: " + ex.getMessage());
+                                infoArea.setText(i18n("error.replacing.text", ex.getMessage())); // "\nError during text replacement: "
                             }
                         } else {
-                            infoArea.setText("No text selected for replacement. Please select text in the editor first.");
+                            infoArea.setText(i18n("no.text.selected"));  // "No text selected in the editor."
                         }
-                    } else {
-                        infoArea.setText("Current editor is not a text editor.");
                     }
-                } else {
-                    infoArea.setText("No editor is currently open.");
+                    // Note: fetchSelectedText already handles non-text mode case
                 }
+                // Note: fetchSelectedText already handles no editor case
             } catch (Exception ex) {
                 logDebug("Error accessing editor: " + ex.getMessage());
-                infoArea.setText("Error accessing editor: " + ex.getMessage());
+                infoArea.setText(i18n("ui.error.accessing.editor", ex.getMessage())); // "Error accessing editor: {0}"
             }
         }
     }
@@ -587,11 +612,11 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             logDebug("Transfer button triggered");
             
             if (currentNonUtf8Files == null || currentNonUtf8Files.isEmpty()) {
-                infoArea.setText("No files to convert.");
+                infoArea.setText(i18n("no.files.to.convert")); // "\nNo files to convert."
                 return;
             }
             
-            infoArea.setText("Converting files to UTF-8...");
+            infoArea.setText(i18n("ui.utf8.Converting")); // "Converting files to UTF-8..."
             hideTransferButtons();
             
             // Convert files in background
@@ -600,7 +625,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                     displayConversionResults(conversionResults)))
                 .exceptionally(throwable -> {
                     SwingUtilities.invokeLater(() -> {
-                        infoArea.setText("Error converting files: " + throwable.getMessage());
+                        infoArea.setText(i18n("ui.error.converting.files", throwable.getMessage())); // "Error converting files: {0}"
                     });
                     return null;
                 });
@@ -617,7 +642,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             
             currentNonUtf8Files = null;
             hideTransferButtons();
-            infoArea.setText("UTF-8 conversion cancelled.");
+            infoArea.setText(i18n("ui.utf8.conversion.cancelled")); // "UTF-8 conversion cancelled."
             resultArea.setText("");
         }
     }
@@ -636,6 +661,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                 java.lang.reflect.Method getMessageMethod = resources.getClass().getMethod("getMessage", String.class);
                 return (String) getMessageMethod.invoke(resources, key);
             }
+            logDebug("Resources not available for i18n key: " + key);
             return key;
         } catch (Exception e) {
             logDebug("Error getting i18n message for key " + key + ": " + e.getMessage());
@@ -644,9 +670,28 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     }
     
     /**
+     * Get internationalized string with parameter substitution
+     */
+    private String i18n(String key, Object... params) {
+        try {
+            String message = i18n(key);
+            if (params != null && params.length > 0) {
+                // Simple parameter substitution using {0}, {1}, etc.
+                for (int i = 0; i < params.length; i++) {
+                    message = message.replace("{" + i + "}", String.valueOf(params[i]));
+                }
+            }
+            return message;
+        } catch (Exception e) {
+            logDebug("Error formatting i18n message for key " + key + ": " + e.getMessage());
+            return key;
+        }
+    }
+    
+    /**
      * Fetch selected text from current editor
      */
-    private String fetchSelectedText() {
+    private String fetchSelectedText(JTextArea area) {
         try {
             WSEditor editorAccess = pluginWorkspaceAccess.getCurrentEditorAccess(PluginWorkspace.MAIN_EDITING_AREA);
             if (editorAccess != null) {
@@ -655,12 +700,14 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                     WSTextEditorPage textPage = (WSTextEditorPage) pageAccess;
                     return textPage.getSelectedText();
                 } else {
-                    return ""; // Non-text editor
+                    area.setText(i18n("not.text.mode")); // "\nCurrent page is not Text mode."
+                    return ""; // Non-text mode
                 }
             }
+            area.setText(i18n("no.editor.open"));  // "\nNo open Text mode editor."
             return ""; // No editor open
         } catch (Exception e) {
-            logDebug("Error fetching selected text: " + e.getMessage());
+            logDebug("Error fetching selected text: " + e.getMessage()); // "Error accessing editor: {0}"
             return "";
         }
     }
@@ -742,7 +789,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             connection.setDoOutput(true);
             
             // Get system prompt from i18n
-            String systemPrompt = i18n("system.prompt.ai.markup");
+            String systemPrompt = i18n("system.prompt.ai.markup"); // "Please add XML tags for all sutra, volume, page, column, and line references related to "sutra references" in the selected text."
             
             // Create request body
             String requestBody = createJSONRequest(parseModel, systemPrompt, text);
@@ -966,14 +1013,14 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      */
     private void displayUtf8CheckResults(List<Path> nonUtf8Files) {
         if (nonUtf8Files.isEmpty()) {
-            infoArea.setText("All files are valid UTF-8!");
+            infoArea.setText(i18n("ui.utf8.all.valid")); // "All files are valid UTF-8!"
             return;
         }
         
         currentNonUtf8Files = nonUtf8Files;
         
         StringBuilder info = new StringBuilder();
-        info.append("Non-UTF-8 files found: ").append(nonUtf8Files.size()).append("\n\n");
+        info.append(i18n("ui.utf8.non.utf8.found", nonUtf8Files.size())); // "Non-UTF-8 files found: {0}\n\n"
         
         int displayCount = Math.min(10, nonUtf8Files.size());
         for (int i = 0; i < displayCount; i++) {
@@ -981,7 +1028,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         }
         
         if (nonUtf8Files.size() > 10) {
-            info.append("... and ").append(nonUtf8Files.size() - 10).append(" more files");
+            info.append(i18n("more.files.to.convert", nonUtf8Files.size() - 10)); // "... and {0} more files\n"
         }
         
         infoArea.setText(info.toString());
@@ -1012,9 +1059,9 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         }
         
         return "Conversion completed:\n" +
-               "Successfully converted: " + successCount + " files\n" +
-               "Failed conversions: " + failureCount + " files\n\n" +
-               "Details:\n" + results.toString();
+               i18n("ui.utf8.successfully.converted", successCount) + "\n" + // "Successfully converted: {0} files"
+               i18n("ui.utf8.failed.conversions", failureCount) + "\n\n" +
+               "Details:\n" + results.toString(); // "Failed conversions: {0} files"
     }
     
     /**
@@ -1022,7 +1069,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      */
     private void displayConversionResults(String results) {
         resultArea.setText(results);
-        infoArea.setText("UTF-8 conversion completed.");
+        infoArea.setText(i18n("ui.utf8.conversion.completed")); // "UTF-8 conversion completed."
         currentNonUtf8Files = null;
     }
     
