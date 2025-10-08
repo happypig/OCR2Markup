@@ -55,9 +55,9 @@
   </key>
   <key value="initial.info">
     <comment>JTextArea()@createTextAreas()</comment>
-    <val lang="en_US">Please select a function from the Actions/Tools menu, or select Preferences from the Options menu to configure parameters.</val>
-    <val lang="zh_CN">請從「標記功能」/「工具」菜單選擇功能，或從「選項」菜單選擇「偏好設定」以設定參數。</val>
-    <val lang="zh_TW">請從「標記功能」/「工具」菜單選擇功能，或從「選項」菜單選擇「偏好設定」以設定參數。</val>
+    <val lang="en_US">Please select any function from the Actions/Tools menu, or select Preferences from the Gear icon(Options menu) to configure parameters.</val>
+    <val lang="zh_CN">請從「標記功能」/「工具」菜單選擇任何功能，或從齒輪圖示(「選項」菜單)選擇「偏好設定」以設定參數。</val>
+    <val lang="zh_TW">請從「標記功能」/「工具」菜單選擇任何功能，或從齒輪圖示(「選項」菜單)選擇「偏好設定」以設定參數。</val>
   </key>
   <key value="button.replace">
     <comment>JButton()@createButtonPanel()</comment>
@@ -79,39 +79,45 @@
   </key>
   <key value="no.text.selected">
     <comment>infoArea.setText()@AIMarkupActionListener(),TagRemovalActionListener(),@ReplaceButtonActionListener()</comment>
-    <val lang="en_US">\nNo text selected in the editor.</val>
-    <val lang="zh_CN">\n編輯器內未選取文字。</val>
-    <val lang="zh_TW">\n編輯器內未選取文字。</val>
+    <val lang="en_US">No text selected in the editor.</val>
+    <val lang="zh_CN">編輯器內未選取文字。</val>
+    <val lang="zh_TW">編輯器內未選取文字。</val>
   </key>
   <key value="action.ai.markup.selected">
     <comment>infoArea.setText()@AIMarkupActionListener()</comment>
-    <val lang="en_US">Action selected: AI Markup (Use AI for reference tagging)\n</val>
-    <val lang="zh_CN">選取標記功能：AI 標記 (用 AI 來標記選取的參照文字)\n</val>
-    <val lang="zh_TW">選取標記功能：AI 標記 (用 AI 來標記選取的參照文字)\n</val>
+    <val lang="en_US">Action selected: AI Markup (Use AI for reference tagging)</val>
+    <val lang="zh_CN">選取標記功能：AI 標記 (用 AI 來標記選取的參照文字)</val>
+    <val lang="zh_TW">選取標記功能：AI 標記 (用 AI 來標記選取的參照文字)</val>
   </key>
   <key value="action.tag.removal.selected">
     <comment>infoArea.setText()@TagRemovalActionListener()</comment>
-    <val lang="en_US">Action selected: Tag Removal (Remove tags from selected text).\n</val>
-    <val lang="zh_CN">選取標記功能： 移除標籤(移除選取參照文字的標籤)。\n</val>
-    <val lang="zh_TW">選取標記功能： 移除標籤(移除選取參照文字的標籤)。\n</val>
+    <val lang="en_US">Action selected: Tag Removal (Remove tags from selected text).</val>
+    <val lang="zh_CN">選取標記功能： 移除標籤(移除選取參照文字的標籤)。</val>
+    <val lang="zh_TW">選取標記功能： 移除標籤(移除選取參照文字的標籤)。</val>
   </key>
   <key value="selected.text">
-    <comment>infoArea.setText().2@AIMarkupActionListener(),TagRemovalActionListener()</comment>
-    <val lang="en_US">\nSelected text: {0}</val>
-    <val lang="zh_CN">\n選取文字: {0}</val>
-    <val lang="zh_TW">\n選取文字: {0}</val>
+    <comment>infoArea.append().2@AIMarkupActionListener(),TagRemovalActionListener()</comment>
+    <val lang="en_US">Selected text: {0}</val>
+    <val lang="zh_CN">選取文字: {0}</val>
+    <val lang="zh_TW">選取文字: {0}</val>
   </key>
   <key value="text.with.length">
-    <comment>infoArea.setText().3@AIMarkupActionListener(),TagRemovalActionListener()</comment>
-    <val lang="en_US">\nText length: {0} characters</val>
-    <val lang="zh_CN">\n文字長度：{0} 個字符</val>
-    <val lang="zh_TW">\n文字長度：{0} 個字符</val>
+    <comment>infoArea.append().3@AIMarkupActionListener(),TagRemovalActionListener()</comment>
+    <val lang="en_US">Text length: {0} characters</val>
+    <val lang="zh_CN">文字長度：{0} 個字符</val>
+    <val lang="zh_TW">文字長度：{0} 個字符</val>
   </key>
   <key value="error.processing.ai.markup">
-    <comment>resultArea.setText()@AIMarkupActionListener()</comment>
+    <comment>resultArea.append()@AIMarkupActionListener()</comment>
     <val lang="en_US">Error processing AI markup: {0}</val>
     <val lang="zh_CN">處理 AI 標記時出錯：{0}</val>
     <val lang="zh_TW">處理 AI 標記時出錯：{0}</val>
+  </key>
+  <key value="action.utf8.check.transfer.selected">
+    <comment>infoArea.setText()@UTF8CheckActionListener()</comment>
+    <val lang="en_US">Tool selected: UTF-8 Check/Convert (for UTF-8 compliance of the selected files or directories).</val>
+    <val lang="zh_CN">選取工具功能： UTF-8 檢查/轉換 (選取檔案或資料夾的 UTF-8 相容性)。</val>
+    <val lang="zh_TW">選取工具功能： UTF-8 檢查/轉換 (選取檔案或資料夾的 UTF-8 相容性)。</val>
   </key>
   <key value="dialog.directories.files.selection">
     <comment>fileChooser.setDialogTitle()@UTF8CheckActionListener()</comment>
@@ -119,7 +125,7 @@
     <val lang="zh_CN">選擇文件或目錄以檢查 UTF-8 編碼</val>
     <val lang="zh_TW">選擇文件或目錄以檢查 UTF-8 編碼</val>
   </key>
-  <key value="utf8.scanning.files">
+  <key value="utf8.check.scanning.files">
     <comment>infoArea.setText()@UTF8CheckActionListener()</comment>
     <val lang="en_US">Scanning files for UTF-8 compliance...</val>
     <val lang="zh_CN">正在掃描檔案的 UTF-8 相容性...</val>
@@ -133,27 +139,33 @@
   </key>
   <key value="no.text.to.replace">
     <comment>infoArea.setText()@ReplaceButtonActionListener()</comment>
-    <val lang="en_US">\nNo text to replace.</val>
-    <val lang="zh_CN">\n無文字可替換。</val>
-    <val lang="zh_TW">\n無文字可替換。</val>
+    <val lang="en_US">No text to replace.</val>
+    <val lang="zh_CN">無文字可替換。</val>
+    <val lang="zh_TW">無文字可替換。</val>
   </key>
   <key value="no.editor.open">
-    <comment>infoArea.setText()@ReplaceButtonActionListener(),area.setText()@fetchSelectedText()</comment>
-    <val lang="en_US">\nNo open Text mode editor.</val>
-    <val lang="zh_CN">\n目前沒有開啟的文本(Text)模式編輯器。</val>
-    <val lang="zh_TW">\n目前沒有開啟的文本(Text)模式編輯器。</val>
+    <comment>infoArea.append()@ReplaceButtonActionListener(),area.setText()@fetchSelectedText()</comment>
+    <val lang="en_US">No open Text mode editor.</val>
+    <val lang="zh_CN">目前沒有開啟的文本(Text)模式編輯器。</val>
+    <val lang="zh_TW">目前沒有開啟的文本(Text)模式編輯器。</val>
+  </key>
+  <key value="error.fetching.selected.text">
+    <comment>infoArea.setText()@ReplaceButtonActionListener()</comment>
+    <val lang="en_US">Error fetching selected text: {0}</val>
+    <val lang="zh_CN">抓取所選文字時出錯： {0}</val>
+    <val lang="zh_TW">抓取所選文字時出錯： {0}</val>
   </key>
   <key value="text.replaced">
     <comment>infoArea.setText()@ReplaceButtonActionListener()</comment>
-    <val lang="en_US">\nSelected text has been replaced.</val>
-    <val lang="zh_CN">\n選取文字已替換。</val>
-    <val lang="zh_TW">\n選取文字已替換。</val>
+    <val lang="en_US">Selected text has been replaced.</val>
+    <val lang="zh_CN">選取文字已替換。</val>
+    <val lang="zh_TW">選取文字已替換。</val>
   </key>
   <key value="error.replacing.text">
     <comment>infoArea.setText()@ReplaceButtonActionListener()</comment>
-    <val lang="en_US">\nError during text replacement: </val>
-    <val lang="zh_CN">\n替換文字時發生錯誤: </val>
-    <val lang="zh_TW">\n替換文字時發生錯誤: </val>
+    <val lang="en_US">Error during text replacement: </val>
+    <val lang="zh_CN">替換文字時發生錯誤: </val>
+    <val lang="zh_TW">替換文字時發生錯誤: </val>
   </key>
   <key value="error.accessing.editor">
     <comment>infoArea.setText()@ReplaceButtonActionListener()</comment>
@@ -163,9 +175,9 @@
   </key>
   <key value="no.files.to.convert">
     <comment>infoArea.setText()@TransferButtonActionListener()</comment>
-    <val lang="en_US">\nNo files to convert.</val>
-    <val lang="zh_CN">\n沒有檔案需要轉換。</val>
-    <val lang="zh_TW">\n沒有檔案需要轉換。</val>
+    <val lang="en_US">No files to convert.</val>
+    <val lang="zh_CN">沒有檔案需要轉換。</val>
+    <val lang="zh_TW">沒有檔案需要轉換。</val>
   </key>
   <key value="utf8.Converting">
     <comment>infoArea.setText()@TransferButtonActionListener()</comment>
@@ -187,9 +199,9 @@
   </key>
   <key value="not.text.mode">
     <comment>area.setText()@fetchSelectedText()</comment>
-    <val lang="en_US">\nCurrent page is not a Text mode editor.</val>
-    <val lang="zh_CN">\n當前頁面不是Text模式編輯器。</val>
-    <val lang="zh_TW">\n當前頁面不是Text模式編輯器。</val>
+    <val lang="en_US">Current page is not a Text mode editor.</val>
+    <val lang="zh_CN">當前頁面不是Text模式編輯器。</val>
+    <val lang="zh_TW">當前頁面不是Text模式編輯器。</val>
   </key>
   <key value="error.no.APIKey">
     <comment>infoArea.setText()@processAIMarkup()</comment>
@@ -211,9 +223,9 @@
   </key>
   <key value="llm.error">
     <comment>i18n("llm.error", e.getMessage())@processAIMarkup()</comment>
-    <val lang="en_US">\nError calling language model: \n{0}</val>
-    <val lang="zh_CN">\n呼叫語言模型發生錯誤: \n{0}</val>
-    <val lang="zh_TW">\n呼叫語言模型發生錯誤: \n{0}</val>
+    <val lang="en_US">Error calling language model: {0}</val>
+    <val lang="zh_CN">呼叫語言模型發生錯誤: {0}</val>
+    <val lang="zh_TW">呼叫語言模型發生錯誤: {0}</val>
   </key>
   <key value="utf8.all.valid">
     <comment>infoArea.setText()@displayUtf8CheckResults()</comment>
@@ -233,11 +245,29 @@
     <val lang="zh_CN">... 還有 {0} 個檔案\n</val>
     <val lang="zh_TW">... 還有 {0} 個檔案\n</val>
   </key>
-  <key value="utf8.conversion.summary">
+  <key value="utf8.conversion.summary.header">
     <comment>return@convertFilesToUtf8()</comment>
-    <val lang="en_US">Conversion summary:\nSuccessfully converted {0} files\nFailed conversions {1} files\n\nDetails:\n{2}</val>
-    <val lang="zh_CN">轉換摘要：\n成功轉換 {0} 個檔案\n轉換失敗 {1} 個檔案\n\n詳情：\n{2}</val>
-    <val lang="zh_TW">轉換摘要：\n成功轉換 {0} 個檔案\n轉換失敗 {1} 個檔案\n\n詳情：\n{2}</val>
+    <val lang="en_US">Conversion summary:</val>
+    <val lang="zh_CN">轉換摘要：</val>
+    <val lang="zh_TW">轉換摘要：</val>
+  </key>
+  <key value="utf8.conversion.success.count">
+    <comment>return@convertFilesToUtf8()</comment>
+    <val lang="en_US">Successfully converted {0} files</val>
+    <val lang="zh_CN">成功轉換 {0} 個檔案</val>
+    <val lang="zh_TW">成功轉換 {0} 個檔案</val>
+  </key>
+  <key value="utf8.conversion.failure.count">
+    <comment>return@convertFilesToUtf8()</comment>
+    <val lang="en_US">Failed conversions {0} files</val>
+    <val lang="zh_CN">轉換失敗 {0} 個檔案</val>
+    <val lang="zh_TW">轉換失敗 {0} 個檔案</val>
+  </key>
+  <key value="utf8.conversion.details.header">
+    <comment>return@convertFilesToUtf8()</comment>
+    <val lang="en_US">Details:</val>
+    <val lang="zh_CN">詳情：</val>
+    <val lang="zh_TW">詳情：</val>
   </key>
   <key value="utf8.conversion.completed">
     <comment>infoArea.setText()@displayConversionResults()</comment>
@@ -263,11 +293,6 @@
     <val lang="zh_CN">API 金鑰*： </val>
     <val lang="zh_TW">API 金鑰*： </val>
   </key>
-  <key value="utf8.check.select.files">
-    <val lang="en_US">Please select files or folders to check for UTF-8 encoding...</val>
-    <val lang="zh_CN">請選擇要檢查 UTF-8 編碼的檔案或資料夾...</val>
-    <val lang="zh_TW">請選擇要檢查 UTF-8 編碼的檔案或資料夾...</val>
-  </key>
   <key value="utf8.check.cancelled">
     <val lang="en_US">File selection cancelled.</val>
     <val lang="zh_CN">檔案選擇已取消。</val>
@@ -283,21 +308,11 @@
     <val lang="zh_CN">還有 {0} 個檔案</val>
     <val lang="zh_TW">還有 {0} 個檔案</val>
   </key>
-  <key value="utf8.check.all.valid">
-    <val lang="en_US">✓ All selected files are already valid UTF-8.</val>
-    <val lang="zh_CN">✓ 所有選定檔案都已是有效的 UTF-8 編碼。</val>
-    <val lang="zh_TW">✓ 所有選定檔案都已是有效的 UTF-8 編碼。</val>
-  </key>
-  <key value="utf8.check.select.encoding">
+  <!-- <key value="utf8.check.select.encoding">
     <val lang="en_US">Select the source encoding for conversion:</val>
     <val lang="zh_CN">請選擇轉換的源編碼：</val>
     <val lang="zh_TW">請選擇轉換的源編碼：</val>
-  </key>
-  <key value="utf8.conversion.started">
-    <val lang="en_US">Starting UTF-8 conversion from {0} encoding...</val>
-    <val lang="zh_CN">開始從 {0} 編碼轉換為 UTF-8...</val>
-    <val lang="zh_TW">開始從 {0} 編碼轉換為 UTF-8...</val>
-  </key>
+  </key> -->
   <key value="utf8.conversion.backing.up">
     <val lang="en_US">✓ Backed up: </val>
     <val lang="zh_CN">✓ 已備份：</val>
@@ -312,31 +327,6 @@
     <val lang="en_US">✗ Failed: </val>
     <val lang="zh_CN">✗ 失敗：</val>
     <val lang="zh_TW">✗ 失敗：</val>
-  </key>
-  <key value="utf8.conversion.summary">
-    <val lang="en_US">Conversion Summary:</val>
-    <val lang="zh_CN">轉換摘要：</val>
-    <val lang="zh_TW">轉換摘要：</val>
-  </key>
-  <key value="utf8.conversion.success.count">
-    <val lang="en_US">Successfully converted: {0} files</val>
-    <val lang="zh_CN">成功轉換：{0} 個檔案</val>
-    <val lang="zh_TW">成功轉換：{0} 個檔案</val>
-  </key>
-  <key value="utf8.conversion.fail.count">
-    <val lang="en_US">Failed: {0} files</val>
-    <val lang="zh_CN">失敗：{0} 個檔案</val>
-    <val lang="zh_TW">失敗：{0} 個檔案</val>
-  </key>
-  <key value="utf8.conversion.cancelled">
-    <val lang="en_US">UTF-8 conversion cancelled by user.</val>
-    <val lang="zh_CN">使用者取消了 UTF-8 轉換。</val>
-    <val lang="zh_TW">使用者取消了 UTF-8 轉換。</val>
-  </key>
-  <key value="utf8.conversion.error">
-    <val lang="en_US">Error in UTF-8 conversion: </val>
-    <val lang="zh_CN">UTF-8 轉換錯誤：</val>
-    <val lang="zh_TW">UTF-8 轉換錯誤：</val>
   </key>
   <key value="utf8.conversion.backup.note">
     <val lang="en_US">Note: Original files backed up with .bak extension</val>

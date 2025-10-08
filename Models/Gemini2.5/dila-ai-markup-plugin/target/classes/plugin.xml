@@ -7,7 +7,6 @@
        name="DILA AI Markup Assistant"
        version="0.3.0" 
        vendor="DILA"
-       class="com.dila.dama.plugin.workspace.DAMAWorkspaceAccessPlugin" 
        classLoaderType="preferReferencedResources">
 
        <description>

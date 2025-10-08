@@ -24,6 +24,10 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <oxygen.sdk.version>27.1.0.3</oxygen.sdk.version>
     <javac.path>${env.JAVA_HOME}/bin/javac</javac.path>
+    <!-- Force Java 8 compatibility -->
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.release>8</maven.compiler.release>
   </properties>
 
   <repositories>
@@ -181,6 +185,74 @@
               </descriptors>
               <finalName>dilaAIMarkupPlugin</finalName>
               <appendAssemblyId>false</appendAssemblyId>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- Copy and rename extension.xml to dilaAIMarkupPlugin.xml -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <id>copy-extension-xml</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/resources</directory>
+                  <includes>
+                    <include>extension.xml</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- Rename the copied extension.xml to dilaAIMarkupPlugin.xml -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>rename-extension-xml</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <move file="${basedir}/extension.xml" 
+                      tofile="${basedir}/dilaAIMarkupPlugin.xml" 
+                      overwrite="true" 
+                      failonerror="false"/>
+                <echo message="Renamed extension.xml to dilaAIMarkupPlugin.xml in root directory"/>
+              </target>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-zip-to-root</id>
+            <phase>install</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <copy file="${project.build.directory}/dilaAIMarkupPlugin.zip" 
+                      tofile="${basedir}/dilaAIMarkupPlugin.zip" 
+                      overwrite="true" 
+                      failonerror="false"/>
+                <echo message="Copied dilaAIMarkupPlugin.zip from target to root directory"/>
+              </target>
             </configuration>
           </execution>
         </executions>
