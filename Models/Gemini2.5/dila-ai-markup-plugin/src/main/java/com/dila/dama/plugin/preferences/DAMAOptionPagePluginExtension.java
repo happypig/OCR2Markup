@@ -30,6 +30,12 @@ import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
 
   /**
+   * The option page title for this preferences page.
+   * Magic string matches the name from plugin.xml in order to get flat entry(no extra blank page root for single preference page plugin) right under plugins in preference tree.
+   */
+  public static final String DILA_DAMA_OPTIONS_PAGE_TITLE = "DILA AI Markup Assistant";
+
+    /**
    * The option page key for this preferences page.
    */
   public static final String DILA_DAMA_OPTIONS_PAGE_KEY = "dila_ai_markup_options_page_key";
@@ -207,30 +213,10 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
    */
   @Override
   public String getTitle() {
-    String title = null;
-    try {
-      // Try to initialize resource bundle if not already done
-      if (resources == null) {
-        // Try using PluginWorkspaceProvider first
-        PluginWorkspace workspace = PluginWorkspaceProvider.getPluginWorkspace();
-        if (workspace != null) {
-          System.err.println("DILA Plugin: Initializing resource bundle in getTitle() via PluginWorkspaceProvider");
-          initializeResourceBundle(workspace);
-        } else if (pluginWorkspace != null) {
-          System.err.println("DILA Plugin: Initializing resource bundle in getTitle() via stored workspace");
-          initializeResourceBundle(pluginWorkspace);
-        }
-      }
-      
-      // Only catch exceptions from getMessage for clarity
-      title = "DILA AI Markup Assistant";
-      System.err.println("DILA Plugin: getTitle() returning: " + title);
-    } catch (Exception e) {
-      System.err.println("[E] DILA Plugin: Error in getMessage() in getTitle(): " + e.getMessage());
-      e.printStackTrace();
-    }
-    // Ensure we NEVER return null - this prevents NPE in Oxygen's options dialog
-    return (title != null && !title.trim().isEmpty()) ? title : "DILA Plugin";
+    String title = DILA_DAMA_OPTIONS_PAGE_TITLE;
+    System.err.println("DILA Plugin: getTitle() returning: " + title);
+
+    return title;
   }
 
   /**
