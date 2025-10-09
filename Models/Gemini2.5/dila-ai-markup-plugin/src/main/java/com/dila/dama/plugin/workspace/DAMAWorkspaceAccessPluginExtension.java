@@ -97,7 +97,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     }
     
     /**
-     * Custom view component customizer for the DILA AI Markup view
+     * Custom view component customizer for the DILA AI Markup view(i18n)
      */
     private class DAMAViewComponentCustomizer implements ViewComponentCustomizer {
         
@@ -157,7 +157,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     }
     
     /**
-     * Create the menu bar with Actions, Tools, and Options menus
+     * Create the menu bar with Actions, Tools, and Options menus(i18n)
      */
     private JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
@@ -196,7 +196,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     }
     
     /**
-     * Create options menu with theme-appropriate icon
+     * Create options menu with theme-appropriate icon(i18n)
      */
     private JMenu createOptionsMenu() {
         JMenu menuOptions = new JMenu();
@@ -348,10 +348,10 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     // }
     
     /**
-     * Create text areas for info and results
+     * Create text areas for info and results(i18n)
      */
     private void createTextAreas() {
-        infoArea = new JTextArea(i18n("initial.info"), 4, 0); // "Please select a function from the Actions/Tools menu, or select Preferences from the Options menu to configure parameters."
+        infoArea = new JTextArea(i18n("initial.info"), 4, 0); // "Please select any function from the Actions/Tools menu, or select Preferences from the Gear icon(Options menu) to configure parameters."
         infoArea.setLineWrap(true);
         infoArea.setWrapStyleWord(true);
         infoArea.setEditable(false);
@@ -363,7 +363,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     }
     
     /**
-     * Create button panel with replace, transfer, and cancel buttons
+     * Create button panel with replace, transfer, and cancel buttons(i18n)
      */
     private void createButtonPanel() {
         buttonPanel = new JPanel();
@@ -391,7 +391,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     // ========================================
     
     /**
-     * AI Markup action listener
+     * AI Markup action listener(i18n)
      */
     private class AIMarkupActionListener implements ActionListener {
         @Override
@@ -404,7 +404,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             hideAllButtons();
             
             // Get selected text from current editor
-            String selectedText = fetchSelectedText(infoArea);
+            String selectedText = fetchSelectedText(resultArea);
             if (selectedText.isEmpty()) {
                 // infoArea.append(i18n("no.text.selected")); // "No text selected in the editor."
                 return;
@@ -428,7 +428,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     }
     
     /**
-     * Tag Removal action listener
+     * Tag Removal action listener(i18n)
      */
     private class TagRemovalActionListener implements ActionListener {
         @Override
@@ -441,7 +441,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             hideAllButtons();
             
             // Get selected text from current editor
-            String selectedText = fetchSelectedText(infoArea);
+            String selectedText = fetchSelectedText(resultArea);
             if (selectedText.isEmpty()) {
                 // infoArea.append(i18n("no.text.selected")); // "No text selected in the editor."
                 return;
@@ -457,7 +457,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     }
     
     /**
-     * UTF-8 Check action listener
+     * UTF-8 Check action listener(i18n)
      */
     private class UTF8CheckActionListener implements ActionListener {
         @Override
@@ -519,7 +519,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     }
     
     /**
-     * Replace button action listener
+     * Replace button action listener(i18n)
      */
     private class ReplaceButtonActionListener implements ActionListener {
         @Override
@@ -533,7 +533,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             }
             
             // Check if we have selected text - reuse existing validation logic
-            String currentSelection = fetchSelectedText(infoArea);
+            String currentSelection = fetchSelectedText(resultArea);
             if (currentSelection.isEmpty()) {
                 // Error message already set by fetchSelectedText
                 return;
@@ -556,7 +556,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                             try {
                                 // First delete the selected text
                                 textPage.deleteSelection();
-                                
+                               
                                 // Then insert the new text at the cursor position
                                 int currentOffset = textPage.getCaretOffset();
                                 
@@ -579,16 +579,16 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                                     }
                                 }
                                 
-                                infoArea.setText(i18n("text.replaced")); // "\nSelected text has been replaced."
+                                infoArea.append(i18n("text.replaced")); // "\nSelected text has been replaced."
                                 hideAllButtons();
-                                resultArea.setText(""); // Clear result area
+                                // resultArea.setText(""); // Clear result area
                                 
                             } catch (Exception ex) {
                                 logDebug("Error during text replacement: " + ex.getMessage());
-                                infoArea.setText(i18n("error.replacing.text", ex.getMessage())); // "\nError during text replacement: "
+                                infoArea.append(i18n("error.replacing.text", ex.getMessage())); // "\nError during text replacement: "
                             }
                         } else {
-                            infoArea.setText(i18n("no.text.selected"));  // "No text selected in the editor."
+                            infoArea.append(i18n("no.text.selected"));  // "No text selected in the editor."
                         }
                     }
                     // Note: fetchSelectedText already handles non-text mode case
@@ -596,13 +596,13 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                 // Note: fetchSelectedText already handles no editor case
             } catch (Exception ex) {
                 logDebug("Error accessing editor: " + ex.getMessage());
-                infoArea.setText(i18n("error.accessing.editor", ex.getMessage())); // "Error accessing editor: {0}"
+                setResultInformational(i18n("error.accessing.editor", ex.getMessage())); // "Error accessing editor: {0}"
             }
         }
     }
     
     /**
-     * Transfer button action listener for UTF-8 conversion
+     * Transfer button action listener for UTF-8 conversion(i18n)
      */
     private class TransferButtonActionListener implements ActionListener {
         @Override
@@ -610,11 +610,11 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             logDebug("Transfer button triggered");
             
             if (currentNonUtf8Files == null || currentNonUtf8Files.isEmpty()) {
-                infoArea.setText(i18n("no.files.to.convert")); // "\nNo files to convert."
+                infoArea.append(i18n("no.files.to.convert")); // "\nNo files to convert."
                 return;
             }
             
-            infoArea.setText(i18n("utf8.Converting")); // "Converting files to UTF-8..."
+            infoArea.append(i18n("utf8.Converting")); // "Converting files to UTF-8..."
             hideTransferButtons();
             
             // Convert files in background
@@ -623,15 +623,15 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                     displayConversionResults(conversionResults)))
                 .exceptionally(throwable -> {
                     SwingUtilities.invokeLater(() -> {
-                        infoArea.setText(i18n("error.converting.files", throwable.getMessage())); // "Error converting files: {0}"
+                        setResultInformational(i18n("error.converting.files", throwable.getMessage())); // "Error converting files: {0}"
                     });
                     return null;
                 });
         }
     }
-    
+
     /**
-     * Cancel button action listener
+     * Cancel button action listener(i18n)
      */
     private class CancelButtonActionListener implements ActionListener {
         @Override
@@ -640,7 +640,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             
             currentNonUtf8Files = null;
             hideTransferButtons();
-            infoArea.setText(i18n("utf8.conversion.cancelled")); // "UTF-8 conversion cancelled."
+            infoArea.append(i18n("utf8.conversion.cancelled")); // "UTF-8 conversion cancelled."
             resultArea.setText("");
         }
     }
@@ -687,7 +687,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     }
     
     /**
-     * Fetch selected text from current editor
+     * Fetch selected text from current editor(i18n)
      */
     private String fetchSelectedText(JTextArea area) {
         try {
@@ -701,7 +701,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                         logDebug("Current page is Text mode" + selectedText);
                         return selectedText;
                     } else {
-                        area.append(i18n("no.text.selected") + "\n"); // "No text selected in the editor."
+                        area.append(i18n("no.text.selected") + "\n"); // [shared] "No text selected in the editor."
                         logDebug("No text selected in the editor");
                         return ""; // No text selected
                     }
@@ -711,11 +711,11 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                     return ""; // Non-text mode
                 }
             }
-            area.append(i18n("no.editor.open") + "\n");  // "No open Text mode editor."
+            area.append(i18n("no.editor.open") + "\n");  // [shared] "No open Text mode editor."
             logDebug("No open editor");
             return ""; // No editor open
         } catch (Exception e) {
-            area.append(i18n("error.fetching.selected.text", e.getMessage()) + "\n");  // "No open Text mode editor."
+            area.append(i18n("error.fetching.selected.text", e.getMessage()) + "\n");  // "Error fetching selected text: {0}"
             logDebug("Error fetching selected text: " + e.getMessage()); 
             return "";
         }
@@ -738,10 +738,13 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      * For AI Markup and Tag Removal operations
      */
     private void setResultWithReplaceButton(String result) {
+        logDebug("[setResultWithReplaceButton]Setting result with replace button: " + result);
         resultArea.setText(result);
         if (isValidResultForReplacement(result)) {
+            logDebug("[setResultWithReplaceButton]Showing replace button");
             showReplaceButton();
         } else {
+            logDebug("[setResultWithReplaceButton]Hiding all buttons");
             hideAllButtons();
         }
     }
@@ -751,10 +754,13 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      * For UTF-8 Check/Convert operations
      */
     private void setResultWithConversionButtons(String result) {
-        // resultArea.setText(result);
+        logDebug("[setResultWithConversionButtons]Setting result with conversion buttons: " + result);
+        resultArea.setText(result);
         if (isValidResultForConversion(result)) {
+            logDebug("[setResultWithConversionButtons]Showing transfer buttons");
             showTransferButtons();
         } else {
+            logDebug("[setResultWithConversionButtons]Hiding all buttons");
             hideAllButtons();
         }
     }
@@ -764,6 +770,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      * For completed operations or final status messages
      */
     private void setResultInformational(String result) {
+        logDebug("[setResultInformational]Setting result as informational: " + result);
         resultArea.setText(result);
         hideAllButtons();
     }
@@ -774,16 +781,19 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      */
     private boolean isValidResultForReplacement(String result) {
         if (result == null || result.trim().isEmpty()) {
+            logDebug("[isValidResultForReplacement]Invalid result for replacement: " + result);
             return false;
         }
         
         // Check for error patterns in both English and i18n messages
         if (isErrorMessage(result)) {
+            logDebug("[isValidResultForReplacement]Result is an error message, not valid for replacement: " + result);
             return false;
         }
         
         // Only allow actual processed text content for replacement
         // AI Markup and Tag Removal should produce clean text or XML markup
+        logDebug("[isValidResultForReplacement]Result is valid for replacement: " + result);
         return true;
     }
     
@@ -792,26 +802,31 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      */
     private boolean isValidResultForConversion(String result) {
         if (result == null || result.trim().isEmpty()) {
+            logDebug("[isValidResultForConversion]Invalid result for conversion: " + result);
             return false;
         }
         
         // Error messages should not show conversion buttons
         if (isErrorMessage(result)) {
+            logDebug("[isValidResultForConversion]Result is an error message, not valid for conversion: " + result);
             return false;
         }
         
         // Check for UTF-8 scan results that indicate files need conversion using i18n
-        if (result.startsWith(i18n("utf8.non.utf8.found", "").split("\\{")[0].trim())) {
+        if (result.startsWith(i18n("utf8.check.found.non.utf8").split("\\{")[0].trim())) {
+            logDebug("[isValidResultForConversion]Result indicates files need conversion: " + result);
             return true;
         }
         
         // Check for completion messages that should not show conversion buttons
         if (result.equals(i18n("utf8.all.valid")) ||
             result.equals(i18n("utf8.conversion.completed")) ||
-            result.startsWith(i18n("utf8.conversion.summary", "", "", "").split("\\{")[0].trim())) {
+            result.startsWith(i18n("utf8.conversion.summary").split("\\{")[0].trim())) {
+            logDebug("[isValidResultForConversion]Result is a completion message, not valid for conversion: " + result);
             return false;
         }
-        
+
+        logDebug("[isValidResultForConversion]Result does not indicate files need conversion: " + result);
         return false;
     }
     
@@ -820,6 +835,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      */
     private boolean isErrorMessage(String result) {
         if (result == null) {
+            logDebug("[isErrorMessage]Result is null, not an error message");
             return false;
         }
         
@@ -838,6 +854,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         for (String errorKey : errorKeys) {
             String errorMessage = i18n(errorKey, "").split("\\{")[0].trim(); // Get message without parameter placeholders
             if (!errorMessage.equals(errorKey) && result.startsWith(errorMessage)) {
+                logDebug("[isErrorMessage]Result is an i18n error message: " + result);
                 return true;
             }
         }
@@ -848,9 +865,11 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             lowerResult.startsWith("http error") || 
             lowerResult.contains("exception") ||
             lowerResult.contains("failed")) {
+            logDebug("[isErrorMessage]Result is an English error message: " + result);
             return true;
         }
         
+        logDebug("[isErrorMessage]Result is not an error message: " + result);
         return false;
     }
     
@@ -891,7 +910,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     // ========================================
     
     /**
-     * Process AI markup with LLM API integration
+     * Process AI markup with LLM API integration(i18n)
      */
     private String processAIMarkup(String text) {
         try {
@@ -971,7 +990,8 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                     }
                 }
                 logDebug("AI Markup HTTP error response: " + errorResponse.toString());
-                return "HTTP Error " + responseCode + ": " + errorResponse.toString();
+                // return "HTTP Error " + responseCode + ": " + errorResponse.toString();
+                return i18n("http.error", responseCode, errorResponse.toString()); // "HTTP Error {0}: {1}"
             }
             
         } catch (Exception e) {
@@ -1099,7 +1119,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             totalFiles += scanFileOrDirectory(file.toPath(), nonUtf8Files);
         }
         
-        logDebug("UTF-8 check completed. Total files: " + totalFiles + ", Non-UTF-8: " + nonUtf8Files.size());
+        logDebug("[checkUtf8Files]UTF-8 check completed. Total files: " + totalFiles + ", Non-UTF-8: " + nonUtf8Files.size());
         return nonUtf8Files;
     }
     
@@ -1138,6 +1158,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      * Check if file is likely a text file
      */
     private boolean isTextFile(Path path) {
+        logDebug("[isTextFile]Checking if file is a text file: " + path);
         String fileName = path.getFileName().toString().toLowerCase();
         String[] textExtensions = {".xml", ".txt", ".html", ".htm", ".xhtml", ".css", ".js", 
                                   ".json", ".md", ".properties", ".java", ".py", ".php", ".rb", 
@@ -1152,19 +1173,20 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     }
     
     /**
-     * Display UTF-8 check results
+     * Display UTF-8 check results(i18n)
      */
     private void displayUtf8CheckResults(List<Path> nonUtf8Files) {
         if (nonUtf8Files.isEmpty()) {
-            infoArea.setText(i18n("utf8.all.valid") + "\n"); // "All files are valid UTF-8!"
-            setResultInformational(i18n("utf8.all.valid")); // This will hide all buttons appropriately
+            // infoArea.append(i18n("utf8.all.valid") + "\n"); // "All files are valid UTF-8!"
+            setResultInformational(i18n("utf8.all.valid")); // "All files are valid UTF-8!"
+            logDebug("[displayUtf8CheckResults]All files are valid UTF-8");
             return;
         }
         
         currentNonUtf8Files = nonUtf8Files;
         
         StringBuilder info = new StringBuilder();
-        info.append(i18n("utf8.non.utf8.found", nonUtf8Files.size())); // "Non-UTF-8 files found: {0}\n\n"
+        info.append(i18n("utf8.check.found.non.utf8", nonUtf8Files.size())).append("\n"); // "Found {0} files that are not valid UTF-8:"
         
         int displayCount = Math.min(10, nonUtf8Files.size());
         for (int i = 0; i < displayCount; i++) {
@@ -1172,15 +1194,16 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         }
         
         if (nonUtf8Files.size() > 10) {
-            info.append(i18n("more.files.to.convert", nonUtf8Files.size() - 10)); // "... and {0} more files\n"
+            info.append(i18n("more.files.to.convert", nonUtf8Files.size() - 10)); // "... and {0} more files"
         }
         
-        infoArea.setText(info.toString());
+        // infoArea.setText(info.toString());
+        logDebug("UTF-8 check results: " + info.toString());
         setResultWithConversionButtons(info.toString()); // This will show transfer/cancel buttons if validation passes
     }
     
     /**
-     * Convert files to UTF-8
+     * Convert files to UTF-8(i18n)
      */
     private String convertFilesToUtf8(List<Path> files) {
         StringBuilder results = new StringBuilder();
@@ -1202,8 +1225,8 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                    .append(" - ").append(failure.getError()).append("\n");
         }
         
-        logDebug("UTF-8 conversion summary: Successes=" + successCount + ", Failures=" + failureCount);        
-        logDebug("UTF-8 conversion results:\n" + results.toString());
+        logDebug("[convertFilesToUtf8]UTF-8 conversion summary: Successes=" + successCount + ", Failures=" + failureCount);        
+        logDebug("[convertFilesToUtf8]UTF-8 conversion results:\n" + results.toString());
         
         // Fix: Handle empty results case and ensure proper formatting
         String detailsText = results.length() > 0 ? results.toString() : i18n("utf8.conversion.no.details");
@@ -1223,12 +1246,13 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      * Display conversion results
      */
     private void displayConversionResults(String results) {
+        logDebug("[displayConversionResults]Displaying conversion results: " + results);
         setResultInformational(results); // Conversion results are informational, no action buttons needed
-        infoArea.setText(i18n("utf8.conversion.completed")); // "UTF-8 conversion completed."
+        infoArea.append(i18n("utf8.conversion.completed")); // "UTF-8 conversion completed."
         currentNonUtf8Files = null;
     }
     
-    // ========================================
+    // ===============================[displayConversionResults]=========
     // Static utility methods
     // ========================================
     
@@ -1262,7 +1286,12 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      */
     private static void logDebug(String message) {
         if (DEBUG) {
-            System.err.println("[" + new Date() + "] " + message);
+            try {
+                java.io.PrintStream ps = new java.io.PrintStream(System.err, true, "UTF-8");
+                ps.println("[" + new Date() + "] " + message);
+            } catch (java.io.UnsupportedEncodingException e) {
+                System.err.println("[" + new Date() + "] " + message);
+            }
         }
     }
     
