@@ -3,14 +3,14 @@ package com.dila.dama.plugin.preferences;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.nio.ByteBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CodingErrorAction;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.io.IOException;
+// import java.nio.ByteBuffer;
+// import java.nio.charset.CharacterCodingException;
+// import java.nio.charset.Charset;
+// import java.nio.charset.CharsetDecoder;
+// import java.nio.charset.CodingErrorAction;
+// import java.nio.file.Files;
+// import java.nio.file.Path;
+// import java.io.IOException;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -58,7 +58,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
   /**
    * Safe fallback values to prevent null pointer exceptions in Oxygen's options system.
    */
-  private static final String SAFE_KEY_FALLBACK = "dila_safe_fallback";
+  // private static final String SAFE_KEY_FALLBACK = "dila_safe_fallback";
   private static final String SAFE_VALUE_FALLBACK = "";
   
   /**
@@ -81,10 +81,10 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
    */
   private PluginResourceBundle resources;
   
-  /**
-   * Keep a reference to the plugin workspace for resource bundle initialization.
-   */
-  private PluginWorkspace pluginWorkspace;
+  // /**
+  //  * Keep a reference to the plugin workspace for resource bundle initialization.
+  //  */
+  // private PluginWorkspace pluginWorkspace;
 
   /**
    * Constructor - Initialize resource bundle early to ensure it's available for getTitle()
@@ -225,7 +225,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
    */
   private void initializeResourceBundle(PluginWorkspace pluginWorkspace) {
     // Store the workspace reference for later use
-    this.pluginWorkspace = pluginWorkspace;
+    // this.pluginWorkspace = pluginWorkspace;
     
     // Store the resource bundle as an instance variable
     // According to Oxygen SDK, cast to StandalonePluginWorkspace to access getResourceBundle()

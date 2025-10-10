@@ -27,12 +27,12 @@ public class DAMAWorkspaceAccessPlugin extends Plugin {
 		instance = this;
 	}
 
-	/**
-	 * Get the plugin instance.
-	 * 
-	 * @return the shared plugin instance.
-	 */
-	public static DAMAWorkspaceAccessPlugin getInstance() {
-		return instance;
-	}
+	// /**
+	//  * Get the plugin instance.
+	//  * 
+	//  * @return the shared plugin instance.
+	//  */
+	// public static DAMAWorkspaceAccessPlugin getInstance() {
+	// 	return instance;
+	// }
 }
