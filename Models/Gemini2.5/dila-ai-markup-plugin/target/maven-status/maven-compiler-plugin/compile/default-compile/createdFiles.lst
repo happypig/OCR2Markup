@@ -8,6 +8,7 @@ com\dila\dama\plugin\workspace\DAMAWorkspaceAccessPluginExtension$OptionsActionL
 com\dila\dama\plugin\utf8\UTF8ValidationService.class
 com\dila\dama\plugin\workspace\DAMAWorkspaceAccessPluginExtension.class
 com\dila\dama\plugin\workspace\DAMAWorkspaceAccessPlugin.class
+com\dila\dama\plugin\workspace\DAMAWorkspaceAccessPluginExtension$OperationType.class
 com\dila\dama\plugin\workspace\DAMAWorkspaceAccessPluginExtension$TagRemovalActionListener.class
 com\dila\dama\plugin\workspace\DAMAWorkspaceAccessPluginExtension$TransferButtonActionListener.class
 com\dila\dama\plugin\workspace\DAMAWorkspaceAccessPluginExtension$1.class

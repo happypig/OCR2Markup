@@ -309,32 +309,21 @@
     <val lang="zh_CN">在掃描的 {1} 個檔案中，發現 {0} 個非有效 UTF-8 編碼的檔案：</val>
     <val lang="zh_TW">在掃描的 {1} 個檔案中，發現 {0} 個非有效 UTF-8 編碼的檔案：</val>
   </key>
-  <key value="utf8.check.more.files">
+  <key value="utf8.conversion.backing.up">
+    <val lang="en_US">The original files are backed up under the same directory.</val>
+    <val lang="zh_CN">原始檔案已備份至相同目錄內。</val>
+    <val lang="zh_TW">原始檔案已備份至相同目錄內。</val>
+  </key>
+  <!-- <key value="utf8.check.more.files">
     <val lang="en_US">and {0} more files</val>
     <val lang="zh_CN">還有 {0} 個檔案</val>
     <val lang="zh_TW">還有 {0} 個檔案</val>
-  </key>
+  </key> -->
   <!-- <key value="utf8.check.select.encoding">
     <val lang="en_US">Select the source encoding for conversion:</val>
     <val lang="zh_CN">請選擇轉換的源編碼：</val>
     <val lang="zh_TW">請選擇轉換的源編碼：</val>
   </key> -->
-  <key value="utf8.conversion.backing.up">
-    <val lang="en_US">✓ Backed up: </val>
-    <val lang="zh_CN">✓ 已備份：</val>
-    <val lang="zh_TW">✓ 已備份：</val>
-  </key>
-  <key value="utf8.conversion.success">
-    <val lang="en_US">✓ Converted: </val>
-    <val lang="zh_CN">✓ 已轉換：</val>
-    <val lang="zh_TW">✓ 已轉換：</val>
-  </key>
-  <key value="utf8.conversion.failed">
-    <val lang="en_US">✗ Failed: </val>
-    <val lang="zh_CN">✗ 失敗：</val>
-    <val lang="zh_TW">✗ 失敗：</val>
-  </key>
-
   <!-- <key value="action.settings.selected">
     <val lang="en_US">Option selected: Settings for fine-tuning model and API Key parameters.</val>
     <val lang="zh_CN">選取選項：設定微調模型與 API 金鑰參數。</val>

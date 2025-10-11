@@ -54,6 +54,20 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
     
     /**
+     * Operation type enum for tracking current operation context
+     */
+    private enum OperationType {
+        NONE,           // No operation in progress
+        AI_MARKUP,      // AI Markup operation
+        TAG_REMOVAL,    // Tag Removal operation
+        UTF8_CHECK,     // UTF-8 Check operation
+        UTF8_CONVERT    // UTF-8 Conversion operation
+    }
+    
+    // Current operation context
+    private OperationType currentOperation = OperationType.NONE;
+    
+    /**
      * Result class for UTF-8 check operation
      */
     private static class Utf8CheckResult {
@@ -94,17 +108,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             
             if (optionStorage != null) {
                 PluginLogger.debug("[applicationStarted]Options storage available.");
-                // // Handle API key logging safely
-                // String apiKey = optionStorage.getSecretOption("dila.dama.api.key", "");
-                // String maskedApiKey = "";
-                // if (apiKey != null && apiKey.length() > 0) {
-                //     maskedApiKey = apiKey.replaceAll(".(?=.{4})", "*");
-                // }
-                // PluginLogger.debug("API Key (masked except last 4 chars): " + maskedApiKey);
-                
-                // // Load model configuration
-                // String model = optionStorage.getOption("dila.dama.llm.model", "");
-                // PluginLogger.debug("LLM Model: " + model);
+                // Leave the checking of API key & model to the action handlers
             } else {
                 PluginLogger.warn("[applicationStarted]No options storage available.");
             }
@@ -267,10 +271,9 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     }
     
     /**
-     * Load plugin icon with multiple fallback approaches
+     * Load plugin icon by class loader resource
      */
     private ImageIcon loadPluginIcon(String iconPath) {
-        // Method 1: Try class loader resource
         try {
             URL iconURL = getClass().getClassLoader().getResource(iconPath);
             if (iconURL != null) {
@@ -281,93 +284,9 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             PluginLogger.error("[loadPluginIcon]Class loader approach failed: " + e.getMessage());
         }
         
-        // // Method 2: Try direct class resource
-        // try {
-        //     URL iconURL = getClass().getResource("/" + iconPath);
-        //     if (iconURL != null) {
-        //         PluginLogger.debug("Icon found via class resource: " + iconURL);
-        //         return new ImageIcon(iconURL);
-        //     }
-        // } catch (Exception e) {
-        //     PluginLogger.debug("Class resource approach failed: " + e.getMessage());
-        // }
-        
-        // // Method 3: Try using plugin workspace to get plugin directory
-        // try {
-        //     if (pluginWorkspaceAccess != null) {
-        //         // Get plugin directory from workspace access
-        //         String pluginDirPath = getPluginDirectory();
-        //         if (pluginDirPath != null) {
-        //             File iconFile = new File(pluginDirPath, iconPath);
-        //             if (iconFile.exists() && iconFile.canRead()) {
-        //                 PluginLogger.debug("Icon found in plugin directory: " + iconFile.getAbsolutePath());
-        //                 return new ImageIcon(iconFile.getAbsolutePath());
-        //             }
-        //         }
-        //     }
-        // } catch (Exception e) {
-        //     PluginLogger.debug("Plugin directory approach failed: " + e.getMessage());
-        // }
-        
-        // // Method 4: Try alternative naming patterns
-        // try {
-        //     String[] alternativeNames = {
-        //         iconPath,
-        //         iconPath.replace("_", "-"),  // options_dark.png -> options-dark.png
-        //         iconPath.replace("-", "_"),  // options-dark.png -> options_dark.png
-        //         "icons/" + iconPath,         // Try icons/ subdirectory
-        //         "img/" + iconPath            // Try img/ subdirectory
-        //     };
-            
-        //     for (String altPath : alternativeNames) {
-        //         URL iconURL = getClass().getClassLoader().getResource(altPath);
-        //         if (iconURL != null) {
-        //             PluginLogger.debug("Icon found with alternative path: " + altPath);
-        //             return new ImageIcon(iconURL);
-        //         }
-        //     }
-        // } catch (Exception e) {
-        //     PluginLogger.debug("Alternative naming approach failed: " + e.getMessage());
-        // }
-        
         PluginLogger.warn("[loadPluginIcon]All icon loading methods failed for: " + iconPath);
         return null;
     }
-    
-    // /**
-    //  * Get plugin directory path
-    //  */
-    // private String getPluginDirectory() {
-    //     try {
-    //         // Try to get plugin directory using reflection on workspace access
-    //         java.lang.reflect.Method getPluginDirMethod = pluginWorkspaceAccess.getClass().getMethod("getPluginDirectory");
-    //         Object pluginDir = getPluginDirMethod.invoke(pluginWorkspaceAccess);
-    //         if (pluginDir != null) {
-    //             return pluginDir.toString();
-    //         }
-    //     } catch (Exception e) {
-    //         PluginLogger.debug("Could not get plugin directory via reflection: " + e.getMessage());
-    //     }
-        
-    //     // Fallback: try to determine from code source
-    //     try {
-    //         java.security.CodeSource codeSource = getClass().getProtectionDomain().getCodeSource();
-    //         if (codeSource != null) {
-    //             URL location = codeSource.getLocation();
-    //             if (location != null) {
-    //                 File jarFile = new File(location.toURI());
-    //                 File pluginDir = jarFile.getParentFile();
-    //                 if (pluginDir != null && pluginDir.exists()) {
-    //                     return pluginDir.getAbsolutePath();
-    //                 }
-    //             }
-    //         }
-    //     } catch (Exception e) {
-    //         PluginLogger.debug("Could not determine plugin directory from code source: " + e.getMessage());
-    //     }
-        
-    //     return null;
-    // }
     
     /**
      * Create text areas for info and results(i18n)
@@ -420,6 +339,9 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         public void actionPerformed(ActionEvent e) {
             PluginLogger.info("[AIMarkupActionListener]AI Markup action triggered");
             
+            // Set operation context
+            currentOperation = OperationType.AI_MARKUP;
+            
             // Clear previous results
             infoArea.setText(i18n("action.ai.markup.selected") + "\n\n"); // "Action selected: AI Markup (Use AI for reference tagging)"
             resultArea.setText("");
@@ -457,6 +379,9 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         public void actionPerformed(ActionEvent e) {
             PluginLogger.info("[TagRemovalActionListener]Tag Removal action triggered");
             
+            // Set operation context
+            currentOperation = OperationType.TAG_REMOVAL;
+            
             // Clear previous results
             infoArea.setText(i18n("action.tag.removal.selected") + "\n\n"); // "Action selected: Tag Removal (Remove tags from selected text)."
             resultArea.setText("");
@@ -485,6 +410,9 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         @Override
         public void actionPerformed(ActionEvent e) {
             PluginLogger.info("[UTF8CheckActionListener]UTF-8 Check action triggered");
+            
+            // Set operation context
+            currentOperation = OperationType.UTF8_CHECK;
             
             // Clear previous results
             infoArea.setText(i18n("action.utf8.check.transfer.selected") + "\n\n"); // "Action selected: UTF-8 Check/Convert (Check and convert files to UTF-8 encoding)."
@@ -589,6 +517,9 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                                 doc.insertString(currentOffset, resultText, null);
                                 PluginLogger.info("[ReplaceButtonActionListener]Text replaced successfully via document insertion");
                                 
+                                // Reset operation context after successful replacement
+                                currentOperation = OperationType.NONE;
+                                
                                 infoArea.append(i18n("text.replaced")); // "\nSelected text has been replaced."
                                 hideAllButtons();
                                 // resultArea.setText(""); // Clear result area
@@ -623,6 +554,9 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                 return;
             }
             
+            // Set operation context
+            currentOperation = OperationType.UTF8_CONVERT;
+            
             infoArea.append(i18n("utf8.Converting") + "\n"); // "Converting files to UTF-8..."
             hideTransferButtons();
             
@@ -646,6 +580,9 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         @Override
         public void actionPerformed(ActionEvent e) {
             PluginLogger.info("[CancelButtonActionListener]Cancel button triggered");
+            
+            // Reset operation context
+            currentOperation = OperationType.NONE;
             
             currentNonUtf8Files = null;
             hideTransferButtons();
@@ -744,12 +681,19 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     
     /**
      * Set result text and show replace button only if result is valid (non-empty and not an error)
-     * For AI Markup and Tag Removal operations
-     */
+    * 
+    * Usage: Call after AI Markup or Tag Removal operations
+    * - Shows Replace button if result contains valid markup/text
+    * - Hides all buttons if result is error or empty
+    * 
+    * @param result The processed text or error message
+    */
     private void setResultWithReplaceButton(String result) {
-        PluginLogger.info("[setResultWithReplaceButton]Setting result with replace button: " + result);
-        resultArea.setText(result);
-        if (isValidResultForReplacement(result)) {
+        String safeResult = (result != null) ? result : "";
+        PluginLogger.info("[setResultWithReplaceButton]Setting result (length: " + safeResult.length() + ")");
+        boolean isValid = isValidResultForReplacement(safeResult);
+        resultArea.setText(safeResult);
+        if (isValid) {
             PluginLogger.info("[setResultWithReplaceButton]Showing replace button");
             showReplaceButton();
         } else {
@@ -760,12 +704,19 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     
     /**
      * Set result text and show conversion buttons if result indicates files need conversion
-     * For UTF-8 Check/Convert operations
+     * 
+     * Usage: Call after UTF-8 Check operation completes
+     * - Shows Transfer/Cancel buttons if non-UTF-8 files were found
+     * - Hides all buttons if all files are valid UTF-8 or error occurred
+     * 
+     * @param result The UTF-8 check results or error message
      */
     private void setResultWithConversionButtons(String result) {
-        PluginLogger.info("[setResultWithConversionButtons]Setting result with conversion buttons: " + result);
-        resultArea.setText(result);
-        if (isValidResultForConversion(result)) {
+        String safeResult = (result != null) ? result : "";
+        PluginLogger.info("[setResultWithConversionButtons]Setting result (length: " + safeResult.length() + ")");
+        boolean isValid = isValidResultForConversion(safeResult);
+        resultArea.setText(safeResult);
+        if (isValid) {
             PluginLogger.info("[setResultWithConversionButtons]Showing transfer buttons");
             showTransferButtons();
         } else {
@@ -775,67 +726,71 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     }
     
     /**
-     * Set result text for informational display without any action buttons
-     * For completed operations or final status messages
+     * Display informational result without action buttons
+     * 
+     * Usage: Call for completion messages or informational status
+     * - UTF-8 conversion completed summaries
+     * - Error messages that don't require user action
+     * - Final operation results
+     * 
+     * Note: Currently appends to resultArea instead of replacing.
+     * This is intentional for showing conversion summaries after file lists.
+     * 
+     * @param result The informational message to display
      */
     private void setResultInformational(String result) {
-        PluginLogger.info("[setResultInformational]Setting result as informational: " + result);
-        resultArea.append(result);
+        String safeResult = (result != null) ? result : "";
+        PluginLogger.info("[setResultInformational]Setting informational result (length: " + safeResult.length() + ")");
+        resultArea.append(safeResult);
         hideAllButtons();
     }
     
     /**
      * Check if result is valid for replacement (not empty, null, or error message)
      * Only AI Markup and Tag Removal results should be valid for replacement
+     * Uses operation context to determine validity
      */
     private boolean isValidResultForReplacement(String result) {
         if (result == null || result.trim().isEmpty()) {
-            PluginLogger.warn("[isValidResultForReplacement]Invalid result for replacement: " + result);
             return false;
         }
         
         // Check for error patterns in both English and i18n messages
         if (isErrorMessage(result)) {
-            PluginLogger.warn("[isValidResultForReplacement]Result is an error message, not valid for replacement: " + result);
             return false;
         }
         
-        // Only allow actual processed text content for replacement
-        // AI Markup and Tag Removal should produce clean text or XML markup
-        PluginLogger.info("[isValidResultForReplacement]Result is valid for replacement: " + result);
-        return true;
+        // Use operation context: only AI_MARKUP and TAG_REMOVAL should show replace button
+        if (currentOperation == OperationType.AI_MARKUP || 
+            currentOperation == OperationType.TAG_REMOVAL) {
+            return true;
+        }
+        
+        return false;
     }
     
     /**
      * Check if result is valid for UTF-8 conversion (shows non-UTF-8 files that need conversion)
+     * Uses operation context to determine validity, avoiding fragile string matching
      */
     private boolean isValidResultForConversion(String result) {
         if (result == null || result.trim().isEmpty()) {
-            PluginLogger.info("[isValidResultForConversion]Invalid result for conversion: " + result);
             return false;
         }
         
         // Error messages should not show conversion buttons
         if (isErrorMessage(result)) {
-            PluginLogger.warn("[isValidResultForConversion]Result is an error message, not valid for conversion: " + result);
             return false;
         }
         
-        // Check for UTF-8 scan results that indicate files need conversion using i18n
-        if (result.startsWith(i18n("utf8.check.found.non.utf8").split("\\{")[0].trim())) {
-            PluginLogger.info("[isValidResultForConversion]Result indicates files need conversion: " + result);
+        // Use operation context: only UTF8_CHECK should show conversion buttons
+        // and only if there are files that need conversion
+        if (currentOperation == OperationType.UTF8_CHECK 
+            && currentNonUtf8Files != null 
+            && !currentNonUtf8Files.isEmpty()) {
             return true;
         }
         
-        // Check for completion messages that should not show conversion buttons
-        if (result.equals(i18n("utf8.all.valid")) ||
-            result.equals(i18n("utf8.conversion.completed")) ||
-            result.startsWith(i18n("utf8.conversion.summary").split("\\{")[0].trim())) {
-            PluginLogger.info("[isValidResultForConversion]Result is a completion message, not valid for conversion: " + result);
-            return false;
-        }
-
-        PluginLogger.warn("[isValidResultForConversion]Result does not indicate files need conversion: " + result);
         return false;
     }
     
@@ -844,7 +799,6 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      */
     private boolean isErrorMessage(String result) {
         if (result == null) {
-            PluginLogger.warn("[isErrorMessage]Result is null, not an error message");
             return false;
         }
         
@@ -863,7 +817,6 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         for (String errorKey : errorKeys) {
             String errorMessage = i18n(errorKey, "").split("\\{")[0].trim(); // Get message without parameter placeholders
             if (!errorMessage.equals(errorKey) && result.startsWith(errorMessage)) {
-                PluginLogger.warn("[isErrorMessage]Result is an i18n error message: " + result);
                 return true;
             }
         }
@@ -874,11 +827,9 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             lowerResult.startsWith("http error") || 
             lowerResult.contains("exception") ||
             lowerResult.contains("failed")) {
-            PluginLogger.warn("[isErrorMessage]Result is an English error message: " + result);
             return true;
         }
         
-        PluginLogger.warn("[isErrorMessage]Result is not an error message: " + result);
         return false;
     }
     
@@ -1265,8 +1216,13 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      */
     private void displayConversionResults(String results) {
         PluginLogger.info("[displayConversionResults]Displaying conversion results: " + results);
+        
+        // Reset operation context after conversion completes
+        currentOperation = OperationType.NONE;
+        
         setResultInformational(results); // Conversion results are informational, no action buttons needed
-        infoArea.append("\n" + i18n("utf8.conversion.completed")); // "UTF-8 conversion completed."
+        infoArea.append("\n" + i18n("utf8.conversion.completed") + "\n\n"); // "UTF-8 conversion completed."
+        resultArea.append("\n" + i18n("utf8.conversion.backing.up") + "\n"); // "The original files are backed up under the same directory:"
         currentNonUtf8Files = null;
     }
     

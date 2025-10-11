@@ -13,12 +13,18 @@
               <p>This plugin provides an AI-empowered markup assistant for editing TEI XML documents.</p>
               <h3>Release Notes v0.3.0:</h3>
               <ul>
-                     <li><strong>Complete Java Migration:</strong> Migrated entire implementation from JavaScript to pure Java for better performance and reliability</li>
-                     <li><strong>Enhanced UTF-8 Tools:</strong> Improved file encoding validation and conversion with automatic backup creation</li>
-                     <li><strong>Pure Java UI:</strong> Eliminated JavaScript-Java bridge issues with native Swing implementation</li>
-                     <li><strong>AI Markup Integration:</strong> Native Java integration with LLM APIs for markup processing</li>
-                     <li><strong>Tag Removal:</strong> Efficient Java-based XML/HTML tag removal functionality</li>
-                     <li>Support for common text file formats and recursive directory scanning</li>
+                     <li><strong>Complete Java Migration:</strong> Migrated entire implementation from JavaScript to pure Java for better performance and reliability
+                         <ul>
+                             <li><strong>Pure Java UI:</strong> Eliminated JavaScript-Java bridge issues with native Swing implementation</li>
+                             <li><strong>AI Markup Integration:</strong> Native Java integration with LLM APIs for markup processing</li>
+                             <li><strong>Tag Removal:</strong> Efficient Java-based XML/HTML tag removal functionality</li>
+                         </ul>
+                     </li>
+                     <li><strong>Enhanced UTF-8 Tools:</strong> Improved file encoding validation and conversion with automatic backup creation
+                         <ul>
+                             <li>Support for common text file formats and recursive directory scanning</li>
+                         </ul>
+                     </li>
               </ul>
               <h3>Release Notes v0.2.3:</h3>
               <ul>
