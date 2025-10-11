@@ -12,6 +12,7 @@ import ro.sync.exml.workspace.api.editor.page.text.WSTextEditorPage;
 import ro.sync.exml.plugin.workspace.WorkspaceAccessPluginExtension;
 
 import com.dila.dama.plugin.utf8.UTF8ValidationService;
+import com.dila.dama.plugin.util.PluginLogger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,7 +33,6 @@ import java.util.concurrent.Executors;
  */
 public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPluginExtension {
     
-    private static final boolean DEBUG = getDebugMode();
     private static final String OPTIONS_PAGE_KEY = "dila_ai_markup_options_page_key";
     private StandalonePluginWorkspace pluginWorkspaceAccess;
     private Object resources; // PluginResourceBundle - using Object to avoid type issues
@@ -48,9 +48,31 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     
     // UTF-8 workflow state
     private List<Path> currentNonUtf8Files = null;
+    // private int currentTotalFilesScanned = 0;
     
     // Thread pool for background operations
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
+    
+    /**
+     * Result class for UTF-8 check operation
+     */
+    private static class Utf8CheckResult {
+        private final List<Path> nonUtf8Files;
+        private final int totalFiles;
+        
+        public Utf8CheckResult(List<Path> nonUtf8Files, int totalFiles) {
+            this.nonUtf8Files = nonUtf8Files;
+            this.totalFiles = totalFiles;
+        }
+        
+        public List<Path> getNonUtf8Files() {
+            return nonUtf8Files;
+        }
+        
+        public int getTotalFiles() {
+            return totalFiles;
+        }
+    }
     
     /**
      * Called when the application starts - implements WorkspaceAccessPluginExtension
@@ -59,7 +81,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     public void applicationStarted(StandalonePluginWorkspace workspace) {
         try {
             if (workspace == null) {
-                logDebug("Workspace is null, skipping initialization");
+                PluginLogger.warn("[applicationStarted]Workspace is null, skipping initialization");
                 return;
             }
             
@@ -67,31 +89,31 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             this.resources = workspace.getResourceBundle();
             this.optionStorage = workspace.getOptionsStorage();
             
-            logDebug("Starting DILA AI markup plugin (Pure Java Implementation)");
-            logDebug("Debug mode: " + DEBUG);
+            PluginLogger.info("[applicationStarted]Starting DILA AI markup plugin (Pure Java Implementation)");
+            PluginLogger.debug("[applicationStarted]PluginLogger.isDebugEnabled() mode: " + PluginLogger.isDebugEnabled());
             
             if (optionStorage != null) {
-                logDebug("Options storage available.");
+                PluginLogger.debug("[applicationStarted]Options storage available.");
                 // // Handle API key logging safely
                 // String apiKey = optionStorage.getSecretOption("dila.dama.api.key", "");
                 // String maskedApiKey = "";
                 // if (apiKey != null && apiKey.length() > 0) {
                 //     maskedApiKey = apiKey.replaceAll(".(?=.{4})", "*");
                 // }
-                // logDebug("API Key (masked except last 4 chars): " + maskedApiKey);
+                // PluginLogger.debug("API Key (masked except last 4 chars): " + maskedApiKey);
                 
                 // // Load model configuration
                 // String model = optionStorage.getOption("dila.dama.llm.model", "");
-                // logDebug("LLM Model: " + model);
+                // PluginLogger.debug("LLM Model: " + model);
             } else {
-                logDebug("No options storage available.");
+                PluginLogger.warn("[applicationStarted]No options storage available.");
             }
             
             // Add view component customizer
             workspace.addViewComponentCustomizer(new DAMAViewComponentCustomizer());
         } catch (Exception e) {
             // Handle exceptions gracefully during startup
-            logDebug("Exception during startup: " + e.getMessage());
+            PluginLogger.error("[applicationStarted]Exception during startup: " + e.getMessage());
             // Don't propagate exceptions from startup
         }
     }
@@ -104,7 +126,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         @Override
         public void customizeView(ViewInfo viewInfo) {
             if ("dila.ai.markup.view".equals(viewInfo.getViewID())) {
-                logDebug("Customizing DILA AI Markup view with pure Java implementation");
+                PluginLogger.info("[DAMAViewComponentCustomizer]Customizing DILA AI Markup view with pure Java implementation");
                 
                 // Create the main plugin panel
                 JPanel pluginPanel = createMainPanel();
@@ -112,8 +134,8 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                 // Set component and title
                 viewInfo.setComponent(pluginPanel);
                 viewInfo.setTitle(i18n("view.title")); // "DILA AI Markup Assistant", with translation
-                
-                logDebug("DILA AI Markup view customization completed");
+
+                PluginLogger.info("[DAMAViewComponentCustomizer]DILA AI Markup view customization completed");
             }
         }
     }
@@ -213,13 +235,13 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                         darkTheme = (Boolean) isDarkMethod.invoke(colorTheme);
                     }
                 } catch (Exception e) {
-                    logDebug("Could not determine theme, using light theme");
+                    PluginLogger.error("[createOptionsMenu]Could not determine theme, using light theme");
                 }
             }
             
             // Use consistent naming with JavaScript version
             String iconPath = darkTheme ? "images/options_dark.png" : "images/options.png";
-            logDebug("Loading options icon: " + iconPath + " (dark theme: " + darkTheme + ")");
+            PluginLogger.debug("[createOptionsMenu]Loading options icon: " + iconPath + " (dark theme: " + darkTheme + ")");
             
             // Try multiple approaches to load the icon
             ImageIcon icon = loadPluginIcon(iconPath);
@@ -229,14 +251,14 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                 Image img = icon.getImage();
                 Image scaledImg = img.getScaledInstance(16, 16, Image.SCALE_SMOOTH);
                 menuOptions.setIcon(new ImageIcon(scaledImg));
-                logDebug("Options icon loaded successfully (size: " + icon.getIconWidth() + "x" + icon.getIconHeight() + ")");
+                PluginLogger.debug("[createOptionsMenu]Options icon loaded successfully (size: " + icon.getIconWidth() + "x" + icon.getIconHeight() + ")");
             } else {
-                logDebug("Options icon not found or invalid, using text label");
+                PluginLogger.debug("[createOptionsMenu]Options icon not found or invalid, using text label");
                 menuOptions.setText(i18n("menu.options"));  // "Options"
             }
             
         } catch (Exception e) {
-            logDebug("Error loading options icon: " + e.getMessage());
+            PluginLogger.error("[createOptionsMenu]Error loading options icon: " + e.getMessage());
             menuOptions.setText(i18n("menu.options"));  // "Options"
         }
         
@@ -252,22 +274,22 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         try {
             URL iconURL = getClass().getClassLoader().getResource(iconPath);
             if (iconURL != null) {
-                logDebug("Icon found via class loader: " + iconURL);
+                PluginLogger.debug("[loadPluginIcon]Icon found via class loader: " + iconURL);
                 return new ImageIcon(iconURL);
             }
         } catch (Exception e) {
-            logDebug("Class loader approach failed: " + e.getMessage());
+            PluginLogger.error("[loadPluginIcon]Class loader approach failed: " + e.getMessage());
         }
         
         // // Method 2: Try direct class resource
         // try {
         //     URL iconURL = getClass().getResource("/" + iconPath);
         //     if (iconURL != null) {
-        //         logDebug("Icon found via class resource: " + iconURL);
+        //         PluginLogger.debug("Icon found via class resource: " + iconURL);
         //         return new ImageIcon(iconURL);
         //     }
         // } catch (Exception e) {
-        //     logDebug("Class resource approach failed: " + e.getMessage());
+        //     PluginLogger.debug("Class resource approach failed: " + e.getMessage());
         // }
         
         // // Method 3: Try using plugin workspace to get plugin directory
@@ -278,13 +300,13 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         //         if (pluginDirPath != null) {
         //             File iconFile = new File(pluginDirPath, iconPath);
         //             if (iconFile.exists() && iconFile.canRead()) {
-        //                 logDebug("Icon found in plugin directory: " + iconFile.getAbsolutePath());
+        //                 PluginLogger.debug("Icon found in plugin directory: " + iconFile.getAbsolutePath());
         //                 return new ImageIcon(iconFile.getAbsolutePath());
         //             }
         //         }
         //     }
         // } catch (Exception e) {
-        //     logDebug("Plugin directory approach failed: " + e.getMessage());
+        //     PluginLogger.debug("Plugin directory approach failed: " + e.getMessage());
         // }
         
         // // Method 4: Try alternative naming patterns
@@ -300,15 +322,15 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         //     for (String altPath : alternativeNames) {
         //         URL iconURL = getClass().getClassLoader().getResource(altPath);
         //         if (iconURL != null) {
-        //             logDebug("Icon found with alternative path: " + altPath);
+        //             PluginLogger.debug("Icon found with alternative path: " + altPath);
         //             return new ImageIcon(iconURL);
         //         }
         //     }
         // } catch (Exception e) {
-        //     logDebug("Alternative naming approach failed: " + e.getMessage());
+        //     PluginLogger.debug("Alternative naming approach failed: " + e.getMessage());
         // }
         
-        logDebug("All icon loading methods failed for: " + iconPath);
+        PluginLogger.warn("[loadPluginIcon]All icon loading methods failed for: " + iconPath);
         return null;
     }
     
@@ -324,7 +346,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     //             return pluginDir.toString();
     //         }
     //     } catch (Exception e) {
-    //         logDebug("Could not get plugin directory via reflection: " + e.getMessage());
+    //         PluginLogger.debug("Could not get plugin directory via reflection: " + e.getMessage());
     //     }
         
     //     // Fallback: try to determine from code source
@@ -341,7 +363,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     //             }
     //         }
     //     } catch (Exception e) {
-    //         logDebug("Could not determine plugin directory from code source: " + e.getMessage());
+    //         PluginLogger.debug("Could not determine plugin directory from code source: " + e.getMessage());
     //     }
         
     //     return null;
@@ -396,10 +418,10 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     private class AIMarkupActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            logDebug("AI Markup action triggered");
+            PluginLogger.info("[AIMarkupActionListener]AI Markup action triggered");
             
             // Clear previous results
-            infoArea.setText(i18n("action.ai.markup.selected") + "\n"); // "Action selected: AI Markup (Use AI for reference tagging)"
+            infoArea.setText(i18n("action.ai.markup.selected") + "\n\n"); // "Action selected: AI Markup (Use AI for reference tagging)"
             resultArea.setText("");
             hideAllButtons();
             
@@ -411,7 +433,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             }
             
             infoArea.append(i18n("selected.text", selectedText) + "\n" // "Selected text: "
-                            + i18n("text.with.length", selectedText.length()) + "\n"); // "Text length: {0} characters"
+                            + i18n("text.with.length", selectedText.length()) + "\n\n"); // "Text length: {0} characters"
             
             // Process AI markup in background
             CompletableFuture.supplyAsync(() -> processAIMarkup(selectedText), executor)
@@ -433,10 +455,10 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     private class TagRemovalActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            logDebug("Tag Removal action triggered");
+            PluginLogger.info("[TagRemovalActionListener]Tag Removal action triggered");
             
             // Clear previous results
-            infoArea.setText(i18n("action.tag.removal.selected") + "\n"); // "Action selected: Tag Removal (Remove tags from selected text)."
+            infoArea.setText(i18n("action.tag.removal.selected") + "\n\n"); // "Action selected: Tag Removal (Remove tags from selected text)."
             resultArea.setText("");
             hideAllButtons();
             
@@ -448,7 +470,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             }
 
             infoArea.append(i18n("selected.text", selectedText) + "\n" // "\nSelected text: "
-                            + i18n("text.with.length", selectedText.length()) + "\n"); // "Text length: {0} characters"
+                            + i18n("text.with.length", selectedText.length()) + "\n\n"); // "Text length: {0} characters"
 
             // Process tag removal
             String result = processTagRemoval(selectedText);
@@ -462,10 +484,10 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     private class UTF8CheckActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            logDebug("UTF-8 Check action triggered");
+            PluginLogger.info("[UTF8CheckActionListener]UTF-8 Check action triggered");
             
             // Clear previous results
-            infoArea.setText(i18n("action.utf8.check.transfer.selected") + "\n"); // "Action selected: UTF-8 Check/Convert (Check and convert files to UTF-8 encoding)."
+            infoArea.setText(i18n("action.utf8.check.transfer.selected") + "\n\n"); // "Action selected: UTF-8 Check/Convert (Check and convert files to UTF-8 encoding)."
             resultArea.setText("");
             hideAllButtons();
             currentNonUtf8Files = null;
@@ -480,11 +502,11 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             if (result == JFileChooser.APPROVE_OPTION) {
                 File[] selectedFiles = fileChooser.getSelectedFiles();
                 if (selectedFiles != null && selectedFiles.length > 0) {
-                    infoArea.append(i18n("utf8.check.scanning.files") + "\n"); // "Scanning files for UTF-8 compliance..."
+                    infoArea.append(i18n("utf8.check.scanning.files") + "\n\n"); // "Scanning files for UTF-8 compliance..."
                     // Check files in background
                     CompletableFuture.supplyAsync(() -> checkUtf8Files(selectedFiles), executor)
-                        .thenAccept(nonUtf8Files -> SwingUtilities.invokeLater(() -> {
-                            displayUtf8CheckResults(nonUtf8Files);
+                        .thenAccept(checkResult -> SwingUtilities.invokeLater(() -> {
+                            displayUtf8CheckResults(checkResult);
                         }))
                         .exceptionally(throwable -> {
                             SwingUtilities.invokeLater(() -> {
@@ -503,17 +525,17 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     private class OptionsActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            logDebug("Options action triggered");
+            PluginLogger.info("[OptionsActionListener]Options action triggered");
             
             try {
                 if (pluginWorkspaceAccess != null) {
                     // Open options page using the same key as defined in plugin configuration
                     pluginWorkspaceAccess.showPreferencesPages(new String[]{OPTIONS_PAGE_KEY}, OPTIONS_PAGE_KEY, true);
                 } else {
-                    logDebug("Plugin workspace access is null, cannot open options");
+                    PluginLogger.warn("[OptionsActionListener]Plugin workspace access is null, cannot open options");
                 }
             } catch (Exception ex) {
-                logDebug("Error opening options page: " + ex.getMessage());
+                PluginLogger.error("[OptionsActionListener]Error opening options page: " + ex.getMessage());
             }
         }
     }
@@ -524,17 +546,19 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     private class ReplaceButtonActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            logDebug("Replace button triggered");
+            PluginLogger.info("[ReplaceButtonActionListener]Replace button triggered");
             
             String resultText = resultArea.getText();
             if (resultText == null || resultText.trim().isEmpty()) {
-                infoArea.append(i18n("no.text.to.replace")); // "No text to replace."
+                PluginLogger.warn("[ReplaceButtonActionListener]No text to replace");
+                infoArea.append("\n" + i18n("no.text.to.replace") + "\n"); // "No text to replace."
                 return;
             }
             
             // Check if we have selected text - reuse existing validation logic
             String currentSelection = fetchSelectedText(resultArea);
             if (currentSelection.isEmpty()) {
+                PluginLogger.warn("[ReplaceButtonActionListener]No selected text in editor");
                 // Error message already set by fetchSelectedText
                 return;
             }
@@ -560,42 +584,27 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                                 // Then insert the new text at the cursor position
                                 int currentOffset = textPage.getCaretOffset();
                                 
-                                // Use reflection to call insertTextAtOffset if available
-                                try {
-                                    java.lang.reflect.Method insertMethod = textPage.getClass().getMethod(
-                                        "insertTextAtOffset", String.class, int.class);
-                                    insertMethod.invoke(textPage, resultText, currentOffset);
-                                    logDebug("Text replaced by insertTextAtOffset successfully");
-                                } catch (NoSuchMethodException nsme) {
-                                    // Fallback: try using document insertion
-                                    javax.swing.text.Document doc = textPage.getDocument();
-                                    if (doc != null) {
-                                        doc.insertString(currentOffset, resultText, null);
-                                        logDebug("Text replaced by document insertion successfully");
-                                    } else {
-                                        infoArea.append(i18n("no.editor.open")); // "No open Text mode editor."
-                                        logDebug("No open Text mode editor.");
-                                        return;
-                                    }
-                                }
+                                // Use document insertion to add the new text (document should never be null for valid text page)
+                                javax.swing.text.Document doc = textPage.getDocument();
+                                doc.insertString(currentOffset, resultText, null);
+                                PluginLogger.info("[ReplaceButtonActionListener]Text replaced successfully via document insertion");
                                 
                                 infoArea.append(i18n("text.replaced")); // "\nSelected text has been replaced."
                                 hideAllButtons();
                                 // resultArea.setText(""); // Clear result area
                                 
                             } catch (Exception ex) {
-                                logDebug("Error during text replacement: " + ex.getMessage());
-                                infoArea.append(i18n("error.replacing.text", ex.getMessage())); // "\nError during text replacement: "
+                                PluginLogger.error("[ReplaceButtonActionListener]Error during text replacement: " + ex.getMessage());
+                                infoArea.append("\n" + i18n("error.replacing.text", ex.getMessage()) + "\n"); // "\nError during text replacement: "
                             }
-                        } else {
-                            infoArea.append(i18n("no.text.selected"));  // "No text selected in the editor."
                         }
+                        // Note: Selection validation already handled by fetchSelectedText() at method start
                     }
                     // Note: fetchSelectedText already handles non-text mode case
                 }
                 // Note: fetchSelectedText already handles no editor case
             } catch (Exception ex) {
-                logDebug("Error accessing editor: " + ex.getMessage());
+                PluginLogger.error("[ReplaceButtonActionListener]Error accessing editor: " + ex.getMessage());
                 setResultInformational(i18n("error.accessing.editor", ex.getMessage())); // "Error accessing editor: {0}"
             }
         }
@@ -607,14 +616,14 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     private class TransferButtonActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            logDebug("Transfer button triggered");
+            PluginLogger.info("[TransferButtonActionListener]Transfer button triggered");
             
             if (currentNonUtf8Files == null || currentNonUtf8Files.isEmpty()) {
-                infoArea.append(i18n("no.files.to.convert")); // "\nNo files to convert."
+                infoArea.append(i18n("no.files.to.convert") + "\n"); // "\nNo files to convert."
                 return;
             }
             
-            infoArea.append(i18n("utf8.Converting")); // "Converting files to UTF-8..."
+            infoArea.append(i18n("utf8.Converting") + "\n"); // "Converting files to UTF-8..."
             hideTransferButtons();
             
             // Convert files in background
@@ -636,7 +645,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     private class CancelButtonActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            logDebug("Cancel button triggered");
+            PluginLogger.info("[CancelButtonActionListener]Cancel button triggered");
             
             currentNonUtf8Files = null;
             hideTransferButtons();
@@ -659,10 +668,10 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                 java.lang.reflect.Method getMessageMethod = resources.getClass().getMethod("getMessage", String.class);
                 return (String) getMessageMethod.invoke(resources, key);
             }
-            logDebug("Resources not available for i18n key: " + key);
+            PluginLogger.warn("[i18n]Resources not available for i18n key: " + key);
             return key;
         } catch (Exception e) {
-            logDebug("Error getting i18n message for key " + key + ": " + e.getMessage());
+            PluginLogger.error("[i18n]Error getting i18n message for key " + key + ": " + e.getMessage());
             return key;
         }
     }
@@ -681,7 +690,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             }
             return message;
         } catch (Exception e) {
-            logDebug("Error formatting i18n message for key " + key + ": " + e.getMessage());
+            PluginLogger.error("[i18n]Error formatting i18n message for key " + key + ": " + e.getMessage());
             return key;
         }
     }
@@ -698,25 +707,25 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                     WSTextEditorPage textPage = (WSTextEditorPage) pageAccess;
                     String selectedText = textPage.getSelectedText();
                     if (selectedText != null && !selectedText.trim().isEmpty()) {
-                        logDebug("Current page is Text mode" + selectedText);
+                        PluginLogger.info("[fetchSelectedText]Current page is Text mode: " + selectedText);
                         return selectedText;
                     } else {
                         area.append(i18n("no.text.selected") + "\n"); // [shared] "No text selected in the editor."
-                        logDebug("No text selected in the editor");
+                        PluginLogger.warn("[fetchSelectedText]No text selected in the editor");
                         return ""; // No text selected
                     }
                 } else {
                     area.append(i18n("not.text.mode") + "\n"); // "Current page is not Text mode."
-                    logDebug("Current page is not Text mode");
+                    PluginLogger.warn("[fetchSelectedText]Current page is not Text mode");
                     return ""; // Non-text mode
                 }
             }
             area.append(i18n("no.editor.open") + "\n");  // [shared] "No open Text mode editor."
-            logDebug("No open editor");
+            PluginLogger.warn("[fetchSelectedText]No open editor");
             return ""; // No editor open
         } catch (Exception e) {
             area.append(i18n("error.fetching.selected.text", e.getMessage()) + "\n");  // "Error fetching selected text: {0}"
-            logDebug("Error fetching selected text: " + e.getMessage()); 
+            PluginLogger.error("[fetchSelectedText]Error fetching selected text: " + e.getMessage());
             return "";
         }
     }
@@ -738,13 +747,13 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      * For AI Markup and Tag Removal operations
      */
     private void setResultWithReplaceButton(String result) {
-        logDebug("[setResultWithReplaceButton]Setting result with replace button: " + result);
+        PluginLogger.info("[setResultWithReplaceButton]Setting result with replace button: " + result);
         resultArea.setText(result);
         if (isValidResultForReplacement(result)) {
-            logDebug("[setResultWithReplaceButton]Showing replace button");
+            PluginLogger.info("[setResultWithReplaceButton]Showing replace button");
             showReplaceButton();
         } else {
-            logDebug("[setResultWithReplaceButton]Hiding all buttons");
+            PluginLogger.info("[setResultWithReplaceButton]Hiding all buttons");
             hideAllButtons();
         }
     }
@@ -754,13 +763,13 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      * For UTF-8 Check/Convert operations
      */
     private void setResultWithConversionButtons(String result) {
-        logDebug("[setResultWithConversionButtons]Setting result with conversion buttons: " + result);
+        PluginLogger.info("[setResultWithConversionButtons]Setting result with conversion buttons: " + result);
         resultArea.setText(result);
         if (isValidResultForConversion(result)) {
-            logDebug("[setResultWithConversionButtons]Showing transfer buttons");
+            PluginLogger.info("[setResultWithConversionButtons]Showing transfer buttons");
             showTransferButtons();
         } else {
-            logDebug("[setResultWithConversionButtons]Hiding all buttons");
+            PluginLogger.info("[setResultWithConversionButtons]Hiding all buttons");
             hideAllButtons();
         }
     }
@@ -770,8 +779,8 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      * For completed operations or final status messages
      */
     private void setResultInformational(String result) {
-        logDebug("[setResultInformational]Setting result as informational: " + result);
-        resultArea.setText(result);
+        PluginLogger.info("[setResultInformational]Setting result as informational: " + result);
+        resultArea.append(result);
         hideAllButtons();
     }
     
@@ -781,19 +790,19 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      */
     private boolean isValidResultForReplacement(String result) {
         if (result == null || result.trim().isEmpty()) {
-            logDebug("[isValidResultForReplacement]Invalid result for replacement: " + result);
+            PluginLogger.warn("[isValidResultForReplacement]Invalid result for replacement: " + result);
             return false;
         }
         
         // Check for error patterns in both English and i18n messages
         if (isErrorMessage(result)) {
-            logDebug("[isValidResultForReplacement]Result is an error message, not valid for replacement: " + result);
+            PluginLogger.warn("[isValidResultForReplacement]Result is an error message, not valid for replacement: " + result);
             return false;
         }
         
         // Only allow actual processed text content for replacement
         // AI Markup and Tag Removal should produce clean text or XML markup
-        logDebug("[isValidResultForReplacement]Result is valid for replacement: " + result);
+        PluginLogger.info("[isValidResultForReplacement]Result is valid for replacement: " + result);
         return true;
     }
     
@@ -802,19 +811,19 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      */
     private boolean isValidResultForConversion(String result) {
         if (result == null || result.trim().isEmpty()) {
-            logDebug("[isValidResultForConversion]Invalid result for conversion: " + result);
+            PluginLogger.info("[isValidResultForConversion]Invalid result for conversion: " + result);
             return false;
         }
         
         // Error messages should not show conversion buttons
         if (isErrorMessage(result)) {
-            logDebug("[isValidResultForConversion]Result is an error message, not valid for conversion: " + result);
+            PluginLogger.warn("[isValidResultForConversion]Result is an error message, not valid for conversion: " + result);
             return false;
         }
         
         // Check for UTF-8 scan results that indicate files need conversion using i18n
         if (result.startsWith(i18n("utf8.check.found.non.utf8").split("\\{")[0].trim())) {
-            logDebug("[isValidResultForConversion]Result indicates files need conversion: " + result);
+            PluginLogger.info("[isValidResultForConversion]Result indicates files need conversion: " + result);
             return true;
         }
         
@@ -822,11 +831,11 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         if (result.equals(i18n("utf8.all.valid")) ||
             result.equals(i18n("utf8.conversion.completed")) ||
             result.startsWith(i18n("utf8.conversion.summary").split("\\{")[0].trim())) {
-            logDebug("[isValidResultForConversion]Result is a completion message, not valid for conversion: " + result);
+            PluginLogger.info("[isValidResultForConversion]Result is a completion message, not valid for conversion: " + result);
             return false;
         }
 
-        logDebug("[isValidResultForConversion]Result does not indicate files need conversion: " + result);
+        PluginLogger.warn("[isValidResultForConversion]Result does not indicate files need conversion: " + result);
         return false;
     }
     
@@ -835,7 +844,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      */
     private boolean isErrorMessage(String result) {
         if (result == null) {
-            logDebug("[isErrorMessage]Result is null, not an error message");
+            PluginLogger.warn("[isErrorMessage]Result is null, not an error message");
             return false;
         }
         
@@ -854,7 +863,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         for (String errorKey : errorKeys) {
             String errorMessage = i18n(errorKey, "").split("\\{")[0].trim(); // Get message without parameter placeholders
             if (!errorMessage.equals(errorKey) && result.startsWith(errorMessage)) {
-                logDebug("[isErrorMessage]Result is an i18n error message: " + result);
+                PluginLogger.warn("[isErrorMessage]Result is an i18n error message: " + result);
                 return true;
             }
         }
@@ -865,11 +874,11 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             lowerResult.startsWith("http error") || 
             lowerResult.contains("exception") ||
             lowerResult.contains("failed")) {
-            logDebug("[isErrorMessage]Result is an English error message: " + result);
+            PluginLogger.warn("[isErrorMessage]Result is an English error message: " + result);
             return true;
         }
         
-        logDebug("[isErrorMessage]Result is not an error message: " + result);
+        PluginLogger.warn("[isErrorMessage]Result is not an error message: " + result);
         return false;
     }
     
@@ -922,12 +931,12 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             StringBuilder errors = new StringBuilder();
             
             if (apiKey == null || apiKey.trim().isEmpty()) {
-                logDebug("API key not configured");
+                PluginLogger.warn("[processAIMarkup]API key not configured");
                 errors.append(i18n("error.no.APIKey")); // "Error: API key not configured. Please set up your API key in Preferences."
             }
             
             if (parseModel == null || parseModel.trim().isEmpty()) {
-                logDebug("Parse model not configured");
+                PluginLogger.warn("[processAIMarkup]Parse model not configured");
                 if (errors.length() > 0) {
                     errors.append("\n");
                 }
@@ -938,7 +947,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                 return errors.toString();
             }
             
-            logDebug("Making AI Markup API call with model: " + parseModel);
+            PluginLogger.info("[processAIMarkup]Making AI Markup API call with model: " + parseModel);
             
             // Create HTTP connection
             URL url = new URL("https://api.openai.com/v1/chat/completions");
@@ -989,13 +998,13 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                         errorResponse.append(errorLine);
                     }
                 }
-                logDebug("AI Markup HTTP error response: " + errorResponse.toString());
+                PluginLogger.error("[processAIMarkup]AI Markup HTTP error response: " + errorResponse.toString());
                 // return "HTTP Error " + responseCode + ": " + errorResponse.toString();
                 return i18n("http.error", responseCode, errorResponse.toString()); // "HTTP Error {0}: {1}"
             }
             
         } catch (Exception e) {
-            logDebug("AI Markup error: " + e.getMessage());
+            PluginLogger.error("[processAIMarkup]AI Markup error: " + e.getMessage());
             return i18n("llm.error", e.getMessage()); // "\nError calling language model: \n{0}"
         }
     }
@@ -1059,7 +1068,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             }
             
         } catch (Exception e) {
-            logDebug("Error parsing OpenAI response: " + e.getMessage());
+            PluginLogger.error("[processAIMarkup]Error parsing OpenAI response: " + e.getMessage());
             return "Error parsing response: " + e.getMessage();
         }
     }
@@ -1096,13 +1105,13 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         if (text == null || text.trim().isEmpty()) {
             return "";
         }
-        
-        logDebug("Processing tag removal for text length: " + text.length());
-        
+
+        PluginLogger.info("[processTagRemoval]Processing tag removal for text length: " + text.length());
+
         // Remove XML/HTML tags using regex
         String cleanedText = text.replaceAll("<[^>]*>", "");
-        
-        logDebug("Tag removal completed. Original length: " + text.length() + 
+
+        PluginLogger.info("[processTagRemoval]Tag removal completed. Original length: " + text.length() +
                 ", cleaned length: " + cleanedText.length());
         
         return cleanedText;
@@ -1111,7 +1120,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     /**
      * Check UTF-8 encoding of files using Java service
      */
-    private List<Path> checkUtf8Files(File[] selectedFiles) {
+    private Utf8CheckResult checkUtf8Files(File[] selectedFiles) {
         List<Path> nonUtf8Files = new ArrayList<>();
         int totalFiles = 0;
         
@@ -1119,8 +1128,8 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             totalFiles += scanFileOrDirectory(file.toPath(), nonUtf8Files);
         }
         
-        logDebug("[checkUtf8Files]UTF-8 check completed. Total files: " + totalFiles + ", Non-UTF-8: " + nonUtf8Files.size());
-        return nonUtf8Files;
+        PluginLogger.info("[checkUtf8Files]UTF-8 check completed. Total files: " + totalFiles + ", Non-UTF-8: " + nonUtf8Files.size());
+        return new Utf8CheckResult(nonUtf8Files, totalFiles);
     }
     
     /**
@@ -1131,15 +1140,21 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         
         try {
             if (Files.isDirectory(path)) {
+                // Collect all text files first to avoid stream reuse issues
+                List<Path> textFiles;
                 try (java.util.stream.Stream<Path> stream = Files.walk(path)) {
-                    stream.filter(Files::isRegularFile)
-                          .filter(this::isTextFile)
-                          .forEach(file -> {
-                              if (!UTF8ValidationService.isValidUtf8(file)) {
-                                  nonUtf8Files.add(file);
-                              }
-                          });
-                    count = (int) stream.filter(Files::isRegularFile).count();
+                    textFiles = stream
+                        .filter(Files::isRegularFile)
+                        .filter(this::isTextFile)
+                        .collect(java.util.stream.Collectors.toList());
+                }
+                
+                // Check each file for UTF-8 encoding
+                count = textFiles.size();
+                for (Path file : textFiles) {
+                    if (!UTF8ValidationService.isValidUtf8(file)) {
+                        nonUtf8Files.add(file);
+                    }
                 }
             } else if (Files.isRegularFile(path) && isTextFile(path)) {
                 count = 1;
@@ -1148,7 +1163,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                 }
             }
         } catch (IOException e) {
-            logDebug("Error scanning path " + path + ": " + e.getMessage());
+            PluginLogger.error("[scanFileOrDirectory]Error scanning path " + path + ": " + e.getMessage());
         }
         
         return count;
@@ -1158,7 +1173,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      * Check if file is likely a text file
      */
     private boolean isTextFile(Path path) {
-        logDebug("[isTextFile]Checking if file is a text file: " + path);
+        PluginLogger.info("[isTextFile]Checking if file is a text file: " + path);
         String fileName = path.getFileName().toString().toLowerCase();
         String[] textExtensions = {".xml", ".txt", ".html", ".htm", ".xhtml", ".css", ".js", 
                                   ".json", ".md", ".properties", ".java", ".py", ".php", ".rb", 
@@ -1175,18 +1190,21 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     /**
      * Display UTF-8 check results(i18n)
      */
-    private void displayUtf8CheckResults(List<Path> nonUtf8Files) {
+    private void displayUtf8CheckResults(Utf8CheckResult result) {
+        List<Path> nonUtf8Files = result.getNonUtf8Files();
+        int totalFiles = result.getTotalFiles();
+        
         if (nonUtf8Files.isEmpty()) {
             // infoArea.append(i18n("utf8.all.valid") + "\n"); // "All files are valid UTF-8!"
             setResultInformational(i18n("utf8.all.valid")); // "All files are valid UTF-8!"
-            logDebug("[displayUtf8CheckResults]All files are valid UTF-8");
+            PluginLogger.info("[displayUtf8CheckResults]All files are valid UTF-8 (Total scanned: " + totalFiles + ")");
             return;
         }
         
         currentNonUtf8Files = nonUtf8Files;
         
         StringBuilder info = new StringBuilder();
-        info.append(i18n("utf8.check.found.non.utf8", nonUtf8Files.size())).append("\n"); // "Found {0} files that are not valid UTF-8:"
+        info.append(i18n("utf8.check.found.non.utf8", nonUtf8Files.size(), totalFiles)).append("\n"); // "Found {0} files that are not valid UTF-8 out of {1} files:"
         
         int displayCount = Math.min(10, nonUtf8Files.size());
         for (int i = 0; i < displayCount; i++) {
@@ -1198,7 +1216,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         }
         
         // infoArea.setText(info.toString());
-        logDebug("UTF-8 check results: " + info.toString());
+        PluginLogger.info("[displayUtf8CheckResults]UTF-8 check results: " + info.toString());
         setResultWithConversionButtons(info.toString()); // This will show transfer/cancel buttons if validation passes
     }
     
@@ -1225,15 +1243,15 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                    .append(" - ").append(failure.getError()).append("\n");
         }
         
-        logDebug("[convertFilesToUtf8]UTF-8 conversion summary: Successes=" + successCount + ", Failures=" + failureCount);        
-        logDebug("[convertFilesToUtf8]UTF-8 conversion results:\n" + results.toString());
+        PluginLogger.info("[convertFilesToUtf8]UTF-8 conversion summary: Successes=" + successCount + ", Failures=" + failureCount);        
+        PluginLogger.info("[convertFilesToUtf8]UTF-8 conversion results:\n" + results.toString());
         
         // Fix: Handle empty results case and ensure proper formatting
         String detailsText = results.length() > 0 ? results.toString() : i18n("utf8.conversion.no.details");
         
         // Fix: Use a more structured approach to build the summary message
         StringBuilder summaryBuilder = new StringBuilder();
-        summaryBuilder.append(i18n("utf8.conversion.summary.header")).append("\n\n");
+        summaryBuilder.append("\n").append(i18n("utf8.conversion.summary.header")).append("\n\n");
         summaryBuilder.append(i18n("utf8.conversion.success.count", String.valueOf(successCount))).append("\n");
         summaryBuilder.append(i18n("utf8.conversion.failure.count", String.valueOf(failureCount))).append("\n\n");
         summaryBuilder.append(i18n("utf8.conversion.details.header")).append("\n");
@@ -1246,53 +1264,10 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      * Display conversion results
      */
     private void displayConversionResults(String results) {
-        logDebug("[displayConversionResults]Displaying conversion results: " + results);
+        PluginLogger.info("[displayConversionResults]Displaying conversion results: " + results);
         setResultInformational(results); // Conversion results are informational, no action buttons needed
-        infoArea.append(i18n("utf8.conversion.completed")); // "UTF-8 conversion completed."
+        infoArea.append("\n" + i18n("utf8.conversion.completed")); // "UTF-8 conversion completed."
         currentNonUtf8Files = null;
-    }
-    
-    // ===============================[displayConversionResults]=========
-    // Static utility methods
-    // ========================================
-    
-    /**
-     * Determine debug mode from environment or system properties
-     */
-    private static boolean getDebugMode() {
-        try {
-            String debugEnv = System.getenv("DILA_DEBUG");
-            if (debugEnv != null) {
-                return "true".equalsIgnoreCase(debugEnv);
-            }
-        } catch (Exception e) {
-            // Continue to system property check
-        }
-        
-        try {
-            String debugProp = System.getProperty("dila.debug");
-            if (debugProp != null) {
-                return "true".equalsIgnoreCase(debugProp);
-            }
-        } catch (Exception e) {
-            // Use default
-        }
-        
-        return false; // Default value
-    }
-    
-    /**
-     * Log debug messages
-     */
-    private static void logDebug(String message) {
-        if (DEBUG) {
-            try {
-                java.io.PrintStream ps = new java.io.PrintStream(System.err, true, "UTF-8");
-                ps.println("[" + new Date() + "] " + message);
-            } catch (java.io.UnsupportedEncodingException e) {
-                System.err.println("[" + new Date() + "] " + message);
-            }
-        }
     }
     
     /**
@@ -1300,7 +1275,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      */
     @Override
     public boolean applicationClosing() {
-        logDebug("Closing DILA AI Markup plugin (Pure Java Implementation)");
+        PluginLogger.info("[applicationClosing]Closing DILA AI Markup plugin (Pure Java Implementation)");
         if (executor != null && !executor.isShutdown()) {
             executor.shutdown();
         }

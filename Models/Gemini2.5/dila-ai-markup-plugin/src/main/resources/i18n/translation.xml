@@ -304,9 +304,10 @@
     <val lang="zh_TW">檔案選擇已取消。</val>
   </key>
   <key value="utf8.check.found.non.utf8">
-    <val lang="en_US">Found {0} files that are not valid UTF-8:</val>
-    <val lang="zh_CN">發現 {0} 個非有效 UTF-8 編碼的檔案：</val>
-    <val lang="zh_TW">發現 {0} 個非有效 UTF-8 編碼的檔案：</val>
+    <comment>info.append()@displayUtf8CheckResults() - {0} = non-UTF-8 file count, {1} = total files scanned</comment>
+    <val lang="en_US">Found {0} files that are not valid UTF-8 out of {1} files:</val>
+    <val lang="zh_CN">在掃描的 {1} 個檔案中，發現 {0} 個非有效 UTF-8 編碼的檔案：</val>
+    <val lang="zh_TW">在掃描的 {1} 個檔案中，發現 {0} 個非有效 UTF-8 編碼的檔案：</val>
   </key>
   <key value="utf8.check.more.files">
     <val lang="en_US">and {0} more files</val>

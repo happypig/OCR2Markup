@@ -1,16 +1,10 @@
 package com.dila.dama.plugin.preferences;
 
+import com.dila.dama.plugin.util.PluginLogger;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-// import java.nio.ByteBuffer;
-// import java.nio.charset.CharacterCodingException;
-// import java.nio.charset.Charset;
-// import java.nio.charset.CharsetDecoder;
-// import java.nio.charset.CodingErrorAction;
-// import java.nio.file.Files;
-// import java.nio.file.Path;
-// import java.io.IOException;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -58,7 +52,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
   /**
    * Safe fallback values to prevent null pointer exceptions in Oxygen's options system.
    */
-  // private static final String SAFE_KEY_FALLBACK = "dila_safe_fallback";
+  private static final String SAFE_KEY_FALLBACK = "dila_safe_fallback";
   private static final String SAFE_VALUE_FALLBACK = "";
   
   /**
@@ -80,11 +74,6 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
    * Resource bundle for i18n support.
    */
   private PluginResourceBundle resources;
-  
-  // /**
-  //  * Keep a reference to the plugin workspace for resource bundle initialization.
-  //  */
-  // private PluginWorkspace pluginWorkspace;
 
   /**
    * Constructor - Initialize resource bundle early to ensure it's available for getTitle()
@@ -92,28 +81,28 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
   public DAMAOptionPagePluginExtension() {
     super();
     // Try to initialize resource bundle immediately using PluginWorkspaceProvider
-    initializeResourceBundleEarly();
+    // initializeResourceBundleEarly();
   }
 
-  /**
-   * Early initialization of resource bundle using PluginWorkspaceProvider.
-   * This ensures the resource bundle is available when getTitle() is called.
-   */
-  private void initializeResourceBundleEarly() {
-    try {
-      // Use PluginWorkspaceProvider to get the current workspace instance
-      PluginWorkspace workspace = PluginWorkspaceProvider.getPluginWorkspace();
-      if (workspace != null) {
-        System.err.println("DILA Plugin: Early resource bundle initialization via PluginWorkspaceProvider");
-        initializeResourceBundle(workspace);
-      } else {
-        System.err.println("DILA Plugin: PluginWorkspaceProvider returned null - resource bundle will be initialized later");
-      }
-    } catch (Exception e) {
-      System.err.println("[E] DILA Plugin: Failed early resource bundle initialization: " + e.getMessage());
-      // Resource bundle will be initialized later in init() method
-    }
-  }
+  // /**
+  //  * Early initialization of resource bundle using PluginWorkspaceProvider.
+  //  * This ensures the resource bundle is available when getTitle() is called.
+  //  */
+  // private void initializeResourceBundleEarly() {
+  //   try {
+  //     // Use PluginWorkspaceProvider to get the current workspace instance
+  //     PluginWorkspace workspace = PluginWorkspaceProvider.getPluginWorkspace();
+  //     if (workspace != null) {
+  //       PluginLogger.info(DAMAOptionPagePluginExtension.class, "Early resource bundle initialization via PluginWorkspaceProvider");
+  //       initializeResourceBundle(workspace);
+  //     } else {
+  //       PluginLogger.warn(DAMAOptionPagePluginExtension.class, "PluginWorkspaceProvider returned null - resource bundle will be initialized later");
+  //     }
+  //   } catch (Exception e) {
+  //     PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed early resource bundle initialization: " + e.getMessage());
+  //     // Resource bundle will be initialized later in init() method
+  //   }
+  // }
 
   /**
    * @see ro.sync.exml.plugin.option.OptionPagePluginExtension#apply(ro.sync.exml.workspace.api.PluginWorkspace)
@@ -121,22 +110,22 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
   @Override
   public void apply(PluginWorkspace pluginWorkspace) {
     try {
-      System.err.println("DILA Plugin: Applying option page settings...");
+      PluginLogger.info(DAMAOptionPagePluginExtension.class, "Applying option page settings...");
       
       // Ultra-defensive checks for system-wide preferences saving
       if (pluginWorkspace == null) {
-        System.err.println("DILA Plugin: PluginWorkspace is null in apply()");
+        PluginLogger.info(DAMAOptionPagePluginExtension.class, "PluginWorkspace is null in apply()");
         return; // Silently return without error
       }
       
       if (pluginWorkspace.getOptionsStorage() == null) {
-        System.err.println("DILA Plugin: OptionsStorage is null in apply()");
+        PluginLogger.info(DAMAOptionPagePluginExtension.class, "OptionsStorage is null in apply()");
         return; // Silently return without error
       }
       
       // Additional check: ensure text fields were initialized
       if (parseModelTextField == null || detectModelTextField == null || apiKeyTextField == null) {
-        System.err.println("DILA Plugin: Text fields not initialized in apply()");
+        PluginLogger.info(DAMAOptionPagePluginExtension.class, "Text fields not initialized in apply()");
         return; // Silently return without error
       }
       
@@ -155,34 +144,33 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       // CRITICAL: Both key and value must be non-null for ConcurrentHashMap.put()
       if (KEY_DILA_DAMA_FT_PARSE_MODEL != null && !KEY_DILA_DAMA_FT_PARSE_MODEL.trim().isEmpty() && parseModelText != null) {
         try {
-          System.err.println("DILA Plugin: Setting parse model: " + parseModelText);
+          PluginLogger.debug(DAMAOptionPagePluginExtension.class, "Setting parse model: " + parseModelText);
           pluginWorkspace.getOptionsStorage().setOption(KEY_DILA_DAMA_FT_PARSE_MODEL, parseModelText);
         } catch (Exception e) {
-          System.err.println("[E] DILA Plugin: Failed to set parse model option: " + e.getMessage());
+          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set parse model option: " + e.getMessage());
         }
       }
       if (KEY_DILA_DAMA_FT_DETECT_MODEL != null && !KEY_DILA_DAMA_FT_DETECT_MODEL.trim().isEmpty() && detectModelText != null) {
         try {
-          System.err.println("DILA Plugin: Setting detect model: " + detectModelText);
+          PluginLogger.debug(DAMAOptionPagePluginExtension.class, "Setting detect model: " + detectModelText);
           pluginWorkspace.getOptionsStorage().setOption(KEY_DILA_DAMA_FT_DETECT_MODEL, detectModelText);
         } catch (Exception e) {
-          System.err.println("[E] DILA Plugin: Failed to set detect model option: " + e.getMessage());
+          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set detect model option: " + e.getMessage());
         }
       }
       if (KEY_DILA_DAMA_API_KEY != null && !KEY_DILA_DAMA_API_KEY.trim().isEmpty() && apiKeyText != null) {
         try {
-          System.err.println("DILA Plugin: Setting API key: " + (apiKeyText.isEmpty() ? "[empty]" : "[***]"));
+          PluginLogger.debug(DAMAOptionPagePluginExtension.class, "Setting API key: " + (apiKeyText.isEmpty() ? "[empty]" : "[***]"));
           pluginWorkspace.getOptionsStorage().setSecretOption(KEY_DILA_DAMA_API_KEY, apiKeyText);
         } catch (Exception e) {
-          System.err.println("[E] DILA Plugin: Failed to set API key option: " + e.getMessage());
+          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set API key option: " + e.getMessage());
         }
       }
       
-      System.err.println("DILA Plugin: Options saved successfully");
+      PluginLogger.info(DAMAOptionPagePluginExtension.class, "Options saved successfully");
     } catch (Exception e) {
       // Log the error to prevent crashes during option saving
-      System.err.println("[E] DILA Plugin: Error saving options: " + e.getMessage());
-      e.printStackTrace();
+      PluginLogger.error(DAMAOptionPagePluginExtension.class, "Error saving options: " + e.getMessage(), e);
     }
   }
 
@@ -203,8 +191,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
         apiKeyTextField.setText(SAFE_VALUE_FALLBACK);
       }
     } catch (Exception e) {
-      System.err.println("[E] DILA Plugin: Error restoring defaults: " + e.getMessage());
-      e.printStackTrace();
+      PluginLogger.error(DAMAOptionPagePluginExtension.class, "Error restoring defaults: " + e.getMessage(), e);
     }
   }
 
@@ -214,7 +201,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
   @Override
   public String getTitle() {
     String title = DILA_DAMA_OPTIONS_PAGE_TITLE;
-    System.err.println("DILA Plugin: getTitle() returning: " + title);
+    PluginLogger.debug(DAMAOptionPagePluginExtension.class, "getTitle() returning: " + title);
 
     return title;
   }
@@ -233,24 +220,23 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       if (pluginWorkspace instanceof StandalonePluginWorkspace) {
         this.resources = ((StandalonePluginWorkspace) pluginWorkspace).getResourceBundle();
         if (this.resources != null) {
-          System.err.println("DILA Plugin: Resource bundle loaded successfully");
+          PluginLogger.info(DAMAOptionPagePluginExtension.class, "Resource bundle loaded successfully");
           // Test the resource bundle with a known key
           try {
-            String testMessage = this.resources.getMessage("preferences.page.title");
-            System.err.println("DILA Plugin: Test message for 'preferences.page.title': " + testMessage);
+            String testMessage = this.resources.getMessage("language");
+            PluginLogger.debug(DAMAOptionPagePluginExtension.class, "Test message for 'language': " + testMessage);
           } catch (Exception e) {
-            System.err.println("DILA Plugin: Test message failed: " + e.getMessage());
+            PluginLogger.debug(DAMAOptionPagePluginExtension.class, "Test message failed: " + e.getMessage());
           }
         } else {
-          System.err.println("DILA Plugin: Resource bundle is null - i18n translations may not work");
+          PluginLogger.info(DAMAOptionPagePluginExtension.class, "Resource bundle is null - i18n translations may not work");
         }
       } else {
-        System.err.println("DILA Plugin: PluginWorkspace is not StandalonePluginWorkspace - cannot access resource bundle");
+        PluginLogger.info(DAMAOptionPagePluginExtension.class, "PluginWorkspace is not StandalonePluginWorkspace - cannot access resource bundle");
         this.resources = null;
       }
     } catch (Exception e) {
-      System.err.println("[E] DILA Plugin: Failed to load resource bundle: " + e.getMessage());
-      e.printStackTrace();
+      PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to load resource bundle: " + e.getMessage(), e);
       this.resources = null;
     }
   }
@@ -262,17 +248,17 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
   public JComponent init(final PluginWorkspace pluginWorkspace) {
     try {
       // Ultra-defensive initialization for system-wide preferences loading
-      System.err.println("DILA Plugin: Initializing option page...");
+      PluginLogger.info(DAMAOptionPagePluginExtension.class, "Initializing option page...");
       
       // Check for null workspace early
       if (pluginWorkspace == null) {
-        System.err.println("DILA Plugin: PluginWorkspace is null in init()");
+        PluginLogger.info(DAMAOptionPagePluginExtension.class, "PluginWorkspace is null in init()");
         return createSimplePanel("Plugin workspace not available");
       }
       
       // Check if options storage is available
       if (pluginWorkspace.getOptionsStorage() == null) {
-        System.err.println("DILA Plugin: OptionsStorage is null in init()");
+        PluginLogger.info(DAMAOptionPagePluginExtension.class, "OptionsStorage is null in init()");
         return createSimplePanel("Options storage not available");
       }
 
@@ -340,7 +326,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
             String value = pluginWorkspace.getOptionsStorage().getOption(KEY_DILA_DAMA_FT_PARSE_MODEL, SAFE_VALUE_FALLBACK);
             ftParseModel = (value != null) ? value : SAFE_VALUE_FALLBACK;
           } catch (Exception e) {
-            System.err.println("[E] DILA Plugin: Failed to get parse model option: " + e.getMessage());
+            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get parse model option: " + e.getMessage());
             ftParseModel = SAFE_VALUE_FALLBACK;
           }
         }
@@ -349,7 +335,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
             String value = pluginWorkspace.getOptionsStorage().getOption(KEY_DILA_DAMA_FT_DETECT_MODEL, SAFE_VALUE_FALLBACK);
             ftDetectModel = (value != null) ? value : SAFE_VALUE_FALLBACK;
           } catch (Exception e) {
-            System.err.println("[E] DILA Plugin: Failed to get detect model option: " + e.getMessage());
+            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get detect model option: " + e.getMessage());
             ftDetectModel = SAFE_VALUE_FALLBACK;
           }
         }
@@ -358,7 +344,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
             String value = pluginWorkspace.getOptionsStorage().getSecretOption(KEY_DILA_DAMA_API_KEY, SAFE_VALUE_FALLBACK);
             apiKey = (value != null) ? value : SAFE_VALUE_FALLBACK;
           } catch (Exception e) {
-            System.err.println("[E] DILA Plugin: Failed to get API key option: " + e.getMessage());
+            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get API key option: " + e.getMessage());
             apiKey = SAFE_VALUE_FALLBACK;
           }
         }
@@ -378,8 +364,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       return panel;
     } catch (Exception e) {
       // Log the error and return a simple panel to prevent crashes
-      System.err.println("[E] DILA Plugin: Error initializing options page: " + e.getMessage());
-      e.printStackTrace();
+      PluginLogger.error(DAMAOptionPagePluginExtension.class, "Error initializing options page: " + e.getMessage(), e);
       return new JPanel(); // Return empty panel as fallback
     }
   }
@@ -413,7 +398,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
           return translation;
         }
       } catch (Exception e) {
-        System.err.println("[E] DILA Plugin: Error getting message for key '" + key + "': " + e.getMessage());
+        PluginLogger.error(DAMAOptionPagePluginExtension.class, "Error getting message for key '" + key + "': " + e.getMessage(), e);
       }
     }
     
@@ -428,7 +413,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       case "preferences.page.title":
         return "(Fallback)DILA AI Markup Assistant Options";
       default:
-        System.err.println("DILA Plugin: Using key as fallback for: " + key);
+        PluginLogger.debug(DAMAOptionPagePluginExtension.class, "Using key as fallback for: " + key);
         return key; // Return the key itself if no translation found
     }
   }
@@ -443,13 +428,12 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       // Ensure we NEVER return null - this is critical for Oxygen's options system
       String key = DILA_DAMA_OPTIONS_PAGE_KEY;
       if (key == null || key.trim().isEmpty()) {
-        System.err.println("DILA Plugin: Option page key is null/empty, using fallback");
+        PluginLogger.info(DAMAOptionPagePluginExtension.class, "Option page key is null/empty, using fallback");
         return SAFE_KEY_FALLBACK;
       }
       return key;
     } catch (Exception e) {
-      System.err.println("[E] DILA Plugin: Error in getKey(): " + e.getMessage());
-      e.printStackTrace();
+      PluginLogger.error(DAMAOptionPagePluginExtension.class, "Error in getKey(): " + e.getMessage(), e);
       // Return a guaranteed non-null, non-empty string
       return SAFE_KEY_FALLBACK;
     }

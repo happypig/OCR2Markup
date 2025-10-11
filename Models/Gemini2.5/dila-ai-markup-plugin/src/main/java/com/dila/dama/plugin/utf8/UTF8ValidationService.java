@@ -1,5 +1,7 @@
 package com.dila.dama.plugin.utf8;
 
+import com.dila.dama.plugin.util.PluginLogger;
+
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
