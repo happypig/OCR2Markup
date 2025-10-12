@@ -1,0 +1,1 @@
+This is a simple UTF-8 text file with special characters: äöü ñ ©

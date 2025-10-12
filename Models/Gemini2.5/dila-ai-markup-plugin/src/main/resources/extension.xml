@@ -2,19 +2,27 @@
 <xt:extensions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xt="http://www.oxygenxml.com/ns/extension" xsi:schemaLocation="http://www.oxygenxml.com/ns/extension http://www.oxygenxml.com/ns/extension/extensions.xsd">
     <xt:extension id="com.dila.ai.markup">
         <xt:location href="dilaAIMarkupPlugin.zip"/>
-        <xt:version>0.2.4</xt:version>
+        <xt:version>0.3.0</xt:version>
         <xt:oxy_version>27.0+</xt:oxy_version>
         <xt:type>plugin</xt:type>
         <xt:author>DILA DA</xt:author>
         <xt:name>DILA AI Markup Assistant</xt:name>
         <xt:description xmlns="http://www.w3.org/1999/xhtml">
             <p>This plugin provides an AI-empowered markup assistant for editing TEI XML documents.</p>
-              <h3>Release Notes v0.2.4:</h3>
+              <h3>Release Notes v0.3.0:</h3>
               <ul>
-                     <li>UTF-8 Check/Convert tool for file encoding validation and conversion</li>
-                     <li>Automatic backup creation before encoding conversion</li>
-                     <li>Support for common text file formats and recursive directory scanning</li>
-                     <li>User-driven encoding selection with comprehensive error handling</li>
+                     <li><strong>Complete Java Migration:</strong> Migrated entire implementation from JavaScript to pure Java for better performance and reliability
+                         <ul>
+                             <li><strong>Pure Java UI:</strong> Eliminated JavaScript-Java bridge issues with native Swing implementation</li>
+                             <li><strong>AI Markup Integration:</strong> Native Java integration with LLM APIs for markup processing</li>
+                             <li><strong>Tag Removal:</strong> Efficient Java-based XML/HTML tag removal functionality</li>
+                         </ul>
+                     </li>
+                     <li><strong>Enhanced UTF-8 Tools:</strong> Improved file encoding validation and conversion with automatic backup creation
+                         <ul>
+                             <li>Support for common text file formats and recursive directory scanning</li>
+                         </ul>
+                     </li>
               </ul>
               <h3>Release Notes v0.2.3:</h3>
               <ul>

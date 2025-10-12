@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="maven-antrun-" default="main">
+  <target name="main">
+    <copy file="C:\Project\OCR2Markup\Models\Gemini2.5\dila-ai-markup-plugin\target/dilaAIMarkupPlugin.zip" tofile="C:\Project\OCR2Markup\Models\Gemini2.5\dila-ai-markup-plugin/dilaAIMarkupPlugin.zip" failonerror="false" overwrite="true" />
+    <echo message="Copied dilaAIMarkupPlugin.zip from target to root directory" />
+  </target>
+</project>

@@ -1,0 +1,48 @@
+---
+generationTime: 2025-10-03T15:37:20.055Z
+---
+classDiagram
+    class Plugin {
+        +PluginDescriptor descriptor
+        +Plugin(PluginDescriptor descriptor)
+    }
+    
+    class DuplicateLinePlugin {
+        -DuplicateLinePlugin instance$
+        +DuplicateLinePlugin(PluginDescriptor descriptor)
+        +getInstance()$ DuplicateLinePlugin
+    }
+    
+    class DocumentPluginExtension {
+        <<interface>>
+        +process(DocumentPluginContext context) DocumentPluginResult
+    }
+    
+    class DuplicateLinePluginExtension {
+        <<abstract>>
+        #duplicateLine(DocumentPluginContext context, boolean isDown) void
+    }
+    
+    class DuplicateLineDownPluginExtension {
+        +process(DocumentPluginContext context) DocumentPluginResult
+    }
+    
+    class DuplicateLineUpPluginExtension {
+        +process(DocumentPluginContext context) DocumentPluginResult
+    }
+    
+    class DocumentPluginContext {
+        +getTextPage() WSTextEditorPage
+    }
+    
+    class DocumentPluginResult
+    
+    Plugin <|-- DuplicateLinePlugin
+    DocumentPluginExtension <|.. DuplicateLinePluginExtension
+    DuplicateLinePluginExtension <|-- DuplicateLineDownPluginExtension
+    DuplicateLinePluginExtension <|-- DuplicateLineUpPluginExtension
+    
+    DuplicateLineDownPluginExtension ..> DocumentPluginContext : uses
+    DuplicateLineUpPluginExtension ..> DocumentPluginContext : uses
+    DuplicateLineDownPluginExtension ..> DocumentPluginResult : returns
+    DuplicateLineUpPluginExtension ..> DocumentPluginResult : returns

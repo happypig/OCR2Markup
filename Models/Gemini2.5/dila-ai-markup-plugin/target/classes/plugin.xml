@@ -5,18 +5,26 @@
 <plugin 
        id="com.dila.ai.markup" 
        name="DILA AI Markup Assistant"
-       version="0.2.4" 
+       version="0.3.0" 
        vendor="DILA"
-       class="ro.sync.exml.plugin.Plugin" 
        classLoaderType="preferReferencedResources">
 
        <description>
               <p>This plugin provides an AI-empowered markup assistant for editing TEI XML documents.</p>
-              <h3>Release Notes v0.2.4:</h3>
+              <h3>Release Notes v0.3.0:</h3>
               <ul>
-                     <li>UTF-8 Check/Convert tool for file encoding validation and conversion</li>
-                     <li>Automatic backup creation before encoding conversion</li>
-                     <li>Support for common text file formats and recursive directory scanning</li>
+                     <li><strong>Complete Java Migration:</strong> Migrated entire implementation from JavaScript to pure Java for better performance and reliability
+                         <ul>
+                             <li><strong>Pure Java UI:</strong> Eliminated JavaScript-Java bridge issues with native Swing implementation</li>
+                             <li><strong>AI Markup Integration:</strong> Native Java integration with LLM APIs for markup processing</li>
+                             <li><strong>Tag Removal:</strong> Efficient Java-based XML/HTML tag removal functionality</li>
+                         </ul>
+                     </li>
+                     <li><strong>Enhanced UTF-8 Tools:</strong> Improved file encoding validation and conversion with automatic backup creation
+                         <ul>
+                             <li>Support for common text file formats and recursive directory scanning</li>
+                         </ul>
+                     </li>
               </ul>
               <h3>Release Notes v0.2.3:</h3>
               <ul>
@@ -44,14 +52,14 @@
        </description>
 
        <runtime>
-              <library name="lib/dila-ai-markup-plugin-0.2.4.jar" />
+              <library name="lib/dila-ai-markup-plugin-0.3.0.jar" />
        </runtime>
 
        <extension 
-              type="WorkspaceAccessJS" 
-              href="dila-ai-markup.js"/>
+              type="WorkspaceAccess" 
+              class="com.dila.dama.plugin.workspace.DAMAWorkspaceAccessPluginExtension"/>
               
-       <!-- Note: UTF-8 Check/Convert Tool is now integrated in dila-ai-markup.js (v0.2.4+) -->
+       <!-- Note: Complete Java Implementation - All functionality migrated from JavaScript to pure Java (v0.3.0) -->
 
        <extension 
               type="OptionPage" 

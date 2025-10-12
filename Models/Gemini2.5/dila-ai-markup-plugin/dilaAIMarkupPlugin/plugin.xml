@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The plugin.dtd file is located in the OXYGEN_INSATALL_DIR/plugins directory -->
+<!DOCTYPE plugin SYSTEM "../plugin.dtd">
+
+<plugin 
+       id="com.dila.ai.markup" 
+       name="DILA AI Markup Assistant"
+       version="0.3.0" 
+       vendor="DILA"
+       class="com.dila.dama.plugin.workspace.DAMAWorkspaceAccessPlugin" 
+       classLoaderType="preferReferencedResources">
+
+       <description>
+              <p>This plugin provides an AI-empowered markup assistant for editing TEI XML documents.</p>
+              <h3>Release Notes v0.3.0:</h3>
+              <ul>
+                     <li>Complete JavaScript-to-Java conversion for improved performance and maintainability</li>
+                     <li>Native Java AI Markup Assistant extension with enhanced UI integration</li>
+                     <li>Dual-extension architecture: AI Markup Assistant + Options/Preferences</li>
+                     <li>Enhanced UTF-8 validation with comprehensive file processing capabilities</li>
+                     <li>Multi-threaded operations with proper background processing</li>
+                     <li>Improved error handling and user feedback mechanisms</li>
+                     <li>UTF-8 Check/Convert tool for file encoding validation and conversion</li>
+                     <li>Automatic backup creation before encoding conversion</li>
+                     <li>Support for common text file formats and recursive directory scanning</li>
+              </ul>
+              <h3>Release Notes v0.2.3:</h3>
+              <ul>
+                     <li>Oxygen Integrated Options-Preferences page for setting ft LLM models and API key</li>
+              </ul>
+              <h3>Release Notes v0.2.2:</h3>
+              <ul>
+                     <li>Options saved with Oxygen's wsOptionsStorage approach</li>
+                     <li>API key saved and retrieved with better security by Oxygen's secretOption</li>
+              </ul>
+              <h3>Release Notes v0.2.1:</h3>
+              <ul>
+                     <li>Issue fixed: Error calling LLM after saving options caused by API key handling</li>
+              </ul>
+              <h3>Release Notes v0.2.0:</h3>
+              <ul>
+                     <li>Multi-language support (English, Chinese-Traditional Chinese for plugin only)</li>
+                     <li>Custom Options-Preferences page for setting ft LLM models and API key</li>
+              </ul>
+              <h3>Release Notes v0.1.0:</h3>
+              <ul>
+                     <li>AI-driven markup for unmarked references</li>
+                     <li>TEI tag removal</li>
+              </ul>
+       </description>
+
+       <runtime>
+              <library name="lib/dila-ai-markup-plugin-0.3.0.jar" />
+       </runtime>
+
+       <!-- AI Markup Assistant Extension (Java Implementation) -->
+       <extension 
+              type="WorkspaceAccess" 
+              class="com.dila.dama.plugin.workspace.DAMAWorkspaceAccessPluginExtension"/>
+
+       <!-- Options/Preferences Extension (Java Implementation) -->
+       <extension 
+              type="OptionPage" 
+              class="com.dila.dama.plugin.preferences.DAMAOptionPagePluginExtension"/>
+              
+       <view 
+              id="dila.ai.markup.view"
+              initialSide="WEST"
+              initialState="docked"/>
+</plugin>
