@@ -23,10 +23,10 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <oxygen.sdk.version>27.1.0.3</oxygen.sdk.version>
-    <!-- Upgraded to Java 21 -->
-    <maven.compiler.source>21</maven.compiler.source>
-    <maven.compiler.target>21</maven.compiler.target>
-    <maven.compiler.release>21</maven.compiler.release>
+    <!-- Upgraded to Java 25 -->
+    <maven.compiler.source>25</maven.compiler.source>
+    <maven.compiler.target>25</maven.compiler.target>
+    <maven.compiler.release>25</maven.compiler.release>
   </properties>
 
   <repositories>
@@ -110,9 +110,9 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.11.0</version>
         <configuration>
-          <source>21</source>
-          <target>21</target>
-          <release>21</release>
+          <source>25</source>
+          <target>25</target>
+          <release>25</release>
           <debug>true</debug>
         </configuration>
       </plugin>
