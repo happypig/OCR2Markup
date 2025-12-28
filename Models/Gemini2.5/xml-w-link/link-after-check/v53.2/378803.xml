@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../cref.rnc" type="application/relax-ng-compact-syntax"?>
+<?xml-stylesheet type="text/css" href="../../markup2.css"?>
+<root xml:lang="jp"> 『中観心論』の書名と成立をめぐる諸問題 斎藤明 はじめに-問題の所在- バーヴィヴェーカの主著である『中観心論(頌)』〓adhyamakahrduya
+    (karika) (MHk)1)と,その自注として伝わる『論理の炎』tarkaival )をめぐっては, 近年の研究により,テキスト校訂や訳注研究が進められるなかで,いくつかの新
+    たな問題も浮き彫りにされてきた.本稿では,『論理の炎』の著者問題を論じる 前段階として,同じバーヴィヴェーカに帰せられるMhK,『中論』釈の『般若灯
+    論』(pp),および『大乗掌珍論』(玄奘訳,以下『掌珍論』と略称)の先後関係, MHKの書名ならびに成立に関する諸問題をめぐり,従来の研究を批判的に総括 しながら再考してみたい.
+    〓.バーヴィヴェーカの著作とその成立順序 ppの著者であるバーヴィヴェーカ2)(490-570頃)が,Mhk,および有為空・無
+    為空を論じる『掌珍論』の著者でもあったことは,江島[1980]の論証によりほ ぼ確定した.ただし,多少なりとも問題が残るのは,これら3著作の成立順序で
+    ある.氏によれば,ppおよび『掌珍論』がMHKに言及している点を根拠に, 「ppと『掌珍論』が後のものであることが確定された.」という3).
+    この中で,まず『掌珍論』がMHKの成立を前提としていることについては, MHKの別称と考えられる『入眞甘露』*tatrvamrtauataraへの2箇所の言及から推
+    して問題はない.その〓つは,有為空を論じる上卷内で,遍計所執自性=空,依 他起自性=有を主張する「相應論師」,つまり〓伽行派(yogacara)の問いに対す
+    る回答の中で,「廣く入眞甘露に已に具に分別せるが如し.」4)と語る箇所である. また他の〓つは,無為空を論じる下卷において,真如の実有性を主張する同じ相
+    應論師に対する回答の中で,「入眞甘露に已に具に分別せり.」5)という箇所であ る.いずれも,MHKの第5章の中ですでに詳細に論じた通りであるという趣旨
+    68)『中観心論』の書名と成立をめぐる諸問題(斎藤 を語っている. これに対して,ppがMHkの名に言及するのは1箇所で,『中論』第25「涅槃
+    の考察」章の中の最終第24偈に関連させて,瑜伽行派の三性説を批判するくだ りの末尾に見られる.バーヴィヴェーカはそこで,
+    「詳細な考察は,『中観心論』*ルadhyamakahrcauaの「真実への入門」*tattvavataraの章で 瑜伽行派とともになすであろう.」(pp.dta248a-7,p
+    tsa311b3-4 dpyad (spyad p)pe rgyas parni dbu ma'i snying po'i de kho na la 'jug pa'i skabs nas
+    rnal 'byor spyod pa pa dag dang lhan cig byed par 'gyur rof )
+    という.ここでは,『中観心論』が書名を意味し,「真実への入門」については, 広くは第3章での「真実智の探究」tattvainanaisanaをふまえた上で,仏教内外の
+    各派の「真実」説をめぐって批判的な考察を展開し,一様にtattva (viniscaya)- vataraの章題をもつ第4章から第9章をさすと考えることもできる.ただし,今
+    ここでは「瑜伽行派とともに」,つまり〓伽行派の諸論師による三性説を中心と した「真実」説を前主張に置き,それに対する批判的な考察を行っている第5章 に限定されることになる6)
+    事実また,アヴァローキタヴラタも,該当する章を第5章に限定した上で 「[先に引用したppの一文]は,大乗中観派の定説を示し,また唯識論者の定説は理に合
+    わないという詳細な考察は,バーヴィヴェーカ師自身が,『論理の炎』という名の,「根 本中論頌」たる『中観心論』の注釈の中で,「瑜伽行派の真実への入門」という章で説く
+    であろう,というようにまた結合するのである.」(下線部は先のppからの部分的な引用 語句に相当する.)(prainaprudipatika, -3,3……zhes bya ba ni theg
+    pa chen po dbu ma pai gzhung bstan pa dang, rnamm par shes pa tsamm du smra ba dag gi gzhung mi
+    thad par dpyad pa rgyas parni i slob dpon legs ldan byed nyid kyis dbu mairtsa ba'i tshig le. ur
+    byas pa dbu mna'i snying po'i' grel pa rtog ge 'bar ba zhes bya ba'i nang nas rnal 'byor spyod
+    pe )a'i (pa p) de kho na la 'jug pa zhes bya ba'i skabs nas ston par 'gyur ro hes bya bar yang
+    sbya rot ) と語る.これによれば,先のppの一文は,MhKそのものというよりは,その巨 注である『論理の炎』の第5章で詳細な考察がなされることを意味しているとい
+    う.なお,この中の「根本中論頌」*ulamadhyamakakurikaは,Nagariuna作の同 書ではなく,中観学説の心髄を説く-註釈書『論理の炎』に対する-根本偈
+    の意味で,『中観心論頌』をさすと理解すべきであろう アヴァローキタヴラタの解説に従うなら,MHkの著者バーヴィヴェーカは, 〓
+    自注であるtjをも著したことになる.しかしながら,ここでまず注目されるの は,先の『掌珍論』とppに直接出る表現からは,『入眞甘露』あるいは『中観心
+    論』と呼ばれる著作が両書とは別にあり,瑜伽行派に対する詳細な批判をその中 で行ったという事実のみが知られるという点である
+    次にまた,見逃せないのは,ppがMHKの書名に言及しているのは,瑜伽行派 の三性説批判を展開する先の〓箇所のみであるということである7).この三性説
+    批判は,『中論』第25章の最終偈:「すべての認識は静まり(sarvopalambhopasamah), 戯論が静まり,吉祥である.ブッダは,どこにおいても,誰に対しても,いかな
+    る法も説かれていない.」8)に対する註釈の中で,偈頌に対する一通りの説明を終 えたあとに-チベツト語訳では「卷」(bam po)を改めて-置かれる.
+    その論議はまず,「すべての認識は静まり」の句をめぐって,すべての認識が 静まっているということ,-この点を理解するための方便としての依他起「性
+    を損減するのは妥当ではないという〓伽行派の前主張を置き9),その後,三性討 および方便唯識説に対してそれぞれに批判を加えるという構成をもつ.これは
+    偈頌に対する純然たる註釈というよりは,むしろ,真実(tattva)や真如(tathata) を対象化することなく認識するという智のあり方を重視するバーヴィヴェーカ
+    が10),あえて当該の句に関連させて三性説および方便唯識説に対する批判を展開 するという性格が色濃い.ppがmHKに言及するのはこの箇所のみであり,この 点で,『明句論』prasannapa
+    (sp)が総計で19度『入中論』に言及し,「『入牛 論』において規定された方法により…」(machyamakavatara-vihitavidhina, psp p.2),
+    「そしてこれら二諦の区別は,『入中論』によって詳細に確認されねばならない. (anayos ca satyayor vibhago vistarena madhyamakavatarad
+    avaseyah/, pspp494.1-2)等と語り 『入中論』が『明旬論』に先行することがほぼ確定している例とはかなり事情か 異なっている.
+    第3にまた見逃せないのは,ppが言及する,MHKにおける三性説に対する詳 細な考察についても,先の一文は「なすであろう」byed par 'gyurro*karisyami.
+    etc.),あるいはアヴァローキタヴラタの表現を借りれば,「説くであろう」stonp 'gyurro(*pratipadayisyami, desayisyami,
+    etc.)と結んでいる点である. 以上の考察から推定されるのは,まず第1に,mhKが『掌珍論』に先行する のは確かであるが,ppについては,MHKとの先後関係は微妙であり,ほぼ同時
+    並行して成立したか,あるいはまたMHKの完成がppよりも遅れた可能性も否 定できないということである.第2にまた,MHKの最初期の書名は,『入眞甘露』
+    と『中観心論』とであると推定される.つまり中観[学説]の心髄(madhyamak hrdaya)を説く『入眞甘露』(*tattvamtavatara甘露のような[中観派の]真実[説]
+    への入門)が本来の名称と考えられ,両者の相違は,論書全体の位置づけ・意味 づけの視点から名づけるか,あるいはまたその内容に重きを置いて命名するかの
+    違いに由来するであろう.さらにまた第3に,ppと『掌珍論』からは,アヴァ ローキタヴラタの時代には『論理の炎』tjと呼ばれていたバーヴィヴェーカの自
+    主の存在は確認されえないということである.この点もまたTjの著者問題を考 えるうえで見逃すことはできない 〓.『中観心論』の書名と段階的成立説をめぐって
+    このように,MHkをさす本来の直接的な呼称は『入眞甘露』であり,中観学 説を述べる中心的な論書という意味合いから,早い段階から『中観心論』とも呼
+    ばれていた.このことは,先の『掌珍論』に見た2箇所の言及からばかりでなく, 現行のMHKのテキストからも確認することができる
+    「菩提心を捨てないこと」(bodhicittaparityaga)と題するMHK第1章の第4およ び第5の両偈は,同書の書名と第1,第2,第3の3つの章題に言及して,
+    「他者に利益をもたらす清浄行をなす人(=著者)は,偉大なさとりに心を定めた人々 が甘露のような真実に入るために(=書名),[自らの]能力にもとづいて,いくらか述べ る.」(mahabodhau
+    krtadhiyam pararthodayadiksaya/ tattvamrtavataraya saktitah kimcid ucyate/ [k.4])
+    「すべての目的を成就するために,菩提心を捨てないこと(=第1章の章題),苦行者 (牟尼)の誓約に依存すること(=第2章の章題),ならびに真実智を探究すること(=
+    第3章の章題),という[3つの]行がある.」(bodhicittaparityago munivratasamasrayah tattvajnanaisana ceti carya
+    sarvarthasiddhayet/ [.5]) と語る さらにまた,ここにも出る『入眞甘露』と,『中観心論』とに加えて,サンス クリット写本末尾に"tarkaivala nama
+    sutram samaptam iti"「『論理の炎(思択炎)』 という名の経が完了した.」(25a5)とあるように,MHKそのものが『論理の炎』
+    Tarkaivulaと呼ばれることもある.(「経」sutraの名は,注釈文献に対する根本偈をさす 後代の尊称と考えられる.)しかも,このようにMHkそのもの,あるいはまた根本
+    偈と注釈との総称として『論理の炎』と呼ぶ例は,すでに『デンカルマ』目録や 近年公刊された『パンタンマ』目録にも見られるのである.両目録はいずれも 「翻訳中の論書」(bstan bcos
+    sgyur 'phro)として同論および註釈に言及している すなわち,『デンカルマ』dd kor maには,「根本[偈]と注釈をもつ『中観心 論・「論理の炎」』の両者」(dbu mai
+    snying po rtog ge 'bar ba rtsa ba dang/ 'grel par bcas pe gnyisl, lalou
+    no.732)とあり,一方また『パンタンマ』'phang thang mal)は,「『中観 心論・「論理の炎」』.翻訳中()卷.『中観心論・「論理の炎」』の注釈.都訳中 卷」(dbu mai
+    snying po rtog pa la 'bar ba/ sgyur phro bam po/ dbu mai snying po rtog pa la 'bar ba'i'grel pa
+    sgyur 'phro/ bam pol)と記載する. ここで,前者のいう「両者」gnyisは,根本[偈]と註釈の2つをさし12),翻訳
+    が終了した段階で,別箇の翻訳文献として,「中[観]の論書」(dbu ma'i bstar bcos)の部内に編入されるはずであったと考えられるが,残念ながら,その都訃
+    が今に伝わることはなかった.また,『パンタンマ』は,翻訳中であることを叫 記するが,bam po(卷)の直後に置かれるべき具体的な数字は未記入である.両
+    目録はいずれも*nadhuamakahrdaua-farkaivclaの書名を出すが,『デンカルマ』は 偈頌と注釈,つまりMhKとtjの総称として,これに対して『パンタンマ』は
+    MHKのみの呼称として用いている13).このように,MHKの名称には,『入眞甘
+    露』tattuamrtauatora,『中観心論』〓adhyamakahrduya,『論理の炎』torkaivalaと いう3種類が知られ,名称の成立順序もこの通りであったと推定されよう.
+    ところでまた,mHkには,その内容自体に関しても,段階的な成立説がある Gokhale [185]は先に挙げた,第1章内の第4,第5傷を根拠にして,また璃
+    [1991]は,以下のような,第3章末のみに見られる,書名を含むコロフォンに もとづいて,いずれも冒頭3章の先行成立説を唱える.すなわち,写本の第3章 末には,
+    tattvamrtavatare tattvajnanaisanaparicchedo nama trtiyah samaptaho1(11a5)
+    「以上,『入真実甘露』の中の,「真実智の探究章」という名の第3が完了した.」(iti, とあって,『入真実甘露』(=『入眞甘露』)が書名として登場する14)
+    この段階的な成立説については,基本的に同意されよう.先の第1章の両偈と この第3章末のコロフォンに加え,〓Hk全体の構成を考えても,発菩提心と誓
+    願をもとにバーヴィヴェーカ自身の中観思想を述べる冒頭の3章が先行して成立 し,その後に,仏教内外の各派による真実説への批判的な考察を加え(第4から
+    第9章),最後に簡潔に,「一切智者性論証の説示」と「讃頌と[論の]特徴の説 示の2章(第10,11章)を付して,最終的に11の章全体が完成した,という成
+    立の段階を経たであろうことは想像にかたくない.ただし,先にもふれたが,『掌 珍論』が『入眞甘露』に2度言及した段階では,第3章までではなく,すでに第 5章も成立していたことは明らかである15)
+    以上,『中観心論』の書名とその成立に関して,近年の研究成果を踏まえたう えで,いくつかの問題を考察した.この後に,注釈Tjの著者問題という重い課
+    題が残されているが,これについては別稿を期したい 1)〓adhyamakahrdapakorikaはtib.訳〓頭の音写語タイトルに見られ,また 〓adhyamakasya
+    hrdayamの呼称は,サンスクリット写本の最終偈(25a5)に出る(斎 藤[2000]参照).なお,現行のmhKとtjのtib.訳は,dipamkarasriinanaとその弟子 Tshul
+    khrims rgyal baの共訳で,いずれのコロフオンも著者名をbhavyaとする.なお本 論文では,madhyamakahrd mai sning poを『中観心論』と訳すが,略号は便
+    宜的にmHKに統一する. 2)ppの著者名については,bhavavivekaでなくbhavivekaが適切であることを江
+    島[1990]が論じ,ほぼ決着した.その後,*laksanatikuの研究を進めるyonezawa 1999]pp.(2))もまた江島の結論を裏づけている.なお,joshi []pp.3-4
+    は,nyoyabhusanaの著者bhasarvajna ("a person knowing everything pertaining to light or
+    knowledge")もまた,同書の一部のコロフォンでは,bhavasarvajna ("a person knowing everything related to bhava or
+    entity")と呼ばれている事実を報告する.これはbhava-vivekaの伝承がbha-vivekaとの近似した発音に起因する誤伝であることを例証しよう か
+    3)江島[1980]pp.10-1,33. 1)「廣如入眞甘露已具分別.」(<ref xml:id="r1" checked="1"><ptr
+            href="https://cbetaonline.dila.edu.tw/T30n1578_p0272a13"
+            /><canon>大正藏</canon>vol.<v>30</v>,<p>272</p><c>a</c><l>13</l></ref>.
+    )「入眞甘露已具分別.」(同,27a1-12).」 6)チベツト語訳の同章の夕イトルは,mal 'byor spyod pa pa'i de kho na nyid gtan la dbabp
+    la jugpagacratattvaviniscayouatora)「瑜伽行派の[説く]真実の確定への入門」 とある
+    7)なお,この他に,書名への言及はないが,現行のmHkX1と同一傷がpp(ad MK 〓X3)の中で,犢子部が自らの反論を根拠づける偈頌として引用されていることが知ら
+    れている.ただし,この傷頌は内外の論書に引かれ,内容的にもbhavivekaのオリジナ ル偈であるかは疑問視されようか.江島[190]p,n.11,川崎[1992]p.376参照. 8)Mk
+    Xxv.24, de jong [1977]p4 sarvopalambhopasamah prapancopasamah sivah/ na kvacit kasvacit kascit
+    dharmo buddhena desitahf. 9)dtsha2-2,p tsha30-7: rnal 'byor spyod pa pa dag gis smras pa dmigs
+    pa thams cad nyer zhi zhing/ spros pa nyer zhi zhi ba ste/ sangs rgyas kyis ni gang du yang// su
+    la 'ang (la'ang p) chos 'ga' ma bstan to zhes bya ba ni bden na de rtogs par bya ba'i thabs
+    gzhan gyi 『中観心論』の書名と成立をめぐる諸問題(斎藤)(173 dbang la skur pa 'debs pa deni mi rung ste/.
+    10)bhav.による円成実性批判の箇所(mHk v,12dtsha〓477-2.p tsha 310a8-b2,etc.)を参照. 11)西蔵博物館[2003],川越英真[2004]
+    2)このことは,『デンカルマ』で当該論書の直前に置かれ,当時は同様に「翻訳中の 論書」であったナーガールジュナ作の『ヴァイダルヤ』の例からも頷ける(lalou no.731).
+    13)なお,プトウン『仏教史』(1322)および同『テンギュル目録』(1335)は,〓h() を本傷,tjを注釈の名称として記載し,現行のチベツト大蔵経もこれに倣う.この伝
+    統は,先に見たアヴァローキタヴラタの記述に沿っている. 14)ただし,この箇所のチベツト語訳は,dbu ma'i (map) snying po las de kho na nyid ky
+    shes pa tshol bai le'u ste gsum pa'o dsa17pdsa19a7)とあり,書名は『入真実甘 露』でなく『中観心論』に代わる
+    15)cf.蒋[1991]p.115 [参考文献](本稿で言及したもののみ,発表年代順) de jong, j.w. [1977]nagoriuna
+    hulamadhyamakakorikah, adyar. the adyar library and Research centre.
+    江島惠教[1980『中観思想の研究-bhavaviveka研究-』春秋社 Gokhale, v.v. and bahulkar, S.S.[18],
+    "madhyamaka-hrdaya-karika tarkajvala, chapter i", Miscellanea buddhica, indiske studier 5,
+    pp.7-108. Joshi, l.v.[198ritical studyof the pratyaksaricched of bhasarvajn's nyoyabhusana,
+    ahmedabad: Guiarat university. 江島惠教[1990]「bhavaviveka/ bhavya/ bhaviveka」『印仏研』38-2,pp.(8
+    蒋忠新[1991]:「梵文(〈思択焔経〉〉抄本影印版・編者的話]『季羨林教授八十華紀念論 文集』(上),江西人民出版社,pp.111-117. 川崎信定[1992]『一切智思想の研究』春秋社.
+    lindtner, chr.,[1995]bhavy's nadhyamakahrdapg, adyar: the adyar library and Researck centre.
+    Yonezawa, y.[199]laksanatika: a sanskrit manuscript ofaanonymous commentary on the
+    prasannapada", jibs47-2,pp.(1) 斎藤明[200「バヴィアの規定するmadhyamakaとその解釈をめぐって」『アビダル マ仏教とインド思想』春秋社,pp.〓27
+    西蔵博物館[2003]dkar chag 'phang thang ma,北京:民族出版社. 川越英真[2004]「『パンタン目録』について」第52回日本西蔵学会大会(於立正大学) 発表資料.
+    〈キーワード⟩『中観心論』,『論理の炎』,『大乗掌珍論』,『般若灯論』,バーヴィヴェーカ (東京大学教授・phd) </root>
