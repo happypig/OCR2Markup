@@ -1,6 +1,0 @@
-Hello World
-This is a valid UTF-8 file.
-Content with international characters: 中文 日本語 한국어
-Emoji: 🎯 ✅ 🚀
-Special symbols: ♥ ♦ ♣ ♠
-Mathematical: ∀ ∃ ∈ ∉ ∪ ∩
