@@ -1,0 +1,1869 @@
+{
+  "ptrs added": [
+    {
+      "file": "141213.xml",
+      "location": "v53.1",
+      "xml_id": "r27",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T24n1470_p0917a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141214.xml",
+      "location": "v53.1",
+      "xml_id": "r2",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T48n2001_p0050c01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141237.xml",
+      "location": "v53.1",
+      "xml_id": "r14",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/X11n0268_p0180a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141244.xml",
+      "location": "v53.1",
+      "xml_id": "r1",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/X63n1223_p0018c21"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141244.xml",
+      "location": "v53.1",
+      "xml_id": "r2",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/X63n1223_p0023a11"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141244.xml",
+      "location": "v53.1",
+      "xml_id": "r3",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/X63n1223_p0020a06"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141248.xml",
+      "location": "v53.1",
+      "xml_id": "r1",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/X79n1560_p0516a08"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141248.xml",
+      "location": "v53.1",
+      "xml_id": "r2",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/X73n1447_p0045a19"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141248.xml",
+      "location": "v53.1",
+      "xml_id": "r3",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/X73n1447_p0045a10"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141248.xml",
+      "location": "v53.1",
+      "xml_id": "r4",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/X73n1447_p0044a04"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141248.xml",
+      "location": "v53.1",
+      "xml_id": "r5",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/X73n1447_p0048b17"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141254.xml",
+      "location": "v53.1",
+      "xml_id": "r17",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T55n2149_p0233b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141254.xml",
+      "location": "v53.1",
+      "xml_id": "r22",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T15n0642_p0641c01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141255.xml",
+      "location": "v53.1",
+      "xml_id": "r11",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T24n1485_p1011c01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141255.xml",
+      "location": "v53.1",
+      "xml_id": "r12",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T24n1485_p1021a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141256.xml",
+      "location": "v53.1",
+      "xml_id": "r1",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T50n2056_p0292b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141269.xml",
+      "location": "v53.1",
+      "xml_id": "r19",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T45n1882_p0671c01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r6",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1428_p0831b10"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r7",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1421_p0129a20"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r10",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T23n1435_p0249c05"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r11",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T23n1443_p0931c17"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r12",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1421_p0178c05"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r17",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T23n1435_p0022a08"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r19",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1425_p0257a04"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r21",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T23n1435_p0076a03"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r22",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T23n1440_p0543c19"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r24",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T24n1451_p0224b02"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r26",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1421_p0161a14"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r27",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1424_p0218a16"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141290.xml",
+      "location": "v53.1",
+      "xml_id": "r2",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T02n0100_p0480b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141290.xml",
+      "location": "v53.1",
+      "xml_id": "r3",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1428_p0673b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141290.xml",
+      "location": "v53.1",
+      "xml_id": "r4",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T23n1435_p0113b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141290.xml",
+      "location": "v53.1",
+      "xml_id": "r6",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T51n2087_p0926c01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141290.xml",
+      "location": "v53.1",
+      "xml_id": "r7",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T23n1442_p0850c01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141970.xml",
+      "location": "v53.1",
+      "xml_id": "r1",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T46n1932_p0782c01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141976.xml",
+      "location": "v53.1",
+      "xml_id": "r1",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T48n2021_p1015c01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141977.xml",
+      "location": "v53.1",
+      "xml_id": "r1",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T08n0223_p0218a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141977.xml",
+      "location": "v53.1",
+      "xml_id": "r2",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T08n0223_p0225a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141977.xml",
+      "location": "v53.1",
+      "xml_id": "r3",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T08n0223_p0229b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r1",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T27n1545_p0765a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r2",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T27n1545_p0767a28"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r3",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T27n1545_p0368c26"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r4",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T28n1546_p0280b22"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r5",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T28n1547_p0449b15"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r6",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T27n1545_p0368b16"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r7",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T28n1546_p0280a27"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r8",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T28n1547_p0449a08"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r9",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T27n1545_p0382c20"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r10",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T28n1546_p0287b08"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r11",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T28n1547_p0457b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r12",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T27n1545_p0530c16"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r13",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T28n1546_p0383a15"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r14",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T28n1549_p0732a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r15",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T29n1558_p0010a13"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r16",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T29n1559_p0170a09"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r18",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T29n1563_p0790a22"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141987.xml",
+      "location": "v53.1",
+      "xml_id": "r21",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T09n0262_p0055b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141989.xml",
+      "location": "v53.1",
+      "xml_id": "r2",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T01n0041_p0826a03"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141989.xml",
+      "location": "v53.1",
+      "xml_id": "r3",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T37n1764_p0651a20"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141091.xml",
+      "location": "v53.2",
+      "xml_id": "r2",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/T30n1579_p0590a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141091.xml",
+      "location": "v53.2",
+      "xml_id": "r4",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/T45n1861_p0299c01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141094.xml",
+      "location": "v53.2",
+      "xml_id": "r2",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T08n0227_p0578c01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141096.xml",
+      "location": "v53.2",
+      "xml_id": "r5",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T27n1545_p0024a23"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141096.xml",
+      "location": "v53.2",
+      "xml_id": "r8",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T27n1545_p0029c07"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141097.xml",
+      "location": "v53.2",
+      "xml_id": "r2",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T24n1488_p1034a20"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141099.xml",
+      "location": "v53.2",
+      "xml_id": "r4",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T12n0365_p0345b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141099.xml",
+      "location": "v53.2",
+      "xml_id": "r5",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T12n0365_p0345b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141111.xml",
+      "location": "v53.2",
+      "xml_id": "r14",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T45n1861_p0264b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141114.xml",
+      "location": "v53.2",
+      "xml_id": "r7",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T25n1509_p0066b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141117.xml",
+      "location": "v53.2",
+      "xml_id": "r4",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T40n1804_p0050a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141183.xml",
+      "location": "v53.2",
+      "xml_id": "r7",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T12n0377_p0900a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141185.xml",
+      "location": "v53.2",
+      "xml_id": "r2",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T53n2121_p0249b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141186.xml",
+      "location": "v53.2",
+      "xml_id": "r4",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T26n1542_p0722a17"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141186.xml",
+      "location": "v53.2",
+      "xml_id": "r5",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T01n0026_p0469a29"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141186.xml",
+      "location": "v53.2",
+      "xml_id": "r8",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T29n1563_p0865b13"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r7",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T24n1450_p0126b11"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r8",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T25n1509_p0063a23"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r10",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T03n0191_p0932a25"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r12",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T25n1509_p0063b04"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r13",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1428_p0787a29"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r17",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T25n1507_p0046a20"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r18",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T02n0125_p0611c28"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r25",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T50n2042_p0104c02"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "142133.xml",
+      "location": "v53.2",
+      "xml_id": "r2",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T12n0361_p0280b03"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "142133.xml",
+      "location": "v53.2",
+      "xml_id": "r3",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T12n0361_p0280c06"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "142133.xml",
+      "location": "v53.2",
+      "xml_id": "r4",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T12n0362_p0300c23"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "142140.xml",
+      "location": "v53.2",
+      "xml_id": "r1",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T01n0001_p0001b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "142140.xml",
+      "location": "v53.2",
+      "xml_id": "r6",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1421_p0001b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "142143.xml",
+      "location": "v53.2",
+      "xml_id": "r7",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T47n1958_p0007a05"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "142143.xml",
+      "location": "v53.2",
+      "xml_id": "r8",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T47n1958_p0008b19"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "142143.xml",
+      "location": "v53.2",
+      "xml_id": "r14",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T40n1819_p0838c01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "142143.xml",
+      "location": "v53.2",
+      "xml_id": "r15",
+      "ptr_before": [],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T40n1819_p0839a24"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    }
+  ],
+  "single -> single (changed)": [
+    {
+      "file": "141237.xml",
+      "location": "v53.1",
+      "xml_id": "r4",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/X01n00Σ╕Çσ¢¢p0001a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/X09n0243_p0390b21"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r1",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T22n1421_p0083a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1428_p0831a02"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r2",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T22n1421_p0001a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1421_p0167c21"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r3",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T23n1435_p0024a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T23n1435_p0245b03"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r4",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T23n1435_p0101a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T23n1444_p1041a29"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r5",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T22n1421_p0033a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1425_p0322a14"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r8",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T23n1435_p0002a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T23n1435_p0246a07"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r9",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T22n1421_p0090c04"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1428_p0940c04"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r13",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T23n1435_p0015a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T23n1435_p0300a11"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r14",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T22n1421_p0076a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1425_p0507b04"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r15",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T22n1421_p0082c01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1428_p0587a25"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r16",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T22n1421_p0001a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1421_p0015a03"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r18",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T23n1435_p0069a07"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T23n1442_p0695b14"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r20",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T22n1421_p0042a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1421_p0042b23"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r23",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T22n1421_p0003a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1425_p0341b17"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r25",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T22n1421_p0088a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1428_p0885a15"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141289.xml",
+      "location": "v53.1",
+      "xml_id": "r28",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T23n1435_p0002c07"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T23n1435_p0250b19"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141290.xml",
+      "location": "v53.1",
+      "xml_id": "r1",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T02n0100_p0480b01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T02n0099_p0362a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141290.xml",
+      "location": "v53.1",
+      "xml_id": "r5",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T24n1464_p0890b01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T24n1464_p0890b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141290.xml",
+      "location": "v53.1",
+      "xml_id": "r8",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T24n1448_p0003b01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T24n1451_p0233b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141290.xml",
+      "location": "v53.1",
+      "xml_id": "r9",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T24n1462_p0717a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T24n1448_p0007c01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141989.xml",
+      "location": "v53.1",
+      "xml_id": "r4",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T0011"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T03n0191_p0963c02"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141091.xml",
+      "location": "v53.2",
+      "xml_id": "r3",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T30n1579_p0590a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/T45n1861_p0299c01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141091.xml",
+      "location": "v53.2",
+      "xml_id": "r5",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T45n1861_p0299c01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/T45n1861_p0300a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141091.xml",
+      "location": "v53.2",
+      "xml_id": "r6",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T45n1861_p0299c01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/T45n1861_p0300a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141186.xml",
+      "location": "v53.2",
+      "xml_id": "r1",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T26n4810_p0482a03"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T26n1537_p0481c20"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141186.xml",
+      "location": "v53.2",
+      "xml_id": "r7",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T29n54824_p0001a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T29n1562_p0548a24"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141186.xml",
+      "location": "v53.2",
+      "xml_id": "r9",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T09n0266_p0053a26"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T26n1541_p0653a26"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141187.xml",
+      "location": "v53.2",
+      "xml_id": "r1",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T26n9182_p0919a07"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T26n1544_p0918c20"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141187.xml",
+      "location": "v53.2",
+      "xml_id": "r5",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T02n0099_p0224b24"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T01n0026_p0565c09"
+      ],
+      "checked_before": "0",
+      "checked_after": "0"
+    },
+    {
+      "file": "141187.xml",
+      "location": "v53.2",
+      "xml_id": "r6",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T29n1558_p0120b24"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/T02n0099_p0224b24"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r1",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T02n0099_p0059b01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T02n0125_p0593a24"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r2",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T01n0001_p0008b15"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T01n0001_p0008b15"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r3",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T22n1421_p0001a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1428_p0786c27"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r4",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T03n0190_p0805c15"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T22n1421_p0103a08"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r5",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T04n0192_p0018a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T03n0190_p0805c15"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r6",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T25n1509_p0325a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T03n0189_p0642c09"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r9",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T04n0192_p0027b01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T37n1763_p0602a02"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r11",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T22n8724_p0001a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T04n0192_p0027b01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r14",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T02n0125_p0611a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T24n1450_p0126c22"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r15",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T25n1505_p0004a24"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T02n0125_p0611a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r16",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T02n0125_p0611c28"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T02n0125_p0611a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r19",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T02n0125_p0557c01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T02n0125_p0612a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r20",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T50n2042_p0102a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T02n0125_p0612a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r21",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T50n2043_p0136a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T02n0125_p0557c01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r22",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T02n0099_p0168b01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T50n2042_p0104b27"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r23",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T50n2040_p0001a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T50n2043_p0138c03"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r24",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T50n2043_p0138c01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T02n0099_p0168a22"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r26",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T50n2064_p1012a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T50n2043_p0138c11"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r27",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T50n2043_p0138a06"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T02n0099_p0168a28"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r28",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T02n0099_p0123a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T50n2042_p0104c05"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r29",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T50n2040_p0001a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T50n2043_p0138c16"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r30",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T50n2043_p0138a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T02n0099_p0168b04"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141189.xml",
+      "location": "v53.2",
+      "xml_id": "r31",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T02n0099_p0001a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T50n2042_p0104c03"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    }
+  ],
+  "multi -> single": [
+    {
+      "file": "141237.xml",
+      "location": "v53.1",
+      "xml_id": "r13",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/X01n0008_p0261b12",
+        "https://cbetaonline.dila.edu.tw/X01n0001_p0001a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/T39n1799_p0830c24"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141240.xml",
+      "location": "v53.1",
+      "xml_id": "r1",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/X19n0343_p0161b04",
+        "https://cbetaonline.dila.edu.tw/X29n0594_p0001a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/X19n0343_p0161b04"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141240.xml",
+      "location": "v53.1",
+      "xml_id": "r4",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/X18n0338_p0465b01",
+        "https://cbetaonline.dila.edu.tw/X27n0577_p0001a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/X27n0577_p0001a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141240.xml",
+      "location": "v53.1",
+      "xml_id": "r5",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/X18n0338_p0518b22",
+        "https://cbetaonline.dila.edu.tw/X28n0585_p0001a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/X28n0585_p0001a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141270.xml",
+      "location": "v53.1",
+      "xml_id": "r10",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/X63n1231_p0096a04",
+        "https://cbetaonline.dila.edu.tw/X63n1231_p0110a06"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/X37n0662_p0589b21"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141111.xml",
+      "location": "v53.2",
+      "xml_id": "r5",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/X21n0369_p0268a19",
+        "https://cbetaonline.dila.edu.tw/X34n0636_p0018a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/zh/X21n0369_p0268b11"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141111.xml",
+      "location": "v53.2",
+      "xml_id": "r12",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/X21n0369_p0270c07",
+        "https://cbetaonline.dila.edu.tw/X34n0636_p0018a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/X34n0636_p0018a01"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    },
+    {
+      "file": "141111.xml",
+      "location": "v53.2",
+      "xml_id": "r13",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/X19n0352_p0907c19",
+        "https://cbetaonline.dila.edu.tw/X30n0600_p0001a01"
+      ],
+      "ptr_after": [
+        "https://cbetaonline.dila.edu.tw/X19n0352_p0907c19"
+      ],
+      "checked_before": "0",
+      "checked_after": "1"
+    }
+  ],
+  "no ptr before or after": [
+    {
+      "file": "141978.xml",
+      "location": "v53.1",
+      "xml_id": "r17",
+      "ptr_before": [],
+      "ptr_after": [],
+      "checked_before": "0",
+      "checked_after": "1"
+    }
+  ],
+  "ptrs removed": [
+    {
+      "file": "141091.xml",
+      "location": "v53.2",
+      "xml_id": "r7",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T45n1861_p0300a01"
+      ],
+      "ptr_after": [],
+      "checked_before": "0",
+      "checked_after": null
+    },
+    {
+      "file": "141091.xml",
+      "location": "v53.2",
+      "xml_id": "r8",
+      "ptr_before": [
+        "https://cbetaonline.dila.edu.tw/T45n1861_p0300a01"
+      ],
+      "ptr_after": [],
+      "checked_before": "0",
+      "checked_after": null
+    }
+  ]
+}
