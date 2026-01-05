@@ -11,7 +11,7 @@
 
 ### Session 2026-01-05
 
-- Q: How should the system handle CBETA API failures (unreachable, slow, errors)? → A: Show error immediately with option to retry manually via Convert button
+- Q: How should the system handle CBETA API failures (unreachable, slow, errors)? → A: Retry timeouts automatically, then show error with option to retry manually via Convert button
 - Q: Where should the CBETA API endpoint URL be configured? → A: Configurable in DAMA plugin preferences (like existing API key settings)
 - Q: Is the `<c>` (column) element required for API conversion? → A: Optional; convert with canon, volume, page only; column adds precision if present
 
@@ -27,7 +27,7 @@
 | **RefToLinkActionInvoked** | User clicks [Actions]-[<ref> to link] menu |
 | **SelectionDisplayed** | Selected `<ref>` shown in infoArea |
 | **ReferenceComponentsExtracted** | Canon, volume, page, column parsed from `<ref>` |
-| **ConvertButtonClicked** | User triggers conversion |
+| **ConvertButtonClicked** | User retries conversion (optional) |
 | **CBETAAPICallInitiated** | System calls CBETA API |
 | **CBETAAPIResponseReceived** | API returns link(s) or error |
 | **LinkDisplayedInResult** | Generated link shown in resultArea |
@@ -44,7 +44,7 @@
 |---------|---------|--------|
 | **SelectRefToLinkAction** | Menu click | Action invoked, selection displayed |
 | **ExtractReferenceComponents** | Action invoked | Components parsed from XML |
-| **ConvertReferenceToLink** | Convert button | CBETA API called |
+| **ConvertReferenceToLink** | Action invoked (auto) or Convert button | CBETA API called |
 | **ReplaceLinks** | Replace button | Document updated |
 
 ### Actors (Yellow)
@@ -61,6 +61,8 @@
 |--------|-------------|
 | Selection must be valid `<ref>` element | Validate XML structure before processing |
 | Reference must contain required components | Check for `<canon>`, `<v>`, `<w>`, `<p>` before API call; `<c>` is optional |
+| Call API with raw `<ref>` | No local normalization; pass selected XML as-is |
+| API client uses system proxy + headers | Honor OS proxy settings and send User-Agent/Accept-Charset |
 | CBETA API must return valid URL | Cannot enable Replace without successful response |
 | Replace updates checked attribute | Always set `checked="2"` on success |
 | Preserve non-ptr content | Only replace `<ptr>` elements, keep reference text |
@@ -133,7 +135,7 @@ A markup editor working with Buddhist texts needs to verify and update links wit
 
 1. **Given** a user has selected a `<ref>` element containing Tripitaka reference text like `<canon>続蔵</canon><v>一・一六</v>、<p>二四九</p><c>左上</c>`, **When** they click [Actions]-[<ref> to link], **Then** the infoArea displays the selected actions and the selected `<ref>` element and the system extracts the reference components for processing.
 
-2. **Given** the infoArea shows the selected actions and the selected `<ref>` element, **When** the user clicks [Convert], **Then** the system calls the CBETA API with the extracted reference information and displays the generated link in the resultArea.
+2. **Given** the infoArea shows the selected actions and the selected `<ref>` element, **When** the action is invoked, **Then** the system calls the CBETA API with the selected `<ref>` XML (no local normalization) and displays the generated link in the resultArea.
 
 3. **Given** the resultArea displays the converted link, **When** the user reviews and confirms the link is correct, **Then** the [Replace] button becomes visible for the user to apply changes.
 
@@ -149,7 +151,7 @@ After the CBETA API returns the correct link for a Tripitaka reference, the edit
 
 **Acceptance Scenarios**:
 
-1. **Given** the resultArea contains a valid CBETA link and the [Replace] button is visible, **When** the user clicks [Replace], **Then** the old `<ptr>` elements inside the selected `<ref>` are replaced with a new `<ptr>` element containing the CBETA API-generated URL.
+1. **Given** the resultArea contains a valid CBETA link and the [Replace] button is visible, **When** the user clicks [Replace], **Then** the old `<ptr>` elements inside the selected `<ref>` are replaced with a new `<ptr>` element containing the CBETA API-generated URL inserted as the first child of `<ref>`.
 
 2. **Given** the replacement is about to occur, **When** the [Replace] button is clicked, **Then** the `checked` attribute of the `<ref>` element is updated from its current value to "2" to indicate verification.
 
@@ -169,9 +171,9 @@ When the selected `<ref>` element contains incomplete reference information or t
 
 1. **Given** a user selects text that is not a valid `<ref>` element, **When** they click [Actions]-[<ref> to link], **Then** an error message is displayed in the resultArea explaining the selection must be a valid `<ref>` element.
 
-2. **Given** a `<ref>` element is selected but lacks required reference components (canon, volume, page), **When** the user clicks [Convert], **Then** the resultArea displays an error message specifying which components are missing.
+2. **Given** a `<ref>` element is selected but lacks required reference components (canon, volume, page), **When** the action is invoked, **Then** the resultArea displays an error message specifying which components are missing.
 
-3. **Given** the CBETA API returns no results or an error, **When** the API response is received, **Then** the resultArea displays an informative message and the [Replace] button remains hidden.
+3. **Given** the CBETA API returns no results or an error, **When** the API response is received, **Then** the resultArea displays an informative message and the [Replace] button remains hidden (user can retry via [Convert]).
 
 ---
 
@@ -182,7 +184,7 @@ When the selected `<ref>` element contains incomplete reference information or t
 - **Missing checked attribute**: `<ref>` has no `checked` attribute - should add `checked="2"` on replacement
 - **Already verified**: `<ref>` has `checked="2"` already - re-processing should be allowed, attribute remains "2"
 - **No reference text**: `<ref>` contains only `<ptr>` elements, no Tripitaka reference - error message should explain what's needed
-- **Canon format variations**: Different canon abbreviations (T, X, 大正, 続蔵) in various formats - parser should handle common variations
+- **Canon format variations**: Different canon abbreviations (T, X, 大正蔵, 卍續藏) in various formats - API handles variations; no local normalization
 
 ---
 
@@ -199,17 +201,18 @@ When the selected `<ref>` element contains incomplete reference information or t
   - `<p>` - page number *(optional)*
   - `<c>` - column indicator (left/right, upper/lower) *(optional, adds precision if present)*
   - `<l>` - line indicator *(optional, adds precision if present)*
-- **FR-004**: System MUST provide a [Convert] button that triggers the CBETA API call
-- **FR-005**: System MUST call the CBETA API with extracted reference information to obtain the corresponding online link
+- **FR-004**: System MUST trigger the CBETA API call immediately when the action is invoked, and provide a [Convert] button for retry
+- **FR-005**: System MUST call the CBETA API with the selected `<ref>` XML as-is (no local normalization) to obtain the corresponding online link
 - **FR-006**: System MUST display the CBETA API-generated link in the resultArea
 - **FR-007**: System MUST show the [Replace] button after successful link generation
-- **FR-008**: System MUST replace existing `<ptr>` elements inside the `<ref>` with a new `<ptr>` element containing the CBETA-generated URL when [Replace] is clicked
+- **FR-008**: System MUST replace existing `<ptr>` elements inside the `<ref>` with a new `<ptr>` element containing the CBETA-generated URL, inserted as the first child of `<ref>`, when [Replace] is clicked
 - **FR-009**: System MUST update the `checked` attribute of the `<ref>` element to "2" upon successful replacement
 - **FR-010**: System MUST hide the [Replace] button after replacement is complete, consistent with other actions
 - **FR-011**: System MUST validate that the selected text is a properly formed `<ref>` element before processing
 - **FR-012**: System MUST display appropriate error messages when reference conversion fails
-- **FR-013**: System MUST show CBETA API errors immediately without automatic retry; user can retry manually by clicking [Convert] again
+- **FR-013**: System MUST retry CBRD API calls on timeouts (up to 3 attempts with exponential backoff) and then show the timeout error; user can retry manually by clicking [Convert] again
 - **FR-014**: System MUST allow CBETA API endpoint URL to be configured in DAMA plugin preferences
+- **FR-015**: System MUST honor system proxy settings when calling the CBETA API and set a User-Agent and UTF-8 Accept-Charset header
 
 ### Key Entities
 
@@ -226,7 +229,7 @@ When the selected `<ref>` element contains incomplete reference information or t
 
 - **SC-001**: Users can convert a Tripitaka reference to a CBETA link in under 30 seconds from selection to replacement
 - **SC-002**: 95% of valid Tripitaka references successfully convert to correct CBETA links
-- **SC-003**: Users receive clear feedback within 3 seconds of clicking [Convert] (either results or error message)
+- **SC-003**: Users receive clear feedback within the configured timeout window (default 3 seconds per attempt, up to 3 attempts plus backoff) after clicking [Convert]
 - **SC-004**: The action follows the same UI pattern as existing actions (AI Markup, Tag Removal), requiring no additional user training
 - **SC-005**: Zero data loss - original `<ref>` element content outside of `<ptr>` elements is preserved during replacement
 

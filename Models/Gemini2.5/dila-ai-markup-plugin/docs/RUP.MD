@@ -53,6 +53,13 @@ This document describes the object-oriented design of the DILA AI Markup Assista
 4. **Testability**: All components are independently testable
 5. **Extensibility**: Easy to add new features without modifying existing code
 
+### 0.4.0 Implementation Scope
+
+- **UI Actions**: AI Markup, Tag Removal, UTF-8 Check/Convert, and `<ref> to link`
+- **Ref-to-Link Pipeline**: Parse `<ref>`, call CBRD API with raw XML (no normalization), rewrite `<ref>` with `<ptr href="...">` and `checked="2"`
+- **Auto Conversion**: Ref-to-link conversion runs immediately on action; Convert remains for retry
+- **Configuration**: OpenAI + CBRD settings stored in Oxygen options (WSOptionsStorage)
+
 ---
 
 ## Design Principles
@@ -70,27 +77,35 @@ This document describes the object-oriented design of the DILA AI Markup Assista
 ### Architectural Layers
 
 ```
-┌─────────────────────────────────────────┐
-│         Presentation Layer              │  UI Components (Swing)
-│  DAMAWorkspaceAccessPluginExtension     │
-└────────────┬────────────────────────────┘
-             │ Uses
-┌────────────▼────────────────────────────┐
-│         Business Logic Layer            │  Core Operations
-│  UTF8ValidationService                  │
-│  AIMarkupProcessor (implicit)           │
-└────────────┬────────────────────────────┘
-             │ Uses
-┌────────────▼────────────────────────────┐
-│         Configuration Layer             │  Settings Management
-│  DAMAOptionPagePluginExtension          │
-└────────────┬────────────────────────────┘
-             │ Uses
-┌────────────▼────────────────────────────┐
-│         Infrastructure Layer            │  Oxygen SDK, File System
-│  WSEditor, OptionsStorage, File I/O     │
-└─────────────────────────────────────────┘
++--------------------------------------------------------------+
+| Presentation Layer (Swing UI)                                |
+| DAMAWorkspaceAccessPluginExtension                           |
+| - Actions: AI Markup, Tag Removal, UTF-8, Ref-to-Link         |
++--------------------------------------------------------------+
+                |
++--------------------------------------------------------------+
+| Application Layer (Command)                                  |
+| ConvertReferenceCommand                                      |
++--------------------------------------------------------------+
+                |
++--------------------------------------------------------------+
+| Domain Layer (Model + Service)                               |
+| TripitakaComponents, ReferenceConversionSession               |
+| ReferenceParser, RefElementRewriter                            |
+| (No normalization before API call)                             |
++--------------------------------------------------------------+
+                |
++--------------------------------------------------------------+
+| Infrastructure Layer (API)                                   |
+| CBRDAPIClient, CBRDResponse, HttpUrlConnectionFactory        |
++--------------------------------------------------------------+
+
+Cross-cutting utilities:
+- XmlDomUtils, PluginLogger
+- UTF8ValidationService (validation + conversion)
+- DAMAOptionPagePluginExtension (configuration)
 ```
+
 
 ---
 
@@ -108,143 +123,149 @@ package "com.dila.dama.plugin" {
         class DAMAWorkspaceAccessPlugin {
             - {static} instance: DAMAWorkspaceAccessPlugin
             --
-            + DAMAWorkspaceAccessPlugin()
-            + {static} getInstance(): DAMAWorkspaceAccessPlugin
+            + DAMAWorkspaceAccessPlugin(descriptor: PluginDescriptor)
         }
         
         class DAMAWorkspaceAccessPluginExtension {
-            - panel: JPanel
+            - pluginWorkspaceAccess: StandalonePluginWorkspace
+            - resources: Object
+            - optionStorage: WSOptionsStorage
             - infoArea: JTextArea
             - resultArea: JTextArea
+            - buttonPanel: JPanel
             - replaceButton: JButton
+            - convertButton: JButton
+            - transferButton: JButton
             - cancelButton: JButton
-            - pluginWorkspace: StandalonePluginWorkspace
-            - resourceBundle: PluginResourceBundle
             - executor: ExecutorService
+            - currentOperation: OperationType
+            - currentRefToLinkUrl: String
+            - currentRefToLinkSelection: String
+            - currentNonUtf8Files: List<Path>
             --
             + applicationStarted(workspace: StandalonePluginWorkspace): void
             + applicationClosing(): boolean
             - createMainPanel(): JPanel
-            - createTextArea(rows: int, cols: int): JTextArea
-            - createActionsMenu(): JMenu
-            - processAIMarkup(): void
-            - processTagRemoval(): void
-            - checkUtf8Files(): void
-            - performUtf8Conversion(files: List<Path>): void
-            - i18n(key: String): String
+            - createMenuBar(): JMenuBar
+            - createTextAreas(): void
+            - createButtonPanel(): void
+            - processAIMarkup(text: String): String
+            - processTagRemoval(text: String): String
+            - checkUtf8Files(files: File[]): Utf8CheckResult
+            - convertFilesToUtf8(files: List<Path>): String
+            - fetchSelectedText(area: JTextArea): String
+            - fetchSelectedRefToLinkText(): String
+            - replaceSelectionWithText(text: String): boolean
             - i18n(key: String, args: Object[]): String
         }
     }
     
     package "preferences" {
         class DAMAOptionPagePluginExtension {
-            - apiKeyField: JPasswordField
-            - parseModelField: JTextField
-            - detectModelField: JTextField
-            - resourceBundle: PluginResourceBundle
+            - parseModelTextField: JTextField
+            - detectModelTextField: JTextField
+            - apiKeyTextField: JTextField
+            - cbrdApiUrlTextField: JTextField
+            - cbrdRefererTextField: JTextField
+            - cbrdTimeoutTextField: JTextField
+            - resources: PluginResourceBundle
             --
-            + init(pluginWorkspace: StandalonePluginWorkspace): void
-            + apply(options: OptionsStorage): void
+            + init(pluginWorkspace: PluginWorkspace): JComponent
+            + apply(pluginWorkspace: PluginWorkspace): void
             + restoreDefaults(): void
             + getKey(): String
             + getTitle(): String
-            + getMessage(): String
-            - initializeResourceBundle(locale: Locale): PluginResourceBundle
         }
     }
     
+    package "application.command" {
+        class ConvertReferenceCommand
+        class ConvertReferenceResult
+    }
+    
+    package "domain.model" {
+        class TripitakaComponents
+        class TransformedComponents
+        class ReferenceConversionSession
+        class InvalidReferenceException
+        class TransformationException
+    }
+    
+    package "domain.service" {
+        class ReferenceParser
+        class ComponentTransformer
+        class NumeralConverter
+        class RefElementRewriter
+    }
+    
+    package "infrastructure.api" {
+        class CBRDAPIClient
+        class CBRDResponse
+        class CBRDAPIException
+        class HttpUrlConnectionFactory
+    }
+    
+    package "util" {
+        class XmlDomUtils
+        class PluginLogger
+    }
+    
     package "utf8" {
-        class UTF8ValidationService <<static>> {
-            + {static} MAX_FILE_SIZE: long = 52428800
-            --
-            + {static} isValidUtf8(filePath: Path): boolean
-            + {static} convertFilesToUtf8(files: List<Path>, encoding: String): ConversionResult
-            + {static} scanForNonUtf8Files(paths: Path[]): List<Path>
-            - {static} detectEncoding(filePath: Path): String
-            - {static} isTextFile(filePath: Path): boolean
-            - {static} scanPathRecursively(path: Path, results: List<Path>): void
-        }
-        
-        class ConversionResult {
-            - successes: List<ConversionSuccess>
-            - failures: List<ConversionFailure>
-            --
-            + getSuccesses(): List<ConversionSuccess>
-            + getFailures(): List<ConversionFailure>
-            + getSuccessCount(): int
-            + getFailureCount(): int
-        }
-        
-        class ConversionSuccess {
-            - filePath: Path
-            - backupPath: Path
-            - sourceEncoding: String
-            --
-            + getFilePath(): Path
-            + getBackupPath(): Path
-            + getSourceEncoding(): String
-        }
-        
-        class ConversionFailure {
-            - filePath: Path
-            - error: String
-            --
-            + getFilePath(): Path
-            + getError(): String
-        }
+        class UTF8ValidationService <<static>>
+        class ConversionResult
+        class ConversionSuccess
+        class ConversionFailure
     }
 }
 
 package "ro.sync.exml.plugin" <<External SDK>> {
-    interface Plugin {
-        + {abstract} getDescription(): String
-    }
-    
-    interface WorkspaceAccessPluginExtension {
-        + {abstract} applicationStarted(workspace: StandalonePluginWorkspace): void
-        + {abstract} applicationClosing(): boolean
-    }
-    
-    interface OptionPagePluginExtension {
-        + {abstract} init(workspace: StandalonePluginWorkspace): void
-        + {abstract} apply(options: OptionsStorage): void
-        + {abstract} restoreDefaults(): void
-    }
-    
-    interface StandalonePluginWorkspace {
-        + {abstract} getOptionsStorage(): OptionsStorage
-        + {abstract} createEditorAccess(url: URL, editorType: int): WSEditor
-        + {abstract} addMenuBarCustomizer(customizer: MenuBarCustomizer): void
-    }
+    interface Plugin
+    interface WorkspaceAccessPluginExtension
 }
 
-' Associations - 關聯
-DAMAWorkspaceAccessPlugin --|> Plugin : <<implements>>
-DAMAWorkspaceAccessPluginExtension --|> WorkspaceAccessPluginExtension : <<implements>>
-DAMAOptionPagePluginExtension --|> OptionPagePluginExtension : <<implements>>
+package "ro.sync.exml.plugin.option" <<External SDK>> {
+    interface OptionPagePluginExtension
+}
 
-DAMAWorkspaceAccessPluginExtension --> DAMAWorkspaceAccessPlugin : uses
+package "ro.sync.exml.workspace.api" <<External SDK>> {
+    interface StandalonePluginWorkspace
+    interface PluginWorkspace
+    interface WSOptionsStorage
+}
+
+DAMAWorkspaceAccessPlugin --|> Plugin : <<extends>>
+DAMAWorkspaceAccessPluginExtension --|> WorkspaceAccessPluginExtension : <<implements>>
+DAMAOptionPagePluginExtension --|> OptionPagePluginExtension : <<extends>>
+
+DAMAWorkspaceAccessPluginExtension --> ConvertReferenceCommand : uses
+DAMAWorkspaceAccessPluginExtension --> RefElementRewriter : uses
 DAMAWorkspaceAccessPluginExtension --> UTF8ValidationService : uses
 DAMAWorkspaceAccessPluginExtension --> StandalonePluginWorkspace : uses
-DAMAOptionPagePluginExtension --> StandalonePluginWorkspace : uses
+DAMAWorkspaceAccessPluginExtension --> WSOptionsStorage : uses
+DAMAWorkspaceAccessPluginExtension ..> PluginLogger : logs
+
+ConvertReferenceCommand --> ReferenceParser : uses
+ConvertReferenceCommand --> CBRDAPIClient : uses
+ConvertReferenceCommand ..> ConvertReferenceResult : returns
+
+ReferenceParser ..> TripitakaComponents : creates
+RefElementRewriter ..> XmlDomUtils : uses
+
+CBRDAPIClient --> HttpUrlConnectionFactory : uses
+CBRDAPIClient ..> CBRDResponse : parses
+CBRDAPIClient ..> CBRDAPIException : throws
 
 UTF8ValidationService ..> ConversionResult : creates
 ConversionResult *-- "0..*" ConversionSuccess : contains
 ConversionResult *-- "0..*" ConversionFailure : contains
 
-note right of UTF8ValidationService
-  Static utility class
-  No instances created
-  All methods are static
-end note
-
 note right of DAMAWorkspaceAccessPlugin
-  Singleton pattern
-  Only one instance allowed
+  Singleton initialization enforced by constructor
 end note
 
 @enduml
 ```
+
 
 ### 2. Detailed Class Relationships with Multiplicity
 
@@ -253,64 +274,45 @@ end note
 !theme plain
 
 class DAMAWorkspaceAccessPluginExtension {
-    - panel: JPanel [1]
     - infoArea: JTextArea [1]
     - resultArea: JTextArea [1]
     - replaceButton: JButton [1]
+    - convertButton: JButton [1]
+    - transferButton: JButton [1]
     - cancelButton: JButton [1]
-    - pluginWorkspace: StandalonePluginWorkspace [1]
-    - resourceBundle: PluginResourceBundle [1]
-    - executor: ExecutorService [1]
+    - currentRefToLinkUrl: String [0..1]
+    - currentNonUtf8Files: List<Path> [0..*]
 }
 
-class UTF8ValidationService {
-    <<static>>
+class ConvertReferenceCommand {
+    - parser: ReferenceParser [1]
+    - apiClient: CBRDAPIClient [1]
+    --
+    + execute(selectedRefXml: String): ConvertReferenceResult
 }
 
-class ConversionResult {
-    - successes: List<ConversionSuccess> [0..*]
-    - failures: List<ConversionFailure> [0..*]
-}
+class ReferenceParser
+class ComponentTransformer
+class NumeralConverter
+class RefElementRewriter
+class TripitakaComponents
+class TransformedComponents
+class CBRDAPIClient
+class CBRDResponse
 
-class ConversionSuccess {
-    - filePath: Path [1]
-    - backupPath: Path [1]
-    - sourceEncoding: String [1]
-}
+DAMAWorkspaceAccessPluginExtension "1" --> "1" ConvertReferenceCommand : uses
+DAMAWorkspaceAccessPluginExtension "1" --> "1" RefElementRewriter : uses
 
-class ConversionFailure {
-    - filePath: Path [1]
-    - error: String [1]
-}
+ConvertReferenceCommand "1" --> "1" ReferenceParser
+ConvertReferenceCommand "1" --> "1" CBRDAPIClient
 
-class Path <<Java.NIO>> {
-}
+ReferenceParser "1" ..> "1" TripitakaComponents : creates
 
-' Multiplicity Relationships - 多重性
-DAMAWorkspaceAccessPluginExtension "1" --> "1" StandalonePluginWorkspace : uses
-DAMAWorkspaceAccessPluginExtension "1" ..> "0..*" Path : processes
-DAMAWorkspaceAccessPluginExtension "1" ..> "0..1" ConversionResult : receives
-
-UTF8ValidationService "1" ..> "0..*" Path : validates
-UTF8ValidationService "1" ..> "1" ConversionResult : returns
-
-ConversionResult "1" *-- "0..*" ConversionSuccess : contains
-ConversionResult "1" *-- "0..*" ConversionFailure : contains
-
-ConversionSuccess "1" --> "1" Path : filePath
-ConversionSuccess "1" --> "1" Path : backupPath
-
-ConversionFailure "1" --> "1" Path : filePath
-
-note bottom of ConversionResult
-  Multiplicity: 
-  - 0..* successes (may be empty if all fail)
-  - 0..* failures (may be empty if all succeed)
-  - At least one collection will be non-empty
-end note
+CBRDAPIClient "1" ..> "0..*" CBRDResponse : parses
 
 @enduml
 ```
+
 
 ### 3. UI Component Hierarchy
 
@@ -322,42 +324,47 @@ package "javax.swing" <<Java Standard Library>> {
     class JPanel
     class JTextArea
     class JScrollPane
+    class JSplitPane
     class JButton
+    class JMenuBar
     class JMenu
     class JMenuItem
 }
 
 package "com.dila.dama.plugin.workspace" {
     class DAMAWorkspaceAccessPluginExtension {
-        - panel: JPanel
         - infoArea: JTextArea
         - resultArea: JTextArea
+        - buttonPanel: JPanel
         - replaceButton: JButton
+        - convertButton: JButton
+        - transferButton: JButton
         - cancelButton: JButton
-        - actionsMenu: JMenu
+        - menuBar: JMenuBar
     }
 }
 
-' Composition relationships - UI組件包含關係
 DAMAWorkspaceAccessPluginExtension *-- "1" JPanel : mainPanel
-JPanel *-- "2" JScrollPane : contains
+DAMAWorkspaceAccessPluginExtension *-- "1" JSplitPane : mainSplit
+JSplitPane *-- "2" JScrollPane : textScrolls
 JScrollPane *-- "1" JTextArea : wraps
-DAMAWorkspaceAccessPluginExtension *-- "1" JTextArea : infoArea
-DAMAWorkspaceAccessPluginExtension *-- "1" JTextArea : resultArea
-DAMAWorkspaceAccessPluginExtension *-- "2" JButton : buttons
-DAMAWorkspaceAccessPluginExtension *-- "1" JMenu : menu
-JMenu *-- "3..*" JMenuItem : items
+DAMAWorkspaceAccessPluginExtension *-- "1" JPanel : buttonPanel
+JPanel *-- "4" JButton : actionButtons
+DAMAWorkspaceAccessPluginExtension *-- "1" JMenuBar : menuBar
+JMenuBar *-- "3" JMenu : menus
+JMenu *-- "1..*" JMenuItem : items
 
 note right of DAMAWorkspaceAccessPluginExtension
   UI Composition:
-  - 1 main panel (JPanel)
-  - 2 text areas (info + result)
-  - 2 buttons (replace + cancel)
-  - 1 actions menu with 3+ items
+  - 1 main panel (BorderLayout)
+  - split pane: info/result
+  - 4 action buttons (replace/convert/transfer/cancel)
+  - menu bar (Actions, Tools, Options)
 end note
 
 @enduml
 ```
+
 
 ---
 
@@ -369,28 +376,24 @@ end note
 
 **Stereotype**: `<<Singleton>>`
 
-**責任 (Responsibility)**: Plugin descriptor and lifecycle manager
+**Responsibility**: Plugin descriptor and lifecycle manager
 
-**屬性 (Attributes)**:
+**Attributes**:
 
 | Name | Type | Visibility | Multiplicity | Description |
 |------|------|------------|--------------|-------------|
 | instance | DAMAWorkspaceAccessPlugin | private static | 1 | Singleton instance |
 
-**方法 (Methods)**:
+**Methods**:
 
 | Signature | Visibility | Return Type | Description |
 |-----------|------------|-------------|-------------|
-| DAMAWorkspaceAccessPlugin() | public | void | Constructor, ensures singleton |
-| getInstance() | public static | DAMAWorkspaceAccessPlugin | Returns singleton instance |
+| DAMAWorkspaceAccessPlugin(descriptor: PluginDescriptor) | public | void | Construct plugin and enforce singleton |
 
 **OCL Constraints**:
 ```ocl
 context DAMAWorkspaceAccessPlugin
 inv singleton: DAMAWorkspaceAccessPlugin.allInstances()->size() = 1
-
-context DAMAWorkspaceAccessPlugin::getInstance()
-post: result = instance
 ```
 
 ---
@@ -399,65 +402,70 @@ post: result = instance
 
 **Stereotype**: `<<Extension Point>>`
 
-**責任 (Responsibility)**: Main plugin UI and business logic coordinator
+**Responsibility**: Main plugin UI and action coordinator (AI Markup, Tag Removal, UTF-8, Ref-to-Link)
 
-**屬性 (Attributes)**:
+**Attributes**:
 
 | Name | Type | Visibility | Multiplicity | Default | Description |
 |------|------|------------|--------------|---------|-------------|
-| panel | JPanel | private | 1 | null | Main UI panel |
+| pluginWorkspaceAccess | StandalonePluginWorkspace | private | 1 | null | Oxygen workspace reference |
+| resources | Object | private | 1 | null | Plugin resource bundle (i18n) |
+| optionStorage | WSOptionsStorage | private | 1 | null | Options storage reference |
 | infoArea | JTextArea | private | 1 | null | Information display area |
 | resultArea | JTextArea | private | 1 | null | Result display area |
+| buttonPanel | JPanel | private | 1 | null | Button container |
 | replaceButton | JButton | private | 1 | null | Replace action button |
+| convertButton | JButton | private | 1 | null | Convert action button (ref-to-link) |
+| transferButton | JButton | private | 1 | null | Transfer UTF-8 button |
 | cancelButton | JButton | private | 1 | null | Cancel action button |
-| pluginWorkspace | StandalonePluginWorkspace | private | 1 | null | Oxygen workspace reference |
-| resourceBundle | PluginResourceBundle | private | 1 | null | i18n resource bundle |
-| executor | ExecutorService | private | 1 | null | Async task executor |
+| currentRefToLinkUrl | String | private | 0..1 | null | Cached CBRD URL |
+| currentRefToLinkSelection | String | private | 0..1 | null | Selected <ref> XML |
+| currentNonUtf8Files | List<Path> | private | 0..* | null | Files requiring conversion |
+| executor | ExecutorService | private final | 1 | initialized | Async task executor |
+| currentOperation | OperationType | private | 1 | NONE | Active operation context |
 
-**方法 (Methods)**:
+**Methods**:
 
 | Signature | Visibility | Return Type | Parameters | Description |
 |-----------|------------|-------------|------------|-------------|
 | applicationStarted | public | void | workspace: StandalonePluginWorkspace | Initialize plugin on app start |
 | applicationClosing | public | boolean | - | Cleanup on app close |
-| createMainPanel | private | JPanel | - | Create main UI panel |
-| createTextArea | private | JTextArea | rows: int, cols: int | Create configured text area |
-| createActionsMenu | private | JMenu | - | Create actions menu |
-| processAIMarkup | private | void | - | Handle AI markup action |
-| processTagRemoval | private | void | - | Handle tag removal action |
-| checkUtf8Files | private | void | - | Handle UTF-8 check action |
-| performUtf8Conversion | private | void | files: List\<Path\> | Convert files to UTF-8 |
+| createMainPanel | private | JPanel | - | Build main UI panel |
+| createMenuBar | private | JMenuBar | - | Build menu bar (Actions/Tools/Options) |
+| createOptionsMenu | private | JMenu | - | Build options menu with icon |
+| createTextAreas | private | void | - | Initialize info/result areas |
+| createButtonPanel | private | void | - | Initialize action buttons |
+| processAIMarkup | private | String | text: String | Call LLM and return markup |
+| processTagRemoval | private | String | text: String | Strip XML/HTML tags |
+| checkUtf8Files | private | Utf8CheckResult | files: File[] | Scan for non-UTF-8 files |
+| convertFilesToUtf8 | private | String | files: List<Path> | Convert files to UTF-8 |
+| displayUtf8CheckResults | private | void | result: Utf8CheckResult | Render UTF-8 scan results |
+| displayConversionResults | private | void | results: String | Render UTF-8 conversion summary |
+| fetchSelectedText | private | String | area: JTextArea | Read selection from editor |
+| fetchSelectedRefToLinkText | private | String | - | Validate selected <ref> XML |
+| replaceSelectionWithText | private | boolean | replacementText: String | Replace selection in editor |
 | i18n | private | String | key: String | Get localized string |
-| i18n | private | String | key: String, args: Object[] | Get formatted localized string |
+| i18n | private | String | key: String, args: Object[] | Format localized string |
 
 **OCL Constraints**:
 ```ocl
 context DAMAWorkspaceAccessPluginExtension
-inv workspaceInitialized: 
-    self.panel <> null implies self.pluginWorkspace <> null
+inv uiConsistency:
+    self.infoArea <> null and
+    self.resultArea <> null and
+    self.buttonPanel <> null and
+    self.replaceButton <> null and
+    self.convertButton <> null and
+    self.transferButton <> null and
+    self.cancelButton <> null
 
-inv textAreasCreated:
-    self.panel <> null implies (self.infoArea <> null and self.resultArea <> null)
+inv workspaceRequired:
+    self.pluginWorkspaceAccess <> null implies self.optionStorage <> null
 
-inv buttonsCreated:
-    self.panel <> null implies (self.replaceButton <> null and self.cancelButton <> null)
-
-inv executorCreated:
-    self.pluginWorkspace <> null implies self.executor <> null
-
-context DAMAWorkspaceAccessPluginExtension::createTextArea(rows: Integer, cols: Integer)
-pre: rows > 0 and cols > 0
-post: result <> null and result.rows = rows and result.columns = cols
-
-context DAMAWorkspaceAccessPluginExtension::i18n(key: String)
-pre: key <> null and key.size() > 0
-pre: self.resourceBundle <> null
-post: result <> null
-
-context DAMAWorkspaceAccessPluginExtension::performUtf8Conversion(files: Collection(Path))
+context DAMAWorkspaceAccessPluginExtension::convertFilesToUtf8(files: Collection(Path))
 pre: files <> null and files->size() > 0
 pre: files->forAll(f | f <> null)
-post: 
+post:
     let result = UTF8ValidationService.convertFilesToUtf8(files, null) in
     result.getSuccessCount() + result.getFailureCount() = files->size()
 ```
@@ -470,80 +478,466 @@ post:
 
 **Stereotype**: `<<Configuration>>`
 
-**責任 (Responsibility)**: Manage plugin configuration and preferences UI
+**Responsibility**: Manage plugin configuration and preferences UI (OpenAI + CBRD)
 
-**屬性 (Attributes)**:
+**Attributes**:
 
 | Name | Type | Visibility | Multiplicity | Default | Description |
 |------|------|------------|--------------|---------|-------------|
-| apiKeyField | JPasswordField | private | 1 | null | API key input field |
-| parseModelField | JTextField | private | 1 | null | Parse model name field |
-| detectModelField | JTextField | private | 1 | null | Detect model name field |
-| resourceBundle | PluginResourceBundle | private | 1 | null | i18n resource bundle |
+| parseModelTextField | JTextField | private | 1 | null | Parse model name field |
+| detectModelTextField | JTextField | private | 1 | null | Detect model name field |
+| apiKeyTextField | JTextField | private | 1 | null | API key input field |
+| cbrdApiUrlTextField | JTextField | private | 1 | null | CBRD API endpoint |
+| cbrdRefererTextField | JTextField | private | 1 | null | CBRD Referer header |
+| cbrdTimeoutTextField | JTextField | private | 1 | null | CBRD timeout (ms) |
+| resources | PluginResourceBundle | private | 1 | null | i18n resource bundle |
 
-**方法 (Methods)**:
+**Methods**:
 
 | Signature | Visibility | Return Type | Parameters | Description |
 |-----------|------------|-------------|------------|-------------|
-| init | public | void | workspace: StandalonePluginWorkspace | Initialize preferences page |
-| apply | public | void | options: OptionsStorage | Save preferences |
+| init | public | JComponent | workspace: PluginWorkspace | Initialize preferences page |
+| apply | public | void | workspace: PluginWorkspace | Save preferences |
 | restoreDefaults | public | void | - | Reset to default values |
 | getKey | public | String | - | Get option page key |
 | getTitle | public | String | - | Get page title |
-| getMessage | public | String | - | Get page description |
-| initializeResourceBundle | private | PluginResourceBundle | locale: Locale | Load i18n resources |
 
 **OCL Constraints**:
 ```ocl
 context DAMAOptionPagePluginExtension
 inv fieldsInitialized:
-    self.apiKeyField <> null and 
-    self.parseModelField <> null and 
-    self.detectModelField <> null
-
-context DAMAOptionPagePluginExtension::apply(options: OptionsStorage)
-pre: options <> null
-post: 
-    -- API key is stored securely
-    options.getSecretOption('dila.dama.api.key', '') = 
-        new String(self.apiKeyField.getPassword())
+    self.parseModelTextField <> null and
+    self.detectModelTextField <> null and
+    self.apiKeyTextField <> null and
+    self.cbrdApiUrlTextField <> null and
+    self.cbrdRefererTextField <> null and
+    self.cbrdTimeoutTextField <> null
 
 context DAMAOptionPagePluginExtension::getKey()
-post: result = 'dila.dama.preferences'
+post: result = 'dila_ai_markup_options_page_key'
 
 context DAMAOptionPagePluginExtension::restoreDefaults()
-post: 
-    self.apiKeyField.text = '' and
-    self.parseModelField.text = '' and
-    self.detectModelField.text = ''
+post:
+    self.parseModelTextField.text = '' and
+    self.detectModelTextField.text = '' and
+    self.apiKeyTextField.text = ''
 ```
 
 ---
 
+### Package: com.dila.dama.plugin.application.command
+
+#### Class: ConvertReferenceCommand
+
+**Stereotype**: `<<Command>>`
+
+**Responsibility**: Orchestrate ref-to-link conversion (parse -> API with raw XML)
+
+**Attributes**:
+
+| Name | Type | Visibility | Multiplicity | Description |
+|------|------|------------|--------------|-------------|
+| parser | ReferenceParser | private final | 1 | XML reference parser |
+| apiClient | CBRDAPIClient | private final | 1 | CBRD API client |
+
+**Methods**:
+
+| Signature | Visibility | Return Type | Description |
+|-----------|------------|-------------|-------------|
+| execute(selectedRefXml: String) | public | ConvertReferenceResult | Execute conversion workflow |
+
+**OCL Constraints**:
+```ocl
+context ConvertReferenceCommand::execute(selectedRefXml: String)
+pre: selectedRefXml <> null and selectedRefXml.size() > 0
+post: result <> null
+```
+
+---
+
+#### Class: ConvertReferenceResult
+
+**Stereotype**: `<<Value Object>>`
+
+**Responsibility**: Represent conversion success or failure
+
+**Attributes**:
+
+| Name | Type | Visibility | Multiplicity | Description |
+|------|------|------------|--------------|-------------|
+| success | boolean | private final | 1 | Success flag |
+| url | String | private final | 0..1 | Generated URL |
+| messageKey | String | private final | 1 | i18n message key |
+| messageParams | Object[] | private final | 0..* | Message parameters |
+
+**Methods**:
+
+| Signature | Visibility | Return Type | Description |
+|-----------|------------|-------------|-------------|
+| success(url: String) | public static | ConvertReferenceResult | Create success result |
+| failure(messageKey: String, params: Object...) | public static | ConvertReferenceResult | Create failure result |
+| isSuccess() | public | boolean | Check success |
+| getUrl() | public | String | Get URL |
+| getMessageKey() | public | String | Get message key |
+| getMessageParams() | public | Object[] | Get message params |
+
+**OCL Constraints**:
+```ocl
+context ConvertReferenceResult
+inv successImpliesUrl:
+    self.success = true implies self.url <> null
+inv failureImpliesMessageKey:
+    self.success = false implies self.messageKey <> null
+```
+
+---
+
+### Package: com.dila.dama.plugin.domain.model
+
+#### Class: TripitakaComponents
+
+**Stereotype**: `<<Value Object>>`
+
+**Responsibility**: Hold raw components parsed from `<ref>`
+
+**Attributes**:
+
+| Name | Type | Visibility | Multiplicity | Description |
+|------|------|------------|--------------|-------------|
+| canon | String | private final | 1 | Canon identifier |
+| volume | String | private final | 1 | Volume number |
+| work | String | private final | 0..1 | Work number |
+| page | String | private final | 1 | Page number |
+| column | String | private final | 0..1 | Column indicator |
+| line | String | private final | 0..1 | Line number |
+
+**Methods**:
+
+| Signature | Visibility | Return Type | Description |
+|-----------|------------|-------------|-------------|
+| TripitakaComponents(...) | public | void | Construct immutable components |
+| getCanon() | public | String | Get canon |
+| getVolume() | public | String | Get volume |
+| getWork() | public | String | Get work |
+| getPage() | public | String | Get page |
+| getColumn() | public | String | Get column |
+| getLine() | public | String | Get line |
+
+**OCL Constraints**:
+```ocl
+context TripitakaComponents
+inv requiredFields:
+    self.canon <> null and self.volume <> null and self.page <> null
+```
+
+---
+
+#### Class: TransformedComponents
+
+**Stereotype**: `<<Value Object>>`
+
+**Responsibility**: Hold API-ready normalized components
+
+**Attributes**:
+
+| Name | Type | Visibility | Multiplicity | Description |
+|------|------|------------|--------------|-------------|
+| canonCode | String | private final | 1 | Canon code (1-2 chars) |
+| volume | String | private final | 1 | Volume (Arabic digits) |
+| work | String | private final | 0..1 | Work (Arabic digits) |
+| page | String | private final | 0..1 | Page (Arabic digits) |
+| column | String | private final | 0..1 | Column (a/b/c) |
+| line | String | private final | 0..1 | Line (Arabic digits) |
+
+**OCL Constraints**:
+```ocl
+context TransformedComponents
+inv canonCodeLength:
+    self.canonCode.size() >= 1 and self.canonCode.size() <= 2
+```
+
+---
+
+#### Class: ReferenceConversionSession
+
+**Stereotype**: `<<Aggregate Root>>`
+
+**Responsibility**: Track ref-to-link conversion state
+
+**Attributes**:
+
+| Name | Type | Visibility | Multiplicity | Description |
+|------|------|------------|--------------|-------------|
+| selectedRefXml | String | private final | 1 | Selected `<ref>` XML |
+| tripitakaComponents | TripitakaComponents | private final | 0..1 | Parsed components |
+| transformedComponents | TransformedComponents | private final | 0..1 | Transformed components |
+| generatedUrl | String | private final | 0..1 | Generated URL |
+| status | Status | private final | 1 | Session status |
+| messageKey | String | private final | 0..1 | i18n key |
+| messageParams | Object[] | private final | 0..* | i18n params |
+
+**Methods**:
+
+| Signature | Visibility | Return Type | Description |
+|-----------|------------|-------------|-------------|
+| initialize(selectedRefXml: String) | public static | ReferenceConversionSession | Create new session |
+| parsing() | public | ReferenceConversionSession | Mark parsing state |
+| withParsed(parsed: TripitakaComponents) | public | ReferenceConversionSession | Store parsed components |
+| withTransformed(transformed: TransformedComponents) | public | ReferenceConversionSession | Store transformed components |
+| completed(url: String) | public | ReferenceConversionSession | Mark completed |
+| replaced() | public | ReferenceConversionSession | Mark replacement complete |
+| failed(messageKey: String, params: Object...) | public | ReferenceConversionSession | Mark failed |
+
+---
+
+#### Class: InvalidReferenceException
+
+**Stereotype**: `<<Exception>>`
+
+**Responsibility**: Signal invalid `<ref>` XML or missing components
+
+**Attributes**:
+
+| Name | Type | Visibility | Multiplicity | Description |
+|------|------|------------|--------------|-------------|
+| messageKey | String | private final | 1 | i18n key |
+| params | Object[] | private final | 0..* | i18n params |
+
+**Methods**:
+
+| Signature | Visibility | Return Type | Description |
+|-----------|------------|-------------|-------------|
+| getMessageKey() | public | String | Get message key |
+| getParams() | public | Object[] | Get parameters |
+
+---
+
+#### Class: TransformationException
+
+**Stereotype**: `<<Exception>>`
+
+**Responsibility**: Signal transformation errors
+
+**Attributes**:
+
+| Name | Type | Visibility | Multiplicity | Description |
+|------|------|------------|--------------|-------------|
+| messageKey | String | private final | 1 | i18n key |
+| params | Object[] | private final | 0..* | i18n params |
+
+**Methods**:
+
+| Signature | Visibility | Return Type | Description |
+|-----------|------------|-------------|-------------|
+| getMessageKey() | public | String | Get message key |
+| getParams() | public | Object[] | Get parameters |
+
+---
+
+### Package: com.dila.dama.plugin.domain.service
+
+#### Class: ReferenceParser
+
+**Stereotype**: `<<Service>>`
+
+**Responsibility**: Parse selected `<ref>` XML into components
+
+**Methods**:
+
+| Signature | Visibility | Return Type | Description |
+|-----------|------------|-------------|-------------|
+| parseReference(selectedXml: String) | public | TripitakaComponents | Parse and validate XML |
+
+---
+
+#### Class: ComponentTransformer
+
+**Stereotype**: `<<Service>>`
+
+**Responsibility**: Transform raw components into API format
+
+**Attributes**:
+
+| Name | Type | Visibility | Multiplicity | Description |
+|------|------|------------|--------------|-------------|
+| numeralConverter | NumeralConverter | private final | 1 | Numeral conversion helper |
+
+**Methods**:
+
+| Signature | Visibility | Return Type | Description |
+|-----------|------------|-------------|-------------|
+| transform(components: TripitakaComponents) | public | TransformedComponents | Normalize values |
+
+---
+
+#### Class: NumeralConverter
+
+**Stereotype**: `<<Service>>`
+
+**Responsibility**: Convert mixed numerals to Arabic digits
+
+**Methods**:
+
+| Signature | Visibility | Return Type | Description |
+|-----------|------------|-------------|-------------|
+| toArabicDigits(input: String) | public | String | Normalize numerals |
+
+---
+
+#### Class: RefElementRewriter
+
+**Stereotype**: `<<Service>>`
+
+**Responsibility**: Rewrite `<ref>` with new `<ptr>` and checked flag
+
+**Methods**:
+
+| Signature | Visibility | Return Type | Description |
+|-----------|------------|-------------|-------------|
+| rewrite(refXml: String, newUrl: String) | public | String | Return rewritten XML |
+
+---
+
+### Package: com.dila.dama.plugin.infrastructure.api
+
+#### Class: CBRDAPIClient
+
+**Stereotype**: `<<Infrastructure Service>>`
+
+**Responsibility**: Call CBRD API and return first link
+
+**Attributes**:
+
+| Name | Type | Visibility | Multiplicity | Description |
+|------|------|------------|--------------|-------------|
+| apiUrl | String | private final | 1 | API endpoint |
+| refererHeaderValue | String | private final | 1 | Referer header |
+| timeoutMs | int | private final | 1 | Timeout in ms |
+| connectionFactory | HttpUrlConnectionFactory | private final | 1 | Connection factory |
+
+**Methods**:
+
+| Signature | Visibility | Return Type | Description |
+|-----------|------------|-------------|-------------|
+| convertToFirstLink(components: TransformedComponents) | public | String | Call API and return URL |
+| convertToFirstLink(refXml: String) | public | String | Call API with raw `<ref>` XML |
+
+---
+
+#### Class: CBRDResponse
+
+**Stereotype**: `<<DTO>>`
+
+**Responsibility**: Parse JSON response from CBRD API
+
+**Attributes**:
+
+| Name | Type | Visibility | Multiplicity | Description |
+|------|------|------------|--------------|-------------|
+| success | boolean | private final | 1 | Success flag |
+| found | List<String> | private final | 0..* | URLs found |
+| error | String | private final | 0..1 | Error message |
+
+**Methods**:
+
+| Signature | Visibility | Return Type | Description |
+|-----------|------------|-------------|-------------|
+| fromJson(json: String) | public static | CBRDResponse | Parse JSON |
+| getFirstUrl() | public | String | First URL or null |
+
+---
+
+#### Class: CBRDAPIException
+
+**Stereotype**: `<<Exception>>`
+
+**Responsibility**: Represent API failures (timeout, HTTP, response)
+
+**Attributes**:
+
+| Name | Type | Visibility | Multiplicity | Description |
+|------|------|------------|--------------|-------------|
+| messageKey | String | private final | 1 | i18n key |
+| params | Object[] | private final | 0..* | i18n params |
+
+---
+
+#### Class: HttpUrlConnectionFactory
+
+**Stereotype**: `<<Factory>>`
+
+**Responsibility**: Create HttpURLConnection instances
+
+**Methods**:
+
+| Signature | Visibility | Return Type | Description |
+|-----------|------------|-------------|-------------|
+| openConnection(url: URL) | public | HttpURLConnection | Open connection |
+
+---
+
+### Package: com.dila.dama.plugin.util
+
+#### Class: XmlDomUtils
+
+**Stereotype**: `<<Utility>>`
+
+**Responsibility**: Parse XML safely and serialize DOM nodes
+
+**Methods**:
+
+| Signature | Visibility | Return Type | Description |
+|-----------|------------|-------------|-------------|
+| parseXml(xml: String) | public static | Document | Parse XML string |
+| toXmlString(node: Node) | public static | String | Serialize XML node |
+
+---
+
+#### Class: PluginLogger
+
+**Stereotype**: `<<Utility>>`
+
+**Responsibility**: Centralized logging with debug toggle
+
+**Methods**:
+
+| Signature | Visibility | Return Type | Description |
+|-----------|------------|-------------|-------------|
+| debug(message: String) | public static | void | Log debug message |
+| info(message: String) | public static | void | Log info message |
+| warn(message: String) | public static | void | Log warning |
+| error(message: String) | public static | void | Log error |
+
+---
 ### Package: com.dila.dama.plugin.utf8
 
 #### Class: UTF8ValidationService
 
 **Stereotype**: `<<Utility>>` `<<Static>>`
 
-**責任 (Responsibility)**: UTF-8 validation and file encoding conversion
+**Responsibility**: UTF-8 validation and file encoding conversion
 
-**屬性 (Attributes)**:
+**Attributes**:
 
 | Name | Type | Visibility | Multiplicity | Default | Description |
 |------|------|------------|--------------|---------|-------------|
-| MAX_FILE_SIZE | long | public static final | 1 | 52428800 | Max file size (50MB) |
+| MAX_FILE_SIZE | int | private static final | 1 | 52428800 | Max file size (50MB) |
+| BUFFER_SIZE | int | private static final | 1 | 8192 | IO buffer size |
 
-**方法 (Methods)**:
+**Methods**:
 
 | Signature | Visibility | Return Type | Parameters | Description |
 |-----------|------------|-------------|------------|-------------|
 | isValidUtf8 | public static | boolean | filePath: Path | Check if file is valid UTF-8 |
-| convertFilesToUtf8 | public static | ConversionResult | files: List\<Path\>, encoding: String | Convert files to UTF-8 |
-| scanForNonUtf8Files | public static | List\<Path\> | paths: Path[] | Find non-UTF-8 files |
+| isTextFile | public static | boolean | filePath: Path | Check if file is text |
+| scanForNonUtf8Files | public static | List<Path> | paths: Path[] | Find non-UTF-8 files |
+| convertFilesToUtf8 | public static | ConversionResult | files: List<Path>, encoding: String | Convert files to UTF-8 |
 | detectEncoding | private static | String | filePath: Path | Detect file encoding |
-| isTextFile | private static | boolean | filePath: Path | Check if file is text |
-| scanPathRecursively | private static | void | path: Path, results: List\<Path\> | Recursive directory scan |
+| readFirstBytes | private static | byte[] | filePath: Path, numBytes: int | Read leading bytes |
+| canDecodeWith | private static | boolean | filePath: Path, encoding: String | Check decode capability |
+| createBackup | private static | Path | originalFile: Path | Create .utf8backup |
+| convertFileToUtf8 | private static | void | filePath: Path, sourceEncoding: String | Convert a single file |
+| scanPathRecursively | private static | void | path: Path, results: List<Path> | Recursive directory scan |
 
 **OCL Constraints**:
 ```ocl
@@ -552,27 +946,23 @@ inv staticClass: UTF8ValidationService.allInstances()->size() = 0
 
 context UTF8ValidationService::isValidUtf8(filePath: Path)
 pre: filePath <> null
-pre: Files.exists(filePath) = true
-pre: Files.isRegularFile(filePath) = true
 post: result = true or result = false
 
 context UTF8ValidationService::convertFilesToUtf8(
-    files: Collection(Path), 
+    files: Collection(Path),
     encoding: String)
 pre: files <> null and files->size() > 0
 pre: files->forAll(f | f <> null and Files.exists(f))
 post: result <> null
 post: result.getSuccessCount() + result.getFailureCount() = files->size()
-post: result.getSuccesses()->forAll(s | 
+post: result.getSuccesses()->forAll(s |
     Files.exists(s.getBackupPath()) and
     s.getBackupPath().toString().endsWith('.utf8backup')
 )
 
 context UTF8ValidationService::scanForNonUtf8Files(paths: Path[])
 pre: paths <> null and paths.length > 0
-pre: paths->forAll(p | p <> null and Files.exists(p))
 post: result <> null
-post: result->forAll(f | not isValidUtf8(f))
 ```
 
 ---
@@ -707,57 +1097,45 @@ inv immutable:
 !theme plain
 
 actor User
-participant "Oxygen\nXML Editor" as Oxygen
-participant "DAMAWorkspaceAccess\nPlugin" as Plugin
-participant "DAMAWorkspaceAccess\nPluginExtension" as Extension
-participant "DAMAOptionPage\nPluginExtension" as Options
+participant "Oxygen
+XML Editor" as Oxygen
+participant "DAMAWorkspaceAccess
+Plugin" as Plugin
+participant "DAMAWorkspaceAccess
+PluginExtension" as Extension
+participant "ViewComponentCustomizer" as ViewCustomizer
 participant "ResourceBundle" as i18n
 
 User -> Oxygen: Start Application
 activate Oxygen
 
-Oxygen -> Plugin: new DAMAWorkspaceAccessPlugin()
+Oxygen -> Plugin: new DAMAWorkspaceAccessPlugin(descriptor)
 activate Plugin
-Plugin -> Plugin: Check singleton instance
+Plugin -> Plugin: enforce singleton
 Plugin --> Oxygen: plugin instance
 deactivate Plugin
 
 Oxygen -> Extension: applicationStarted(workspace)
 activate Extension
-
-Extension -> i18n: Load translations
-activate i18n
-i18n --> Extension: resourceBundle
-deactivate i18n
-
-Extension -> Extension: createMainPanel()
-activate Extension
-Extension -> Extension: createTextArea(15, 50)
-Extension -> Extension: createTextArea(20, 50)
-Extension -> Extension: createActionsMenu()
-deactivate Extension
-
+Extension -> Extension: cache workspace + options
 Extension -> Oxygen: addViewComponentCustomizer()
-Extension -> Oxygen: addMenuBarCustomizer()
-
-Extension --> Oxygen: void
 deactivate Extension
 
-Oxygen -> Options: init(workspace)
-activate Options
-Options -> i18n: Load translations
-activate i18n
-i18n --> Options: resourceBundle
-deactivate i18n
-Options -> Options: Create UI fields
-Options --> Oxygen: void
-deactivate Options
+Oxygen -> ViewCustomizer: customizeView(viewInfo)
+activate ViewCustomizer
+ViewCustomizer -> Extension: createMainPanel()
+Extension -> Extension: createMenuBar()
+Extension -> Extension: createTextAreas()
+Extension -> Extension: createButtonPanel()
+ViewCustomizer --> Oxygen: setComponent(panel)
+deactivate ViewCustomizer
 
 Oxygen --> User: Application Ready
 deactivate Oxygen
 
 @enduml
 ```
+
 
 ### 2. AI Markup Processing Sequence
 
@@ -839,7 +1217,63 @@ deactivate Ext
 @enduml
 ```
 
-### 3. UTF-8 Validation and Conversion Sequence
+
+### 3. Ref-to-Link Conversion Sequence
+
+```plantuml
+@startuml
+!theme plain
+
+actor User
+participant "Extension" as Ext
+participant "WSEditor" as Editor
+participant "ConvertReferenceCommand" as Command
+participant "ReferenceParser" as Parser
+participant "CBRDAPIClient" as API
+participant "RefElementRewriter" as Rewriter
+participant "InfoArea" as Info
+participant "ResultArea" as Result
+
+User -> Ext: Click "<ref> to link"
+activate Ext
+
+Ext -> Editor: getSelectedText()
+Editor --> Ext: selectedRefXml
+Ext -> Info: show selection details
+
+Ext -> Command: execute(selectedRefXml)
+activate Command
+Command -> Parser: parseReference()
+Parser --> Command: TripitakaComponents
+Command -> API: convertToFirstLink(raw refXml)
+API --> Command: url or error
+Command --> Ext: ConvertReferenceResult
+deactivate Command
+
+alt Success
+    Ext -> Result: setText(url)
+    Ext -> Info: append success
+    Ext -> Ext: show Replace button
+else Failure
+    Ext -> Result: setText(error message)
+    Ext -> Ext: keep Convert button for retry
+end
+
+deactivate Ext
+
+User -> Ext: Click "Replace"
+activate Ext
+Ext -> Rewriter: rewrite(selectedRefXml, url)
+Rewriter --> Ext: rewrittenRefXml
+Ext -> Editor: replaceSelection(rewrittenRefXml)
+Ext -> Info: append "Replacement complete"
+
+deactivate Ext
+
+@enduml
+```
+
+### 4. UTF-8 Validation and Conversion Sequence
 
 ```plantuml
 @startuml
@@ -948,7 +1382,7 @@ deactivate Ext
 @enduml
 ```
 
-### 4. Tag Removal Sequence
+### 5. Tag Removal Sequence
 
 ```plantuml
 @startuml
@@ -1023,35 +1457,39 @@ deactivate Ext
 [*] --> Uninitialized
 
 Uninitialized --> Initializing: applicationStarted()
+Initializing --> CreatingUI: Build view
+CreatingUI --> Ready: View ready
 
-Initializing --> Loading: Load i18n resources
-Loading --> CreatingUI: Create panel
-CreatingUI --> RegisteringMenus: Register menus
-RegisteringMenus --> Ready: Complete initialization
-
-Ready --> ProcessingAI: processAIMarkup()
-Ready --> ProcessingTag: processTagRemoval()
-Ready --> CheckingUtf8: checkUtf8Files()
+Ready --> ProcessingAI: AI Markup
+Ready --> ProcessingTag: Tag Removal
+Ready --> CheckingUtf8: UTF-8 Check
+Ready --> RefToLinkSelected: <ref> to link
 
 ProcessingAI --> WaitingAPI: Send request
 WaitingAPI --> DisplayingResult: Receive response
 DisplayingResult --> Ready: Display in result area
 
 ProcessingTag --> DisplayingResult: Process locally
-CheckingUtf8 --> ScanningFiles: Scan directories
 
+CheckingUtf8 --> ScanningFiles: Scan directories
 ScanningFiles --> DisplayingResults: Show non-UTF-8 files
 DisplayingResults --> WaitingConversion: User clicks "Transfer"
 WaitingConversion --> Converting: Convert files
 Converting --> DisplayingResults: Show conversion results
 DisplayingResults --> Ready: Operation complete
 
+RefToLinkSelected --> ConvertingRef: Auto convert on action
+ConvertingRef --> DisplayingRefResult: URL or error
+DisplayingRefResult --> ReplacingRef: User clicks "Replace"
+ReplacingRef --> Ready: Replacement complete
+
 Ready --> Closing: applicationClosing()
 Closing --> Cleanup: Shutdown executor
-Cleanup --> [*]: Plugin closed
+Cleanup --> [*]
 
 @enduml
 ```
+
 
 ### 2. Conversion Operation State
 
@@ -1103,24 +1541,19 @@ Complete --> [*]
 @startuml
 !theme plain
 
-[*] --> Disabled
+[*] --> Hidden
 
-Disabled --> Enabled: Result area has content
+Hidden --> ReplaceVisible: AI Markup/Tag Removal result
+Hidden --> ConvertVisible: Ref-to-Link selected
+ConvertVisible --> ReplaceVisible: Ref-to-Link success
+Hidden --> TransferVisible: UTF-8 check finds non-UTF-8
 
-Enabled --> Processing: User clicks button
-Processing --> Applying: Perform operation
-Applying --> Disabled: Clear result area
-
-Enabled --> Disabled: Clear result area
-Enabled --> Disabled: Cancel clicked
-
-note right of Processing
-  Replace button: Replace selection
-  Cancel button: Clear result
-end note
+TransferVisible --> Hidden: Transfer or Cancel
+ReplaceVisible --> Hidden: Replace or Cancel
 
 @enduml
 ```
+
 
 ---
 
@@ -1131,7 +1564,7 @@ end note
 ```ocl
 -- Plugin Singleton
 context DAMAWorkspaceAccessPlugin
-inv singleInstance: 
+inv singleInstance:
     DAMAWorkspaceAccessPlugin.allInstances()->size() <= 1
 
 inv instanceConsistency:
@@ -1141,17 +1574,17 @@ inv instanceConsistency:
 -- Extension Initialization
 context DAMAWorkspaceAccessPluginExtension
 inv uiConsistency:
-    self.panel <> null implies (
-        self.infoArea <> null and
-        self.resultArea <> null and
-        self.replaceButton <> null and
-        self.cancelButton <> null and
-        self.resourceBundle <> null and
-        self.executor <> null
-    )
+    self.infoArea <> null and
+    self.resultArea <> null and
+    self.buttonPanel <> null and
+    self.replaceButton <> null and
+    self.convertButton <> null and
+    self.transferButton <> null and
+    self.cancelButton <> null and
+    self.executor <> null
 
 inv workspaceRequired:
-    self.pluginWorkspace <> null
+    self.pluginWorkspaceAccess <> null
 
 -- UTF-8 Service
 context UTF8ValidationService
@@ -1170,24 +1603,24 @@ inv noDuplicateFailures:
     self.failures->forAll(f1, f2 | f1 <> f2 implies f1.filePath <> f2.filePath)
 ```
 
+
 ### Pre/Post Conditions
 
 ```ocl
 -- AI Markup Processing
-context DAMAWorkspaceAccessPluginExtension::processAIMarkup()
-pre hasSelection:
-    self.pluginWorkspace.getCurrentEditorAccess(StandalonePluginWorkspace.MAIN_EDITING_AREA)
-        .getEditorAccess().getSelectedText() <> null and
-    self.pluginWorkspace.getCurrentEditorAccess(StandalonePluginWorkspace.MAIN_EDITING_AREA)
-        .getEditorAccess().getSelectedText().length() > 0
+context DAMAWorkspaceAccessPluginExtension::processAIMarkup(text: String)
+pre: text <> null and text.size() > 0
+post: result <> null
 
-pre hasApiKey:
-    let apiKey = self.pluginWorkspace.getOptionsStorage()
-        .getSecretOption('dila.dama.api.key', '') in
-    apiKey <> null and apiKey.length() > 0
+-- Ref-to-Link Command
+context ConvertReferenceCommand::execute(selectedRefXml: String)
+pre: selectedRefXml <> null and selectedRefXml.size() > 0
+post: result <> null
 
-post infoUpdated:
-    self.infoArea.getText() <> null
+context RefElementRewriter::rewrite(refXml: String, newUrl: String)
+pre: refXml <> null and refXml.size() > 0
+pre: newUrl <> null and newUrl.size() > 0
+post: result <> null and result.matches('.*<[^>]*ptr[^>]*>.*')
 
 -- UTF-8 Validation
 context UTF8ValidationService::isValidUtf8(filePath: Path)
@@ -1205,7 +1638,7 @@ post booleanResult:
 
 -- File Conversion
 context UTF8ValidationService::convertFilesToUtf8(
-    files: Collection(Path), 
+    files: Collection(Path),
     encoding: String)
 pre filesNotNull:
     files <> null and files->size() > 0
@@ -1221,7 +1654,7 @@ post resultComplete:
     result.getSuccessCount() + result.getFailureCount() = files->size()
 
 post backupsCreated:
-    result.getSuccesses()->forAll(s | 
+    result.getSuccesses()->forAll(s |
         Files.exists(s.getBackupPath()) and
         s.getBackupPath().toString() = s.getFilePath().toString() + '.utf8backup'
     )
@@ -1234,24 +1667,11 @@ post originalContentPreserved:
     )
 
 -- Tag Removal
-context DAMAWorkspaceAccessPluginExtension::processTagRemoval()
-pre hasSelection:
-    self.pluginWorkspace.getCurrentEditorAccess(StandalonePluginWorkspace.MAIN_EDITING_AREA)
-        .getEditorAccess().getSelectedText() <> null
-
-post tagsRemoved:
-    let result = self.resultArea.getText() in
-    not result.matches('.*<[^>]+>.*')
-
-post contentPreserved:
-    -- Text content between tags is preserved
-    let original = self.pluginWorkspace.getCurrentEditorAccess(
-            StandalonePluginWorkspace.MAIN_EDITING_AREA)
-        .getEditorAccess().getSelectedText() in
-    let cleaned = self.resultArea.getText() in
-    -- All non-tag characters from original appear in cleaned
-    original.replaceAll('<[^>]+>', '') = cleaned
+context DAMAWorkspaceAccessPluginExtension::processTagRemoval(text: String)
+pre: text <> null and text.size() > 0
+post: not result.matches('.*<[^>]+>.*')
 ```
+
 
 ### Derived Attributes
 
@@ -1282,169 +1702,82 @@ def: isProcessing: Boolean =
 
 ### 1. Singleton Pattern
 
-**適用類別 (Applied Classes)**: `DAMAWorkspaceAccessPlugin`
+**Applied Classes**: `DAMAWorkspaceAccessPlugin`
 
-**目的 (Purpose)**: Ensure only one plugin instance exists
+**Purpose**: Ensure only one plugin instance exists
 
-**實現 (Implementation)**:
+**Implementation**:
 ```java
 public class DAMAWorkspaceAccessPlugin extends Plugin {
-    private static DAMAWorkspaceAccessPlugin instance;
-    
-    public DAMAWorkspaceAccessPlugin() {
+    private static DAMAWorkspaceAccessPlugin instance = null;
+
+    public DAMAWorkspaceAccessPlugin(PluginDescriptor descriptor) {
+        super(descriptor);
         if (instance != null) {
-            throw new IllegalStateException("Plugin already initialized");
+            throw new IllegalStateException("Already instantiated!");
         }
         instance = this;
     }
-    
-    public static DAMAWorkspaceAccessPlugin getInstance() {
-        return instance;
-    }
-}
-```
-
-**OCL約束 (OCL Constraints)**:
-```ocl
-context DAMAWorkspaceAccessPlugin
-inv singleton: DAMAWorkspaceAccessPlugin.allInstances()->size() = 1
-```
-
----
-
-### 2. Strategy Pattern (Implicit)
-
-**適用場景 (Applied Scenario)**: Different encoding detection strategies
-
-**目的 (Purpose)**: Support multiple encoding detection algorithms
-
-**實現 (Implementation)**:
-```java
-private static String detectEncoding(Path filePath) {
-    // Strategy 1: Check BOM
-    if (hasBOM(bytes)) return detectBOMEncoding(bytes);
-    
-    // Strategy 2: Check alternating nulls (UTF-16)
-    if (hasAlternatingNulls(bytes)) return "UTF-16";
-    
-    // Strategy 3: Try common encodings
-    for (String encoding : COMMON_ENCODINGS) {
-        if (canDecode(bytes, encoding)) return encoding;
-    }
-    
-    return "UTF-8"; // Default
 }
 ```
 
 ---
 
-### 3. Command Pattern (Implicit)
+### 2. Command Pattern
 
-**適用場景 (Applied Scenario)**: Menu action handlers
+**Applied Classes**: `ConvertReferenceCommand`, UI action listeners
 
-**目的 (Purpose)**: Encapsulate requests as objects
+**Purpose**: Encapsulate the ref-to-link workflow behind a single command
 
-**實現 (Implementation)**:
+**Implementation**:
 ```java
-// AI Markup Command
-JMenuItem aiMarkupItem = new JMenuItem(i18n("menu.actions.aiMarkup"));
-aiMarkupItem.addActionListener(e -> processAIMarkup());
-
-// Tag Removal Command
-JMenuItem tagRemovalItem = new JMenuItem(i18n("menu.tools.tagRemoval"));
-tagRemovalItem.addActionListener(e -> processTagRemoval());
-
-// UTF-8 Check Command
-JMenuItem utf8CheckItem = new JMenuItem(i18n("menu.tools.utf8Check"));
-utf8CheckItem.addActionListener(e -> checkUtf8Files());
+ConvertReferenceCommand command = new ConvertReferenceCommand(
+    new ReferenceParser(),
+    new CBRDAPIClient(apiUrl, referer, timeoutMs, new HttpUrlConnectionFactory())
+);
+ConvertReferenceResult result = command.execute(selectedRefXml);
 ```
 
 ---
 
-### 4. Template Method Pattern
+### 3. Value Object Pattern
 
-**適用場景 (Applied Scenario)**: File processing workflow
+**Applied Classes**: `TripitakaComponents`, `TransformedComponents`, `ConvertReferenceResult`,
+`ConversionSuccess`, `ConversionFailure`
 
-**目的 (Purpose)**: Define skeleton of conversion algorithm
+**Purpose**: Immutable carriers of domain data
 
-**實現 (Implementation)**:
+**Characteristics**:
+- Final fields, no setters
+- Equality by value
+- Safe to pass across layers
+
+---
+
+### 4. Utility Pattern
+
+**Applied Classes**: `UTF8ValidationService`, `XmlDomUtils`, `PluginLogger`
+
+**Purpose**: Stateless helper methods for cross-cutting concerns
+
+**Implementation**:
 ```java
-public static ConversionResult convertFilesToUtf8(List<Path> files, String encoding) {
-    ConversionResult result = new ConversionResult();
-    
-    for (Path file : files) {
-        try {
-            // Template steps:
-            String detectedEncoding = detectEncoding(file);  // Step 1
-            Path backup = createBackup(file);                // Step 2
-            String content = readWithEncoding(file, detectedEncoding); // Step 3
-            writeAsUtf8(file, content);                      // Step 4
-            result.addSuccess(file, backup, detectedEncoding);
-        } catch (Exception e) {
-            result.addFailure(file, e.getMessage());
-        }
-    }
-    
-    return result;
-}
+Document doc = XmlDomUtils.parseXml(xml);
+String serialized = XmlDomUtils.toXmlString(doc.getDocumentElement());
+PluginLogger.info("Parsed ref element");
 ```
 
 ---
 
-### 5. Observer Pattern (Implicit)
+### 5. Factory Pattern (Lightweight)
 
-**適用場景 (Applied Scenario)**: Button state management
+**Applied Classes**: `HttpUrlConnectionFactory`
 
-**目的 (Purpose)**: Update button state when result area changes
+**Purpose**: Centralize creation of HTTP connections for testability
 
-**實現 (Implementation)**:
+**Implementation**:
 ```java
-resultArea.getDocument().addDocumentListener(new DocumentListener() {
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-        updateButtonStates();
-    }
-    
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-        updateButtonStates();
-    }
-    
-    @Override
-    public void changedUpdate(DocumentEvent e) {
-        updateButtonStates();
-    }
-});
-
-private void updateButtonStates() {
-    boolean hasContent = resultArea.getText() != null && 
-                        !resultArea.getText().isEmpty();
-    replaceButton.setEnabled(hasContent);
-    cancelButton.setEnabled(hasContent);
-}
-```
-
----
-
-### 6. Value Object Pattern
-
-**適用類別 (Applied Classes)**: `ConversionSuccess`, `ConversionFailure`
-
-**目的 (Purpose)**: Immutable objects representing conversion results
-
-**特性 (Characteristics)**:
-- All fields are `final`
-- No setters
-- Thread-safe
-- Can be compared by value
-
-**OCL約束 (OCL Constraints)**:
-```ocl
-context ConversionSuccess
-inv immutable:
-    self.filePath@pre = self.filePath and
-    self.backupPath@pre = self.backupPath and
-    self.sourceEncoding@pre = self.sourceEncoding
+HttpURLConnection conn = new HttpUrlConnectionFactory().openConnection(url);
 ```
 
 ---
@@ -1466,6 +1799,38 @@ package "com.dila.dama.plugin" {
     package "preferences" {
         [DAMAOptionPagePluginExtension]
     }
+
+    package "application.command" {
+        [ConvertReferenceCommand]
+        [ConvertReferenceResult]
+    }
+
+    package "domain.model" {
+        [TripitakaComponents]
+        [TransformedComponents]
+        [ReferenceConversionSession]
+        [InvalidReferenceException]
+        [TransformationException]
+    }
+
+    package "domain.service" {
+        [ReferenceParser]
+        [ComponentTransformer]
+        [NumeralConverter]
+        [RefElementRewriter]
+    }
+
+    package "infrastructure.api" {
+        [CBRDAPIClient]
+        [CBRDResponse]
+        [CBRDAPIException]
+        [HttpUrlConnectionFactory]
+    }
+
+    package "util" {
+        [XmlDomUtils]
+        [PluginLogger]
+    }
     
     package "utf8" {
         [UTF8ValidationService]
@@ -1475,52 +1840,28 @@ package "com.dila.dama.plugin" {
     }
 }
 
-package "ro.sync.exml.plugin" <<External SDK>> {
-    [Plugin]
-    [WorkspaceAccessPluginExtension]
-    [OptionPagePluginExtension]
-    [StandalonePluginWorkspace]
-}
-
-package "javax.swing" <<Java Standard>> {
-    [JPanel]
-    [JTextArea]
-    [JButton]
-}
-
-package "java.nio.file" <<Java Standard>> {
-    [Path]
-    [Files]
-}
-
-[DAMAWorkspaceAccessPlugin] ..> [Plugin]
-[DAMAWorkspaceAccessPluginExtension] ..> [WorkspaceAccessPluginExtension]
-[DAMAOptionPagePluginExtension] ..> [OptionPagePluginExtension]
-
+[DAMAWorkspaceAccessPluginExtension] --> [ConvertReferenceCommand]
+[DAMAWorkspaceAccessPluginExtension] --> [RefElementRewriter]
 [DAMAWorkspaceAccessPluginExtension] --> [UTF8ValidationService]
-[DAMAWorkspaceAccessPluginExtension] --> [StandalonePluginWorkspace]
-[DAMAWorkspaceAccessPluginExtension] --> [JPanel]
+[DAMAOptionPagePluginExtension] --> [PluginLogger]
+
+[ConvertReferenceCommand] --> [ReferenceParser]
+[ConvertReferenceCommand] --> [CBRDAPIClient]
+
+[ReferenceParser] --> [TripitakaComponents]
+[RefElementRewriter] --> [XmlDomUtils]
+
+[CBRDAPIClient] --> [CBRDResponse]
+[CBRDAPIClient] --> [HttpUrlConnectionFactory]
 
 [UTF8ValidationService] --> [ConversionResult]
-[UTF8ValidationService] --> [Path]
-[ConversionResult] --> [ConversionSuccess]
-[ConversionResult] --> [ConversionFailure]
 
 note right of workspace
-  Main plugin logic
-  UI management
-  Action handlers
+  UI + action orchestration
 end note
 
-note right of preferences
-  Configuration management
-  Options page UI
-end note
-
-note right of utf8
-  UTF-8 validation
-  File conversion
-  Encoding detection
+note right of domain.service
+  Parsing and transformation logic
 end note
 
 @enduml
@@ -1530,9 +1871,14 @@ end note
 
 | Package | Responsibility | Classes | Dependencies |
 |---------|---------------|---------|--------------|
-| **workspace** | Plugin lifecycle, UI management, action handling | 2 | preferences, utf8, Oxygen SDK, Swing |
-| **preferences** | Configuration management, options UI | 1 | Oxygen SDK, Swing |
-| **utf8** | UTF-8 validation, file conversion | 4 | Java NIO |
+| **workspace** | Plugin lifecycle, UI, action orchestration | 2 | preferences, application.command, domain.service, utf8, util, Oxygen SDK, Swing |
+| **preferences** | Configuration management, options UI | 1 | Oxygen SDK, util |
+| **application.command** | Orchestrate ref-to-link workflow | 2 | domain.service, infrastructure.api |
+| **domain.model** | Domain value objects and session state | 5 | Java |
+| **domain.service** | Parsing, transformation, rewrite logic | 4 | domain.model, util |
+| **infrastructure.api** | CBRD API integration | 4 | domain.model, util, org.json |
+| **util** | XML parsing + logging utilities | 2 | Java XML, IO |
+| **utf8** | UTF-8 validation and conversion | 4 | Java NIO |
 
 ---
 
@@ -1558,6 +1904,13 @@ node "Oxygen XML Editor" {
         package "preferences" {
             [Options Page]
         }
+        package "application.command" {
+            [ConvertReferenceCommand]
+        }
+        package "domain.service" {
+            [ReferenceParser]
+            [ComponentTransformer]
+        }
         package "utf8" {
             [Validation Service]
         }
@@ -1574,6 +1927,7 @@ node "Oxygen XML Editor" {
 
 cloud "External Services" {
     [OpenAI API]
+    [CBRD API]
 }
 
 folder "File System" {
@@ -1585,6 +1939,7 @@ folder "File System" {
 [Plugin Extension] --> [Editor Access] : uses
 [Plugin Extension] --> [Validation Service] : uses
 [Plugin Extension] --> [OpenAI API] : HTTP/HTTPS
+[Plugin Extension] --> [CBRD API] : HTTP/HTTPS
 [Options Page] --> [Options Storage] : uses
 [Options Page] --> [options.xml] : reads/writes
 [Plugin Extension] --> [translation.xml] : loads
@@ -1625,6 +1980,7 @@ node "User Workstation" {
 
 cloud "Internet" {
     [api.openai.com]
+    [cbss.dila.edu.tw]
 }
 
 [Oxygen XML Editor Process] --> [Plugin ClassLoader] : loads
@@ -1632,6 +1988,7 @@ cloud "Internet" {
 [Oxygen XML Editor Process] --> [.oxygen/options.xml] : reads/writes
 [Oxygen XML Editor Process] --> [User Documents] : edits
 [ExecutorService Thread Pool] --> [api.openai.com] : HTTPS requests
+[ExecutorService Thread Pool] --> [cbss.dila.edu.tw] : HTTPS requests
 [Oxygen XML Editor Process] --> [*.utf8backup files] : creates
 
 note bottom of "User Workstation"
@@ -1639,7 +1996,7 @@ note bottom of "User Workstation"
   - Windows/macOS/Linux
   - JRE 1.8+
   - 100MB disk space
-  - Internet connection (for AI features)
+  - Internet connection (AI + CBRD features)
 end note
 
 @enduml
@@ -1735,6 +2092,7 @@ inv errorMessage:
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
+| 0.4.0 | 2026-01-05 | Jeff Y.H. Wu | Update architecture for ref-to-link pipeline and CBRD API |
 | 1.0 | 2025-10-10 | Jeff Y.H. Wu | Initial RUP design document |
 
 ---

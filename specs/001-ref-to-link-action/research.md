@@ -133,8 +133,8 @@ Based on API example and spec.md FR-003:
 Based on FR-014, the plugin should allow configuration of:
 - **API Base URL**: `https://cbss.dila.edu.tw/dev/cbrd/link` (configurable for different environments)
 - **Referer Header Value**: `CBRD@dila.edu.tw` (configurable if needed)
-- **Timeout**: API call timeout in milliseconds (default 3000ms per SC-003)
-- **Retry Policy**: Number of retries on failure (default: 0, manual retry via Convert button per FR-013)
+- **Timeout**: API call timeout in milliseconds (default 3000ms per attempt)
+- **Retry Policy**: Automatic retries on timeout (default: 3 attempts with exponential backoff), manual retry via Convert button per FR-013
 
 ### Implementation Approach
 
@@ -144,7 +144,7 @@ Based on FR-014, the plugin should allow configuration of:
 public class CBRDAPIClient {
     private String apiUrl = "https://cbss.dila.edu.tw/dev/cbrd/link";
     private String refererHeader = "CBRD@dila.edu.tw";
-    private int timeout = 3000; // 3 seconds
+    private int timeout = 3000; // 3 seconds per attempt
 
     /**
      * Call CBRD API to convert reference to CBETA link
@@ -216,7 +216,7 @@ This appears to be a simple authentication/tracking mechanism. The API requires 
 ### Error Handling
 
 **API-level errors:**
-1. **Connection timeout**: Network unreachable, slow response (>3s per SC-003)
+1. **Connection timeout**: Network unreachable, slow response (exceeds configured timeout window)
 2. **HTTP errors**: 4xx (bad request), 5xx (server error)
 3. **Malformed response**: Invalid JSON, unexpected structure
 4. **No results**: `success: true` but `found: []` (empty array)
@@ -229,14 +229,14 @@ This appears to be a simple authentication/tracking mechanism. The API requires 
 
 **Error Display (per FR-013):**
 - Show error immediately in resultArea
-- Do NOT retry automatically
-- User can click [Convert] again to manually retry
+- Retry automatically on timeout (up to 3 attempts with exponential backoff)
+- User can click [Convert] again to manually retry after errors
 
 ### Performance Requirements
 
 From SC-003:
-- **API call response**: Within 3 seconds
-- **Timeout configuration**: Set to 3000ms (3 seconds)
+- **API call response**: Within configured timeout window (default 3 seconds per attempt, up to 3 attempts plus backoff)
+- **Timeout configuration**: Set to 3000ms per attempt by default
 - **Async execution**: Call API in background thread to avoid blocking UI (Principle VIII)
 
 ### Alternatives Considered

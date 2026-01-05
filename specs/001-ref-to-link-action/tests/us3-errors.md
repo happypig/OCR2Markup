@@ -32,7 +32,7 @@ Source: `specs/001-ref-to-link-action/spec.md` (User Story 3 acceptance scenario
 ### US3-3: API failures and no results
 
 **Given** a valid `<ref>` selection  
-**When** the CBRD API times out or returns a non-200 response  
+**When** the CBRD API times out after retries or returns a non-200 response  
 **Then** resultArea shows the matching API error message  
 **And** Replace remains hidden  
 **And** Convert remains available for manual retry.

@@ -307,7 +307,7 @@ Referer: CBRD@dila.edu.tw
 ```
 
 **Error Scenarios**:
-1. **Timeout** (>3s): Network unreachable or slow response
+1. **Timeout** (configured window with retries): Network unreachable or slow response
 2. **HTTP 400**: Invalid XML query format
 3. **HTTP 401**: Missing or invalid Referer header
 4. **HTTP 500**: Server error
@@ -437,14 +437,15 @@ INITIALIZED → PARSING → TRANSFORMING → CALLING_API → COMPLETED → REPLA
 - Logging for unknown patterns (helps discover new cases)
 - User can report issues to add new mappings
 
-### Risk 5: Performance (3-second API timeout)
+### Risk 5: Performance (configured API timeout with retries)
 **Risk**: CBRD API may be slow or unreachable
 
 **Mitigation**:
-- Configurable timeout (default 3000ms)
+- Configurable timeout (default 3000ms per attempt)
 - Async execution (never block UI)
 - Clear timeout error message
-- Manual retry via Convert button (no automatic retry per FR-013)
+- Automatic retry on timeouts (up to 3 attempts with backoff)
+- Manual retry via Convert button (after error)
 
 ---
 

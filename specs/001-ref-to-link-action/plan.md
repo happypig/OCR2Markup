@@ -39,7 +39,7 @@ Add a new action "<ref> to link" under Actions menu in DILA AI Markup Assistant 
 **Project Type**: Desktop plugin (extends existing DAMA plugin codebase)
 
 **Performance Goals**:
-- API call response within 3 seconds (Success Criteria SC-003)
+- API call response within configured timeout window (default 3 seconds per attempt, up to 3 attempts plus backoff) (SC-003)
 - Complete workflow (selection → replacement) under 30 seconds (SC-001)
 - Non-blocking UI during API calls (async operations)
 

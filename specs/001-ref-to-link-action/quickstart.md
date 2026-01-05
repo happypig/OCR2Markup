@@ -17,24 +17,29 @@ This guide provides a quick reference for developers implementing the Ref to Lin
 ## Architecture at a Glance
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    UI Layer (Swing)                         │
-│  RefToLinkActionListener → infoArea, resultArea, buttons   │
-└─────────────────────────┬───────────────────────────────────┘
-                          │
-┌─────────────────────────▼───────────────────────────────────┐
-│              Application Layer (Command)                     │
-│  ConvertReferenceCommand → orchestrates workflow            │
-└──────┬────────────────────────────────────┬─────────────────┘
-       │                                    │
-┌──────▼─────────────────┐     ┌───────────▼──────────────────┐
-│   Domain Layer         │     │   Infrastructure Layer        │
-│  • ReferenceParser     │     │  • CBRDAPIClient             │
-│  • ComponentTransformer│     │  • HTTP/JSON handling        │
-│  • TripitakaComponents │     │  • Oxygen SDK integration    │
-│  • TransformedComponents│    └──────────────────────────────┘
-└────────────────────────┘
++------------------------------+
+| UI Layer (Swing)             |
+| RefToLinkActionListener      |
++------------------------------+
+               |
++------------------------------+
+| Application Layer            |
+| ConvertReferenceCommand      |
++------------------------------+
+               |
++------------------------------+
+| Domain Layer                 |
+| ReferenceParser              |
+| TripitakaComponents          |
+| RefElementRewriter           |
++------------------------------+
+               |
++------------------------------+
+| Infrastructure Layer         |
+| CBRDAPIClient (raw <ref> XML)|
++------------------------------+
 ```
+
 
 ---
 
@@ -44,19 +49,19 @@ This guide provides a quick reference for developers implementing the Ref to Lin
 
 **Value Objects**:
 - `TripitakaComponents` - Raw components from XML (immutable)
-- `TransformedComponents` - API-ready components (immutable)
+- `TransformedComponents` - Legacy API-ready components (not used in raw-XML API path)
 
 **Aggregate Root**:
 - `ReferenceConversionSession` - Tracks conversion workflow state
 
 **Services**:
 - `ReferenceParser` - Parse `<ref>` XML to extract components
-- `ComponentTransformer` - Transform components for API format
+- `ComponentTransformer` - Legacy transformer (not used before API call)
 - `RefElementRewriter` - Rewrite `<ref>` contents for replacement (ptr/checked)
 
 **Exceptions**:
 - `InvalidReferenceException` - Thrown when XML parsing fails
-- `TransformationException` - Thrown when component transformation fails
+- `TransformationException` - Legacy transformer exception (not used before API call)
 
 ### Application Layer (`com.dila.dama.plugin.application`)
 
@@ -79,19 +84,18 @@ This guide provides a quick reference for developers implementing the Ref to Lin
 
 ```
 1. User selects <ref> element in editor
-2. User clicks [Actions] → [<ref> to link]
+2. User clicks [Actions] -> [<ref> to link]
 3. System displays selection in infoArea
-4. System parses XML → TripitakaComponents
-5. System transforms → TransformedComponents
-6. System shows [Convert] button
-7. User clicks [Convert]
-8. System calls CBRD API → CBETA URL
-9. System displays URL in resultArea
-10. System shows [Replace] button
-11. User clicks [Replace]
-12. System updates document (replace <ptr>, set checked="2")
-13. System shows success message
+4. System validates/parses XML -> TripitakaComponents
+5. System displays "Calling CBRD API..." and disables [Convert] while request is in-flight
+6. System calls CBRD API immediately with the raw <ref> XML (no local normalization)
+7. System displays URL or error in resultArea
+8. System shows [Replace] button on success (Convert remains available for retry)
+9. User clicks [Replace]
+10. System updates document (remove existing <ptr>, insert new <ptr> as first child, set checked="2")
+11. System shows success message
 ```
+
 
 ---
 
@@ -104,6 +108,8 @@ This guide provides a quick reference for developers implementing the Ref to Lin
 GET /dev/cbrd/link?q=<ref><canon>T</canon><v>25</v>.<w>1514</w></ref>
 Headers:
   Referer: CBRD@dila.edu.tw
+  User-Agent: DILA-AI-Markup/0.4.0
+  Accept-Charset: UTF-8
 ```
 
 **Response** (Success):
@@ -134,26 +140,7 @@ Headers:
 
 ## Component Transformations
 
-### Canon Mapping
-| Document | API |
-|----------|-----|
-| 大正蔵 | T |
-| 続蔵 | X |
-
-### Numeral Conversion
-| Document | API |
-|----------|-----|
-| 一 | 1 |
-| 二四 | 24 |
-| 一・一六 | 1.16 |
-
-### Column Mapping
-| Document | API |
-|----------|-----|
-| 上 | a |
-| 中 | b |
-| 下 | c |
-| 左上 | a |
+No local normalization is applied before calling the API. The selected `<ref>` XML is sent as-is, and the CBRD service handles canon/numeral variations.
 
 ---
 
@@ -182,11 +169,6 @@ Headers:
 - Must contain `<v>` with non-empty text
 - Must contain `<p>` with non-empty text
 
-### Transformation Validation
-- Canon must be in mapping table
-- Numerals must be convertible
-- Column must be in mapping table
-
 ### API Validation
 - Response must be valid JSON
 - `success` field must exist
@@ -200,14 +182,13 @@ Headers:
 
 **Terminal Error States**:
 - `PARSING_FAILED` - XML parsing error
-- `TRANSFORM_FAILED` - Transformation error
 - `API_FAILED` - API call error
 - `NO_RESULTS` - No URLs found (not an error, valid state)
 
 **User Actions**:
 - All errors display immediately in resultArea
 - User can click [Convert] again to retry (FR-013)
-- No automatic retry
+- Automatic retries on timeout (up to 3 attempts with exponential backoff), then show timeout error
 
 ---
 
@@ -216,10 +197,11 @@ Headers:
 **Follow Existing Patterns**:
 1. **Action Listener**: Inner class in `DAMAWorkspaceAccessPluginExtension`
 2. **Operation Type**: Add `REF_TO_LINK` to `OperationType` enum
-3. **Selection**: Use existing `fetchSelectedText(resultArea)` method
-4. **Result Display**: Use existing `setResultWithReplaceButton(result)` method
-5. **Async Operations**: Use existing executor with `CompletableFuture`
-6. **UI Updates**: Wrap in `SwingUtilities.invokeLater()`
+3. **Selection**: Use `fetchSelectedRefToLinkText()` for validation
+4. **Auto Convert**: Trigger API call immediately on action; keep [Convert] for retry
+5. **Result Display**: Write URL/error to resultArea and show Replace on success
+6. **Async Operations**: Use existing executor with `CompletableFuture`
+7. **UI Updates**: Wrap in `SwingUtilities.invokeLater()`
 
 ---
 
@@ -228,7 +210,11 @@ Headers:
 **Stored in Oxygen's WSOptionsStorage**:
 - `cbrd.api.url` - CBRD API endpoint (default: `https://cbss.dila.edu.tw/dev/cbrd/link`)
 - `cbrd.referer.header` - Referer header value (default: `CBRD@dila.edu.tw`)
-- `cbrd.timeout` - API timeout in ms (default: `3000`)
+- `cbrd.timeout` - API timeout in ms (default: `3000`, per attempt)
+
+**Retry behavior (fixed)**:
+- Up to 3 attempts on timeout with exponential backoff (250ms, 500ms)
+- Per-attempt timeout scales by attempt (timeout, timeout*2, timeout*3)
 
 ---
 
@@ -256,7 +242,7 @@ Headers:
 - `error.missing.page` - "Missing required <p> (page) element"
 - `error.unknown.canon` - "Unknown canon: {0}"
 - `error.invalid.numerals` - "Invalid numeral format: {0}"
-- `error.api.timeout` - "CBRD API timeout (>3s)"
+- `error.api.timeout` - "CBRD API timeout (after retries)"
 - `error.api.connection` - "Cannot connect to CBRD API"
 - `error.no.results` - "No CBETA links found for this reference"
 
@@ -266,9 +252,9 @@ Headers:
 
 ### Unit Tests
 - `TripitakaComponentsTest` - Value object validation
-- `TransformedComponentsTest` - Value object validation
+- `TransformedComponentsTest` - Legacy value object validation (no longer in API path)
 - `ReferenceParserTest` - XML parsing with various inputs
-- `ComponentTransformerTest` - Transformation logic
+- `ComponentTransformerTest` - Legacy transformation logic (not used before API call)
 - `ReferenceConversionSessionTest` - State transitions
 
 ### Integration Tests
@@ -290,10 +276,10 @@ Headers:
 
 ### Phase 1: Domain Layer
 - [ ] Create `TripitakaComponents` value object
-- [ ] Create `TransformedComponents` value object
+- [ ] Create `TransformedComponents` value object (legacy; not used before API call)
 - [ ] Create `ReferenceConversionSession` aggregate
 - [ ] Create `ReferenceParser` service
-- [ ] Create `ComponentTransformer` service
+- [ ] Create `ComponentTransformer` service (legacy; not used before API call)
 - [ ] Create domain exceptions
 - [ ] Write unit tests for all domain classes
 
@@ -340,8 +326,10 @@ Headers:
 3. **Validate Oxygen SDK nulls**: `WSEditor`, `WSEditorPage`, etc. can be null
 4. **URL encode query parameter**: CBRD API query must be URL-encoded
 5. **Preserve reference text**: Only replace `<ptr>` elements, keep all other content in `<ref>`
-6. **Handle empty results**: `found: []` is success, not an error
-7. **Set Referer header**: API requires `Referer: CBRD@dila.edu.tw`
+6. **Insert `<ptr>` first**: New `<ptr>` should be the first child inside `<ref>`
+7. **Handle empty results**: `found: []` is success, not an error
+8. **Set Referer header**: API requires `Referer: CBRD@dila.edu.tw`
+9. **Respect system proxy settings**: HTTP client should honor OS proxy configuration
 
 ---
 
@@ -349,13 +337,14 @@ Headers:
 
 From Success Criteria:
 - **SC-001**: Complete workflow in <30 seconds
-- **SC-003**: API response within 3 seconds
+- **SC-003**: API response within configured timeout window (default 3 seconds per attempt, up to 3 attempts plus backoff)
 - **SC-005**: Zero data loss during replacement
 
 **Configuration**:
-- API timeout: 3000ms (3 seconds)
-- Connection timeout: 3000ms
-- Read timeout: 3000ms
+- Per-attempt timeout: 3000ms (3 seconds) by default
+- Connection timeout: matches per-attempt timeout
+- Read timeout: matches per-attempt timeout
+- Timeout retries: 3 attempts with 250ms/500ms backoff
 
 ---
 

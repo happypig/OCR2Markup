@@ -296,7 +296,9 @@ COMPLETED
 **Configuration**:
 - `apiUrl`: String (default: `https://cbss.dila.edu.tw/dev/cbrd/link`)
 - `refererHeader`: String (default: `CBRD@dila.edu.tw`)
-- `timeout`: int (default: 3000ms)
+- `timeout`: int (default: 3000ms, per-attempt connect/read timeout)
+- `maxAttempts`: int (default: 3, timeout retries)
+- `baseBackoffMs`: long (default: 250ms, exponential backoff between retries)
 
 **Inputs**:
 - `components` (TransformedComponents): API-ready components
@@ -332,7 +334,11 @@ Headers:
 2. HTTP 200 + `success: true` + empty `found` array → Return null
 3. HTTP 200 + `success: false` → Throw `CBRDAPIException` with error message
 4. HTTP 4xx/5xx → Throw `CBRDAPIException` with HTTP status
-5. Timeout → Throw `CBRDAPIException` with timeout message
+5. Timeout → Retry up to `maxAttempts` with exponential backoff and per-attempt timeout scaling; after final attempt, throw `CBRDAPIException` with timeout message
+
+**Debug Logging** (when `DILA_DEBUG=true` or `-Ddila.debug=true`):
+- Logs request start/end with elapsed time per attempt
+- Logs request headers (Referer, Accept, Accept-Charset, User-Agent)
 
 ---
 
@@ -413,7 +419,7 @@ Headers:
 3. Column position must be in mapping table (reject unknown positions)
 
 ### API Call Validation
-1. Timeout must not exceed 3 seconds (SC-003)
+1. Per-attempt timeout uses configured `timeout`; retries increase timeout by attempt (e.g., 3000ms, 6000ms, 9000ms)
 2. URL must be valid HTTP/HTTPS URL
 3. Response must be valid JSON
 4. Response must contain `success` boolean and `found` array
@@ -423,7 +429,7 @@ Headers:
 2. Selected `<ref>` element must still be selected in editor
 3. After replacement:
    - All `<ptr>` elements inside `<ref>` are removed
-   - New `<ptr href="{url}"/>` is inserted
+   - New `<ptr href="{url}"/>` is inserted as the first child of `<ref>`
    - `checked` attribute is set to "2" (or added if missing)
    - All other content inside `<ref>` is preserved
 
@@ -482,7 +488,7 @@ stateDiagram-v2
 - Configuration stored in Oxygen's `WSOptionsStorage`:
   - `cbrd.api.url` (String): API endpoint URL
   - `cbrd.referer.header` (String): Referer header value
-  - `cbrd.timeout` (int): API call timeout in milliseconds
+  - `cbrd.timeout` (int): API call timeout in milliseconds (per attempt)
 
 ---
 
@@ -501,7 +507,7 @@ All error messages must be internationalized (en_US, zh_CN, zh_TW):
 | `error.unknown.canon` | Unknown canon: {0} | Canon not in mapping table |
 | `error.invalid.numerals` | Invalid numeral format: {0} | Numeral conversion failed |
 | `error.unknown.column` | Unknown column position: {0} | Column not in mapping table |
-| `error.api.timeout` | CBRD API timeout (>3s) | API call exceeded timeout |
+| `error.api.timeout` | CBRD API timeout (after retries) | API call exceeded timeout |
 | `error.api.http` | CBRD API error: HTTP {0} | API returned non-200 status |
 | `error.api.connection` | Cannot connect to CBRD API | Network error |
 | `error.api.response` | Invalid API response format | JSON parsing failed |
@@ -573,11 +579,11 @@ All error messages must be internationalized (en_US, zh_CN, zh_TW):
    - Document is modified:
      ```xml
      <ref xml:id="ref001" checked="2">
+       <ptr href="https://cbetaonline.dila.edu.tw/X0116_p0249a"/>
        <canon>続蔵</canon>
        <v>一・一六</v>
        <p>二四九</p>
        <c>左上</c>
-       <ptr href="https://cbetaonline.dila.edu.tw/X0116_p0249a"/>
      </ref>
      ```
    - Session updated: `status = REPLACED`

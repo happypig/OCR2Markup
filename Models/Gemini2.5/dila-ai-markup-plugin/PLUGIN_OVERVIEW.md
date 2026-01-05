@@ -162,6 +162,20 @@ target/                              # Maven build output (required, auto-genera
 
 ---
 
+### 2.3 Debugging and Logging
+
+**Logging**: All runtime logging goes through `PluginLogger` with standard levels (DEBUG, INFO, WARN, ERROR).
+
+**Enable debug logging**:
+- Environment variable: `DILA_DEBUG=true`
+- JVM system property: `-Ddila.debug=true`
+
+**What to look for**:
+- API timeouts and retries are logged by `CBRDAPIClient` with attempt counts and timeout values.
+- Non-200 responses and invalid JSON are logged at WARN/ERROR for triage.
+
+---
+
 ## 3. Documentation Files
 
 ### 3.1 Core Documentation

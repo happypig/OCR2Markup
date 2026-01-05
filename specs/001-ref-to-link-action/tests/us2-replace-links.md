@@ -15,6 +15,7 @@ Source: `specs/001-ref-to-link-action/spec.md` (User Story 2 acceptance scenario
 **When** the user clicks `[Replace]`  
 **Then** all existing `<ptr>` elements inside the selected `<ref>` are removed  
 **And** exactly one new `<ptr href="..."/>` is inserted using the generated URL  
+**And** the new `<ptr>` is inserted as the first child inside `<ref>`  
 **And** all non-`<ptr>` children and text in `<ref>` are preserved.
 
 ### US2-2: Replace sets `checked="2"`
@@ -29,4 +30,3 @@ Source: `specs/001-ref-to-link-action/spec.md` (User Story 2 acceptance scenario
 **When** the operation finishes  
 **Then** Replace is hidden  
 **And** a success message is displayed in infoArea.
-
