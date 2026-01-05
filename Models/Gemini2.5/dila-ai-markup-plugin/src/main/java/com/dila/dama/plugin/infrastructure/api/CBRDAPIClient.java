@@ -10,8 +10,12 @@ import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Locale;
 
 public class CBRDAPIClient {
+
+    private static final int MAX_ATTEMPTS = 3;
+    private static final long BASE_BACKOFF_MS = 250L;
 
     private final String apiUrl;
     private final String refererHeaderValue;
@@ -31,50 +35,158 @@ public class CBRDAPIClient {
         }
 
         String queryXml = buildQueryXml(components);
+        return convertToFirstLinkWithQuery(queryXml);
+    }
+
+    public String convertToFirstLink(String refXml) throws CBRDAPIException {
+        if (refXml == null || refXml.trim().isEmpty()) {
+            throw new CBRDAPIException("error.invalid.xml");
+        }
+        return convertToFirstLinkWithQuery(refXml.trim());
+    }
+
+    private String convertToFirstLinkWithQuery(String queryXml) throws CBRDAPIException {
         try {
             String encoded = URLEncoder.encode(queryXml, "UTF-8");
-            URL url = new URL(apiUrl + "?q=" + encoded);
+            String separator = apiUrl.contains("?")
+                ? (apiUrl.endsWith("?") || apiUrl.endsWith("&") ? "" : "&")
+                : "?";
+            URL url = new URL(apiUrl + separator + "q=" + encoded);
 
-            HttpURLConnection conn = connectionFactory.openConnection(url);
-            conn.setRequestMethod("GET");
-            conn.setConnectTimeout(timeoutMs);
-            conn.setReadTimeout(timeoutMs);
-            conn.setRequestProperty("Referer", refererHeaderValue);
-            conn.setRequestProperty("Accept", "application/json");
-
-            int status = conn.getResponseCode();
-            String body = readAll(status >= 200 && status < 300 ? conn.getInputStream() : conn.getErrorStream());
-
-            if (status != 200) {
-                PluginLogger.warn("[CBRDAPIClient]Non-200 HTTP status: " + status + ", body: " + body);
-                throw new CBRDAPIException("error.api.http", status);
-            }
-
-            final CBRDResponse response;
-            try {
-                response = CBRDResponse.fromJson(body);
-            } catch (Exception e) {
-                PluginLogger.error("[CBRDAPIClient]Invalid JSON response: " + body);
-                throw new CBRDAPIException("error.api.response", e);
-            }
-
-            if (!response.isSuccess()) {
-                PluginLogger.warn("[CBRDAPIClient]API returned success=false: " + response.getError());
-                throw new CBRDAPIException("error.api.response");
-            }
-
-            String first = response.getFirstUrl();
-            if (first == null || first.trim().isEmpty()) {
-                throw new CBRDAPIException("error.no.results");
-            }
-
-            return first;
-        } catch (SocketTimeoutException e) {
-            throw new CBRDAPIException("error.api.timeout", e);
+            return executeWithRetries(url);
         } catch (CBRDAPIException e) {
             throw e;
         } catch (Exception e) {
+            PluginLogger.error("[CBRDAPIClient]Connection error: " + e.getMessage(), e);
             throw new CBRDAPIException("error.api.connection", e);
+        }
+    }
+
+    private String executeWithRetries(URL url) throws Exception {
+        Throwable lastTimeout = null;
+        for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+            int attemptTimeoutMs = computeAttemptTimeoutMs(attempt);
+            long startNs = System.nanoTime();
+            PluginLogger.debug("[CBRDAPIClient]Request start (attempt " + attempt + "/" + MAX_ATTEMPTS
+                + ", timeout=" + attemptTimeoutMs + "ms): " + url);
+            try {
+                String result = executeOnce(url, attemptTimeoutMs);
+                long elapsedMs = (System.nanoTime() - startNs) / 1_000_000L;
+                PluginLogger.debug("[CBRDAPIClient]Request success (attempt " + attempt + "/" + MAX_ATTEMPTS
+                    + ", elapsed=" + elapsedMs + "ms).");
+                return result;
+            } catch (CBRDAPIException e) {
+                long elapsedMs = (System.nanoTime() - startNs) / 1_000_000L;
+                PluginLogger.debug("[CBRDAPIClient]Request failed (attempt " + attempt + "/" + MAX_ATTEMPTS
+                    + ", elapsed=" + elapsedMs + "ms, reason=" + e.getMessageKey() + ").");
+                throw e;
+            } catch (Exception e) {
+                if (isTimeoutException(e)) {
+                    long elapsedMs = (System.nanoTime() - startNs) / 1_000_000L;
+                    PluginLogger.debug("[CBRDAPIClient]Request timeout (attempt " + attempt + "/" + MAX_ATTEMPTS
+                        + ", elapsed=" + elapsedMs + "ms).");
+                    lastTimeout = e;
+                    if (attempt < MAX_ATTEMPTS) {
+                        long backoffMs = computeBackoffMs(attempt);
+                        PluginLogger.warn("[CBRDAPIClient]Timeout calling CBRD API (attempt " + attempt + "/" + MAX_ATTEMPTS
+                            + ", timeout=" + attemptTimeoutMs + "ms). Retrying in " + backoffMs + "ms.");
+                        sleepBackoff(backoffMs);
+                        continue;
+                    }
+                    throw new CBRDAPIException("error.api.timeout", e);
+                }
+                long elapsedMs = (System.nanoTime() - startNs) / 1_000_000L;
+                PluginLogger.debug("[CBRDAPIClient]Request error (attempt " + attempt + "/" + MAX_ATTEMPTS
+                    + ", elapsed=" + elapsedMs + "ms, error=" + e.getClass().getSimpleName() + ").");
+                throw e;
+            }
+        }
+        throw new CBRDAPIException("error.api.timeout", lastTimeout);
+    }
+
+    private String executeOnce(URL url, int attemptTimeoutMs) throws Exception {
+        HttpURLConnection conn = connectionFactory.openConnection(url);
+        conn.setRequestMethod("GET");
+        conn.setConnectTimeout(attemptTimeoutMs);
+        conn.setReadTimeout(attemptTimeoutMs);
+        conn.setInstanceFollowRedirects(true);
+        conn.setRequestProperty("Referer", refererHeaderValue);
+        conn.setRequestProperty("Accept", "application/json");
+        conn.setRequestProperty("Accept-Charset", "UTF-8");
+        conn.setRequestProperty("User-Agent", "DILA-AI-Markup/0.4.0");
+        logRequestHeaders(url, conn);
+
+        int status = conn.getResponseCode();
+        String body = readAll(status >= 200 && status < 300 ? conn.getInputStream() : conn.getErrorStream());
+
+        if (status != 200) {
+            PluginLogger.warn("[CBRDAPIClient]Non-200 HTTP status: " + status + ", body: " + body);
+            throw new CBRDAPIException("error.api.http", status);
+        }
+
+        final CBRDResponse response;
+        try {
+            response = CBRDResponse.fromJson(body);
+        } catch (Exception e) {
+            PluginLogger.error("[CBRDAPIClient]Invalid JSON response: " + body);
+            throw new CBRDAPIException("error.api.response", e);
+        }
+
+        if (!response.isSuccess()) {
+            PluginLogger.warn("[CBRDAPIClient]API returned success=false: " + response.getError());
+            throw new CBRDAPIException("error.api.response");
+        }
+
+        String first = response.getFirstUrl();
+        if (first == null || first.trim().isEmpty()) {
+            throw new CBRDAPIException("error.no.results");
+        }
+
+        return first;
+    }
+
+    private static void logRequestHeaders(URL url, HttpURLConnection conn) {
+        if (!PluginLogger.isDebugEnabled()) {
+            return;
+        }
+        PluginLogger.debug("[CBRDAPIClient]Request headers for " + url + " -> Referer="
+            + conn.getRequestProperty("Referer")
+            + ", Accept=" + conn.getRequestProperty("Accept")
+            + ", Accept-Charset=" + conn.getRequestProperty("Accept-Charset")
+            + ", User-Agent=" + conn.getRequestProperty("User-Agent"));
+    }
+
+    private int computeAttemptTimeoutMs(int attempt) {
+        long scaled = (long) timeoutMs * attempt;
+        return scaled > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) scaled;
+    }
+
+    private long computeBackoffMs(int attempt) {
+        long backoff = BASE_BACKOFF_MS * (1L << (attempt - 1));
+        return Math.max(0L, backoff);
+    }
+
+    private static boolean isTimeoutException(Throwable error) {
+        for (Throwable current = error; current != null; current = current.getCause()) {
+            if (current instanceof SocketTimeoutException) {
+                return true;
+            }
+            String message = current.getMessage();
+            if (message != null && message.toLowerCase(Locale.ROOT).contains("timed out")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void sleepBackoff(long backoffMs) {
+        if (backoffMs <= 0L) {
+            return;
+        }
+        try {
+            Thread.sleep(backoffMs);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -122,4 +234,3 @@ public class CBRDAPIClient {
         return sb.toString();
     }
 }
-

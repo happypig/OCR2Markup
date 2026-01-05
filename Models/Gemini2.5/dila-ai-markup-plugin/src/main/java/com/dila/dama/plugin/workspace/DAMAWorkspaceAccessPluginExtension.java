@@ -15,8 +15,6 @@ import com.dila.dama.plugin.utf8.UTF8ValidationService;
 import com.dila.dama.plugin.application.command.ConvertReferenceCommand;
 import com.dila.dama.plugin.application.command.ConvertReferenceResult;
 import com.dila.dama.plugin.domain.model.InvalidReferenceException;
-import com.dila.dama.plugin.domain.service.ComponentTransformer;
-import com.dila.dama.plugin.domain.service.NumeralConverter;
 import com.dila.dama.plugin.domain.service.RefElementRewriter;
 import com.dila.dama.plugin.domain.service.ReferenceParser;
 import com.dila.dama.plugin.infrastructure.api.CBRDAPIClient;
@@ -121,6 +119,11 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             this.pluginWorkspaceAccess = workspace;
             this.resources = workspace.getResourceBundle();
             this.optionStorage = workspace.getOptionsStorage();
+
+            if (System.getProperty("java.net.useSystemProxies") == null) {
+                System.setProperty("java.net.useSystemProxies", "true");
+                PluginLogger.debug("[applicationStarted]Enabled system proxy discovery for HTTP connections");
+            }
             
             PluginLogger.info("[applicationStarted]Starting DILA AI markup plugin (Pure Java Implementation)");
             PluginLogger.debug("[applicationStarted]PluginLogger.isDebugEnabled() mode: " + PluginLogger.isDebugEnabled());
@@ -452,12 +455,11 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                 PluginLogger.warn("[ReplaceButtonActionListener]Ref selection changed since Convert");
             }
             currentRefToLinkSelection = selectedText;
-            currentRefToLinkSelection = selectedText;
 
             infoArea.append(i18n("selected.text", selectedText) + "\n"
                 + i18n("text.with.length", selectedText.length()) + "\n\n");
 
-            showConvertButton();
+            executeRefToLinkConversion(selectedText);
         }
     }
 
@@ -478,69 +480,82 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                 return;
             }
 
-            // Read CBRD configuration from options storage (fallback to defaults)
-            String apiUrl = "https://cbss.dila.edu.tw/dev/cbrd/link";
-            String referer = "CBRD@dila.edu.tw";
-            int timeoutMs = 3000;
-            try {
-                if (optionStorage != null) {
-                    String optUrl = optionStorage.getOption(DAMAOptionPagePluginExtension.KEY_CBRD_API_URL, apiUrl);
-                    String optReferer = optionStorage.getOption(DAMAOptionPagePluginExtension.KEY_CBRD_REFERER_HEADER, referer);
-                    String optTimeout = optionStorage.getOption(DAMAOptionPagePluginExtension.KEY_CBRD_TIMEOUT_MS, String.valueOf(timeoutMs));
-                    if (optUrl != null && !optUrl.trim().isEmpty()) {
-                        apiUrl = optUrl.trim();
-                    }
-                    if (optReferer != null && !optReferer.trim().isEmpty()) {
-                        referer = optReferer.trim();
-                    }
-                    try {
-                        timeoutMs = Integer.parseInt(optTimeout);
-                    } catch (Exception ignored) {
-                        timeoutMs = 3000;
-                    }
-                }
-            } catch (Exception ex) {
-                PluginLogger.warn("[ConvertButtonActionListener]Failed to read CBRD options, using defaults: " + ex.getMessage());
-            }
+            executeRefToLinkConversion(selectedText);
+        }
+    }
 
-            ConvertReferenceCommand command = new ConvertReferenceCommand(
-                new ReferenceParser(),
-                new ComponentTransformer(new NumeralConverter()),
-                new CBRDAPIClient(apiUrl, referer, timeoutMs, new HttpUrlConnectionFactory())
-            );
-
-            CompletableFuture.supplyAsync(() -> command.execute(selectedText), executor)
-                .thenAccept(result -> SwingUtilities.invokeLater(() -> {
-                    handleConvertResult(result);
-                }))
-                .exceptionally(throwable -> {
-                    SwingUtilities.invokeLater(() -> {
-                        currentRefToLinkUrl = null;
-                        resultArea.setText(i18n("error.api.connection"));
-                        showConvertButton();
-                    });
-                    return null;
-                });
+    private void executeRefToLinkConversion(String selectedText) {
+        if (currentOperation != OperationType.REF_TO_LINK) {
+            return;
+        }
+        if (selectedText == null || selectedText.trim().isEmpty()) {
+            return;
         }
 
-        private void handleConvertResult(ConvertReferenceResult result) {
-            if (result == null) {
-                currentRefToLinkUrl = null;
-                resultArea.setText(i18n("error.api.response"));
-                showConvertButton();
-                return;
-            }
+        resultArea.setText(i18n("calling.cbrd.api"));
+        showRefToLinkConvertingState();
 
-            if (result.isSuccess()) {
-                currentRefToLinkUrl = result.getUrl();
-                resultArea.setText(currentRefToLinkUrl != null ? currentRefToLinkUrl : "");
-                infoArea.append(i18n("success.link.generated") + "\n");
-                showConvertAndReplaceButtons();
-            } else {
-                currentRefToLinkUrl = null;
-                resultArea.setText(i18n(result.getMessageKey(), result.getMessageParams()));
-                showConvertButton();
+        // Read CBRD configuration from options storage (fallback to defaults)
+        String apiUrl = "https://cbss.dila.edu.tw/dev/cbrd/link";
+        String referer = "CBRD@dila.edu.tw";
+        int timeoutMs = 3000;
+        try {
+            if (optionStorage != null) {
+                String optUrl = optionStorage.getOption(DAMAOptionPagePluginExtension.KEY_CBRD_API_URL, apiUrl);
+                String optReferer = optionStorage.getOption(DAMAOptionPagePluginExtension.KEY_CBRD_REFERER_HEADER, referer);
+                String optTimeout = optionStorage.getOption(DAMAOptionPagePluginExtension.KEY_CBRD_TIMEOUT_MS, String.valueOf(timeoutMs));
+                if (optUrl != null && !optUrl.trim().isEmpty()) {
+                    apiUrl = optUrl.trim();
+                }
+                if (optReferer != null && !optReferer.trim().isEmpty()) {
+                    referer = optReferer.trim();
+                }
+                try {
+                    timeoutMs = Integer.parseInt(optTimeout);
+                } catch (Exception ignored) {
+                    timeoutMs = 3000;
+                }
             }
+        } catch (Exception ex) {
+            PluginLogger.warn("[executeRefToLinkConversion]Failed to read CBRD options, using defaults: " + ex.getMessage());
+        }
+
+        ConvertReferenceCommand command = new ConvertReferenceCommand(
+            new ReferenceParser(),
+            new CBRDAPIClient(apiUrl, referer, timeoutMs, new HttpUrlConnectionFactory())
+        );
+
+        CompletableFuture.supplyAsync(() -> command.execute(selectedText), executor)
+            .thenAccept(result -> SwingUtilities.invokeLater(() -> {
+                handleRefToLinkConvertResult(result);
+            }))
+            .exceptionally(throwable -> {
+                SwingUtilities.invokeLater(() -> {
+                    currentRefToLinkUrl = null;
+                    resultArea.setText(i18n("error.api.connection"));
+                    showConvertButton();
+                });
+                return null;
+            });
+    }
+
+    private void handleRefToLinkConvertResult(ConvertReferenceResult result) {
+        if (result == null) {
+            currentRefToLinkUrl = null;
+            resultArea.setText(i18n("error.api.response"));
+            showConvertButton();
+            return;
+        }
+
+        if (result.isSuccess()) {
+            currentRefToLinkUrl = result.getUrl();
+            resultArea.setText(currentRefToLinkUrl != null ? currentRefToLinkUrl : "");
+            infoArea.append(i18n("success.link.generated") + "\n");
+            showConvertAndReplaceButtons();
+        } else {
+            currentRefToLinkUrl = null;
+            resultArea.setText(i18n(result.getMessageKey(), result.getMessageParams()));
+            showConvertButton();
         }
     }
     
@@ -943,6 +958,18 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         transferButton.setVisible(false);
         cancelButton.setVisible(false);
         convertButton.setVisible(true);
+        convertButton.setEnabled(true);
+        buttonPanel.setVisible(true);
+        buttonPanel.revalidate();
+        buttonPanel.repaint();
+    }
+
+    private void showRefToLinkConvertingState() {
+        replaceButton.setVisible(false);
+        transferButton.setVisible(false);
+        cancelButton.setVisible(false);
+        convertButton.setVisible(true);
+        convertButton.setEnabled(false);
         buttonPanel.setVisible(true);
         buttonPanel.revalidate();
         buttonPanel.repaint();
@@ -953,6 +980,8 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         cancelButton.setVisible(false);
         convertButton.setVisible(true);
         replaceButton.setVisible(true);
+        convertButton.setEnabled(true);
+        replaceButton.setEnabled(true);
         buttonPanel.setVisible(true);
         buttonPanel.revalidate();
         buttonPanel.repaint();

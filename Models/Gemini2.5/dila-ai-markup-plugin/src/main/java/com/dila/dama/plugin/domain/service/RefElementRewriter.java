@@ -34,7 +34,13 @@ public class RefElementRewriter {
 
         removePtrElements(root);
         root.setAttribute("checked", "2");
-        root.appendChild(createPtrElement(doc, root, newUrl.trim()));
+        Element ptr = createPtrElement(doc, root, newUrl.trim());
+        Node firstChild = root.getFirstChild();
+        if (firstChild != null) {
+            root.insertBefore(ptr, firstChild);
+        } else {
+            root.appendChild(ptr);
+        }
 
         try {
             return XmlDomUtils.toXmlString(root);

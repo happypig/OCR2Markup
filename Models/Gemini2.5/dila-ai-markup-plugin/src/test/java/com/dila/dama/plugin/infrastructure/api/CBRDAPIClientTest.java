@@ -36,6 +36,7 @@ public class CBRDAPIClientTest {
         assertThat(factory.lastUrl.toString()).contains("?q=");
         assertThat(factory.lastUrl.toString()).doesNotContain("<ref>");
         assertThat(factory.lastRequestProperties.get("Referer")).isEqualTo("CBRD@dila.edu.tw");
+        assertThat(factory.lastRequestProperties.get("User-Agent")).isEqualTo("DILA-AI-Markup/0.4.0");
     }
 
     private static final class CapturingConnectionFactory extends HttpUrlConnectionFactory {
@@ -108,4 +109,3 @@ public class CBRDAPIClientTest {
         }
     }
 }
-

@@ -59,6 +59,21 @@ public class CBRDAPIClientErrorHandlingTest {
                 .isEqualTo("error.api.timeout"));
     }
 
+    @Test
+    public void convertToFirstLink_connectionFailure_reportsConnectionKey() {
+        CBRDAPIClient client = newClient(new HttpUrlConnectionFactory() {
+            @Override
+            public HttpURLConnection openConnection(URL url) throws IOException {
+                throw new IOException("boom");
+            }
+        });
+
+        assertThatThrownBy(() -> client.convertToFirstLink(sampleComponents()))
+            .isInstanceOf(CBRDAPIException.class)
+            .satisfies(ex -> assertThat(((CBRDAPIException) ex).getMessageKey())
+                .isEqualTo("error.api.connection"));
+    }
+
     private CBRDAPIClient newClient(HttpUrlConnectionFactory factory) {
         return new CBRDAPIClient(
             "https://cbss.dila.edu.tw/dev/cbrd/link",

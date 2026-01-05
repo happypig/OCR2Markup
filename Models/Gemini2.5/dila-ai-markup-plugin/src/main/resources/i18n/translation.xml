@@ -494,6 +494,11 @@
     <val lang="zh_CN">未找到 CBETA 链接</val>
     <val lang="zh_TW">未找到 CBETA 連結</val>
   </key>
+  <key value="calling.cbrd.api">
+    <val lang="en_US">Calling CBRD API...</val>
+    <val lang="zh_CN">正在调用 CBRD API...</val>
+    <val lang="zh_TW">正在呼叫 CBRD API...</val>
+  </key>
 
   <!-- CBRD preferences -->
   <key value="cbrd.api.url.label">
@@ -515,6 +520,7 @@
     <val lang="zh_TW">CBRD 逾時（毫秒）：</val>
   </key>
 </translation> 
+
 
 
 

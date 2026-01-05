@@ -4,6 +4,7 @@ import com.dila.dama.plugin.util.XmlDomUtils;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,5 +35,8 @@ public class RefElementRewriterTest {
         NodeList ptrs = root.getElementsByTagName("ptr");
         assertThat(ptrs.getLength()).isEqualTo(1);
         assertThat(((Element) ptrs.item(0)).getAttribute("href")).isEqualTo(url);
+        Node firstChild = root.getFirstChild();
+        assertThat(firstChild).isInstanceOf(Element.class);
+        assertThat(((Element) firstChild).getNodeName()).isEqualTo("ptr");
     }
 }

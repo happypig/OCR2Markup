@@ -5,6 +5,7 @@ import org.junit.BeforeClass;
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
@@ -46,12 +47,12 @@ public class TranslationConsistencyTest {
         unusedKeys.removeAll(javaKeys);
         
         if (!unusedKeys.isEmpty()) {
-            System.out.println("⚠️ Unused translation keys found:");
+            System.out.println("Unused translation keys found:");
             unusedKeys.forEach(key -> System.out.println("  - " + key));
             
             // Don't fail the test, just report
             double usageRate = ((double) javaKeys.size() / xmlKeys.size()) * 100;
-            System.out.printf("📊 Translation usage rate: %.1f%% (%d/%d keys)%n", 
+            System.out.printf("Translation usage rate: %.1f%% (%d/%d keys)%n", 
                             usageRate, javaKeys.size(), xmlKeys.size());
         }
     }
@@ -96,7 +97,8 @@ public class TranslationConsistencyTest {
              .filter(path -> path.toString().endsWith(".java"))
              .forEach(javaFile -> {
                  try {
-                     String content = Files.readString(javaFile);
+                     byte[] bytes = Files.readAllBytes(javaFile);
+                     String content = new String(bytes, StandardCharsets.UTF_8);
                      Matcher matcher = pattern.matcher(content);
                      while (matcher.find()) {
                          keys.add(matcher.group(1));
