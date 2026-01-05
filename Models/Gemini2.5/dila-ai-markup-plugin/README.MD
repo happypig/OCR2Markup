@@ -2,6 +2,10 @@
 
 **Product Requirements Document & User Guide**
 
+> **👥 For Users**: This document covers installation, features, and usage instructions
+>
+> **🔧 For Developers**: Looking for technical implementation details, architecture, and build information? See [PLUGIN_OVERVIEW.md](PLUGIN_OVERVIEW.md)
+
 ---
 
 ## Executive Summary
@@ -9,7 +13,7 @@
 The DILA AI Markup Assistant is an Oxygen XML Editor plugin designed to accelerate TEI (Text Encoding Initiative) XML document editing through AI-powered markup automation, comprehensive UTF-8 encoding validation, and XML tag management. The plugin serves scholarly document editors who need to efficiently process large volumes of references and citations while maintaining encoding integrity across international character sets.
 
 ### Version Information
-- **Current Version**: 0.3.1-SNAPSHOT (In Development)
+
 - **Released Version**: 0.3.0
 - **Target Platform**: Oxygen XML Editor 27.0+
 - **Java Compatibility**: JDK 1.8+
@@ -358,7 +362,7 @@ dila-ai-markup-plugin/
 │               └── translation.xml
 │
 └── target/                          # Build output
-    ├── dila-ai-markup-plugin-0.3.1-SNAPSHOT.jar
+    ├── dila-ai-markup-plugin-0.3.0.jar
     └── dilaAIMarkupPlugin.zip       # Distribution package
 ```
 
@@ -404,6 +408,96 @@ User Selection → Plugin → Regex Parser → Result Area → Replace → Docum
                                  ↓
                         Tag Stripper (preserves content)
 ```
+
+### Detailed Workflow Diagrams
+
+Visual representations of the complete workflows with decision points and error handling.
+
+#### AI Markup Workflow Diagram
+
+```mermaid
+flowchart TD
+    A[User Opens XML Document in Oxygen Editor] --> B[User Selects Unmarked Text]
+    B --> C[User Clicks 'AI Markup' Action<br/>from Plugin Menu]
+    C --> D[Plugin Retrieves Configuration<br/>API Key & Model from Preferences]
+    D --> E[Plugin Sends Request to OpenAI API]
+    E --> F{API Response<br/>Successful?}
+
+    F -->|Yes| G[Parse JSON Response<br/>Extract Marked-up Content]
+    F -->|No| H[Display Error Message<br/>in Info Panel]
+
+    G --> I[Display Result in Result Area<br/>Wrapped in ref tags]
+    I --> J[Show 'Replace' Button]
+    J --> K{User Clicks<br/>Replace?}
+
+    K -->|Yes| L[Replace Selected Text<br/>with AI-Marked Version]
+    K -->|No| M[User Can Edit Result<br/>or Cancel Action]
+
+    L --> N[Document Updated<br/>Change Recorded in Undo History]
+    M --> N
+    H --> O[User Can Retry or<br/>Check Configuration]
+
+    style A fill:#e1f5ff
+    style C fill:#fff4e1
+    style E fill:#ffe1e1
+    style G fill:#e1ffe1
+    style L fill:#e1ffe1
+    style N fill:#e1f5e1
+    style H fill:#ffcccc
+```
+
+**Key Decision Points**:
+- **API Response Success**: Handles both successful responses and error cases (invalid API key, network issues, rate limiting)
+- **User Replace Decision**: User can review and edit AI suggestions before applying or cancel the operation
+
+**Error Handling**:
+- Network failures display helpful error messages
+- API errors guide users to check configuration
+- All operations can be undone via Oxygen's undo history
+
+#### UTF-8 Validation Workflow Diagram
+
+```mermaid
+flowchart TD
+    A[User Selects Files/Directories] --> B[UTF8ValidationService.scanForNonUtf8Files]
+    B --> C{Files Found<br/>with Issues?}
+
+    C -->|Yes| D[Display List of<br/>Non-UTF-8 Files]
+    C -->|No| E[Show 'All Files Valid UTF-8']
+
+    D --> F{User Chooses<br/>Convert?}
+    F -->|Yes| G[Create Backup Files<br/>filename.utf8backup]
+    F -->|No| H[User Can Review<br/>File List]
+
+    G --> I[Detect Source Encoding<br/>Windows-1252, GBK, etc.]
+    I --> J[Convert to UTF-8<br/>Preserve Content]
+    J --> K{Conversion<br/>Successful?}
+
+    K -->|Yes| L[Report Success<br/>Show Conversion Summary]
+    K -->|No| M[Report Errors<br/>Show Failed Files]
+
+    L --> N[Files Ready for<br/>XML Processing]
+    M --> O[User Can Retry<br/>or Check File Permissions]
+
+    style A fill:#e1f5ff
+    style C fill:#fff4e1
+    style F fill:#fff4e1
+    style G fill:#e1ffe1
+    style J fill:#e1ffe1
+    style L fill:#e1f5e1
+    style M fill:#ffcccc
+```
+
+**Key Decision Points**:
+- **Files Found with Issues**: Determines if conversion is needed or if all files are already UTF-8
+- **User Chooses Convert**: Two-stage workflow allows review before making irreversible changes
+- **Conversion Successful**: Handles both successful conversions and failures with detailed error reporting
+
+**Safety Features**:
+- Automatic backup creation (`.utf8backup`) before any conversion
+- Detailed success/failure reporting for batch operations
+- File permission and encoding detection error handling
+- 50MB file size limit to prevent memory issues
 
 ---
 
@@ -950,7 +1044,7 @@ mvn install -DskipTests
 
 ## Development Status
 
-### Current Version: 0.3.1-SNAPSHOT
+### Current Version: 0.3.0
 
 **Branch**: `feature/utf8-tool-java`  
 **Status**: Active Development  
@@ -1226,6 +1320,6 @@ A: Email jeffwu@dila.edu.tw with version info, steps to reproduce, and error mes
 
 ---
 
-*Last Updated: October 10, 2025*  
-*Document Version: 1.0 (PRD Format)*  
-*Plugin Version: 0.3.1-SNAPSHOT*
+*Last Updated: Jan 4, 2026*
+*Document Version: 1.0 (PRD Format)*
+*Plugin Version: 0.3.0*
