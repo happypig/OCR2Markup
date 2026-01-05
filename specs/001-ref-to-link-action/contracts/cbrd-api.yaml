@@ -1,0 +1,246 @@
+openapi: 3.0.3
+info:
+  title: CBRD (CBETA Reference Detection) API
+  description: |
+    External API provided by CBETA/DILA for converting Tripitaka references to CBETA online URLs.
+
+    **Authentication**: Requires HTTP Referer header set to `CBRD@dila.edu.tw`
+
+    **Purpose**: This contract documents the external CBRD API that the plugin will integrate with.
+  version: 1.0.0
+  contact:
+    name: DILA (Dharma Drum Institute of Liberal Arts)
+    url: https://cbss.dila.edu.tw
+
+servers:
+  - url: https://cbss.dila.edu.tw/dev/cbrd
+    description: Development server (used in production until official endpoint provided)
+
+paths:
+  /link:
+    get:
+      summary: Convert Tripitaka reference to CBETA link
+      description: |
+        Accepts an XML-formatted Tripitaka reference and returns corresponding CBETA online URLs.
+
+        **Request Requirements**:
+        - Query parameter `q` must contain XML-formatted reference
+        - HTTP header `Referer` must be set to `CBRD@dila.edu.tw`
+        - XML must follow the specified reference structure
+
+        **Response Behavior**:
+        - Returns `success: true` with array of URLs if references found
+        - Returns `success: true` with empty array if no matches
+        - Returns `success: false` with error message if processing failed
+
+      operationId: convertReferenceToLink
+      tags:
+        - Reference Conversion
+
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: XML-formatted Tripitaka reference
+          schema:
+            type: string
+            format: xml
+            example: '<ref><canon>T</canon><v>25</v>.<w>1514</w></ref>'
+          examples:
+            minimal:
+              summary: Minimal reference (canon and volume only)
+              value: '<ref><canon>T</canon><v>25</v></ref>'
+            with_work:
+              summary: Reference with work number
+              value: '<ref><canon>T</canon><v>25</v>.<w>1514</w></ref>'
+            complete:
+              summary: Complete reference with all components
+              value: '<ref><canon>X</canon><v>1.16</v>.<w>268</w><p>180</p><c>a</c><l>01</l></ref>'
+
+        - name: Referer
+          in: header
+          required: true
+          description: Client identifier for API authentication/tracking
+          schema:
+            type: string
+            enum:
+              - CBRD@dila.edu.tw
+          example: 'CBRD@dila.edu.tw'
+
+      responses:
+        '200':
+          description: Successful API call
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CBRDResponse'
+              examples:
+                success_with_results:
+                  summary: Success with one URL found
+                  value:
+                    success: true
+                    found:
+                      - 'https://cbetaonline.dila.edu.tw/T1514'
+                success_multiple_results:
+                  summary: Success with multiple URLs found
+                  value:
+                    success: true
+                    found:
+                      - 'https://cbetaonline.dila.edu.tw/T25n1514_p0001a01'
+                      - 'https://cbetaonline.dila.edu.tw/T25n1514'
+                success_no_results:
+                  summary: Success but no matching URLs
+                  value:
+                    success: true
+                    found: []
+                error_response:
+                  summary: Processing error
+                  value:
+                    success: false
+                    error: 'Invalid reference format'
+                    found: []
+
+        '400':
+          description: Bad request - missing or invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: 'Missing required parameter: q'
+
+        '401':
+          description: Unauthorized - missing or invalid Referer header
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: 'Invalid or missing Referer header'
+
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: 'Internal server error processing reference'
+
+        '504':
+          description: Gateway timeout - API did not respond within time limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: 'Request timeout'
+
+components:
+  schemas:
+    CBRDResponse:
+      type: object
+      description: Response from CBRD API
+      required:
+        - success
+        - found
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the API call succeeded
+          example: true
+        found:
+          type: array
+          description: Array of CBETA URLs (may be empty if no matches)
+          items:
+            type: string
+            format: uri
+            pattern: '^https://cbetaonline\.dila\.edu\.tw/'
+          example:
+            - 'https://cbetaonline.dila.edu.tw/T1514'
+        error:
+          type: string
+          description: Error message (only present when success is false)
+          nullable: true
+          example: null
+
+    ErrorResponse:
+      type: object
+      description: Error response for HTTP error status codes
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Human-readable error message
+          example: 'Invalid reference format'
+
+    ReferenceXML:
+      type: object
+      description: Structure of XML reference (for documentation)
+      xml:
+        name: ref
+      properties:
+        canon:
+          type: string
+          description: Canon code (T, X, etc.)
+          example: 'T'
+          xml:
+            name: canon
+        v:
+          type: string
+          description: Volume number (may contain punctuation)
+          example: '25'
+          xml:
+            name: v
+        w:
+          type: string
+          description: Work number (optional)
+          nullable: true
+          example: '1514'
+          xml:
+            name: w
+        p:
+          type: string
+          description: Page number (optional)
+          nullable: true
+          example: '917'
+          xml:
+            name: p
+        c:
+          type: string
+          description: Column code (a/b/c) (optional)
+          nullable: true
+          enum: [a, b, c]
+          example: 'a'
+          xml:
+            name: c
+        l:
+          type: string
+          description: Line number (optional)
+          nullable: true
+          example: '01'
+          xml:
+            name: l
+      xml:
+        name: ref
+
+  securitySchemes:
+    RefererHeader:
+      type: apiKey
+      in: header
+      name: Referer
+      description: |
+        API authentication via Referer header.
+        Must be set to: `CBRD@dila.edu.tw`
+
+security:
+  - RefererHeader: []
+
+tags:
+  - name: Reference Conversion
+    description: Convert Tripitaka references to CBETA online URLs
+
+externalDocs:
+  description: CBETA Online
+  url: https://cbetaonline.dila.edu.tw
