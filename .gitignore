@@ -2,3 +2,17 @@
 .specstory/.what-is-this.md
 Models/Gemini2.5/dila-ai-markup-plugin/target/
 oxygenSDKSamples
+target/
+build/
+.gradle/
+*.class
+*.jar
+*.log
+.env*
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/
+.tools/
