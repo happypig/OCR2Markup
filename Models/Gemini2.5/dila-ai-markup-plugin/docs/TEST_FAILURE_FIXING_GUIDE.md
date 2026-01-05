@@ -597,7 +597,7 @@ mvn test
 
 ---
 
-**Generated on**: October 5, 2025  
+**Generated on**: January 5, 2026  
 **Project**: DILA AI Markup Plugin  
-**Version**: 0.3.0  
-**Test Results**: 70 tests passing, 0 failures, 0 errors
+**Version**: 0.4.0  
+**Test Results**: 99 tests passing, 0 failures, 0 errors

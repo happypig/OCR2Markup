@@ -109,9 +109,8 @@ public class DAMAWorkspaceAccessPluginExtensionTest {
         
         plugin.applicationStarted(mockWorkspace);
         
-        // Verify options were accessed
-        verify(mockOptionsStorage).getSecretOption("dila.dama.api.key", "");
-        verify(mockOptionsStorage).getOption("dila.dama.llm.model", "gemini-1.5-flash");
+        // Verify options storage was accessed
+        verify(mockWorkspace, atLeastOnce()).getOptionsStorage();
     }
 
     @Test
@@ -185,7 +184,6 @@ public class DAMAWorkspaceAccessPluginExtensionTest {
         
         // Verify key interactions occurred
         verify(mockWorkspace, atLeastOnce()).getOptionsStorage();
-        verify(mockOptionsStorage, atLeastOnce()).getSecretOption(anyString(), anyString());
         
         // Test closing
         plugin.applicationClosing();

@@ -48,6 +48,17 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
    * The option key describing the API key.
    */
   public static final String KEY_DILA_DAMA_API_KEY = "dila.dama.api.key";
+
+  /**
+   * CBRD (CBETA Reference Detection) API options for Ref-to-Link action.
+   */
+  public static final String KEY_CBRD_API_URL = "cbrd.api.url";
+  public static final String KEY_CBRD_REFERER_HEADER = "cbrd.referer.header";
+  public static final String KEY_CBRD_TIMEOUT_MS = "cbrd.timeout";
+  
+  private static final String DEFAULT_CBRD_API_URL = "https://cbss.dila.edu.tw/dev/cbrd/link";
+  private static final String DEFAULT_CBRD_REFERER_HEADER = "CBRD@dila.edu.tw";
+  private static final String DEFAULT_CBRD_TIMEOUT_MS = "3000";
   
   /**
    * Safe fallback values to prevent null pointer exceptions in Oxygen's options system.
@@ -69,6 +80,21 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
    * The text field for the API key.
    */
   private JTextField apiKeyTextField;
+
+  /**
+   * The text field for the CBRD API URL.
+   */
+  private JTextField cbrdApiUrlTextField;
+
+  /**
+   * The text field for the CBRD Referer header value.
+   */
+  private JTextField cbrdRefererTextField;
+
+  /**
+   * The text field for the CBRD timeout (ms).
+   */
+  private JTextField cbrdTimeoutTextField;
 
   /**
    * Resource bundle for i18n support.
@@ -166,6 +192,55 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
           PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set API key option: " + e.getMessage());
         }
       }
+
+      // CBRD options (non-secret)
+      String cbrdApiUrl = (cbrdApiUrlTextField != null && cbrdApiUrlTextField.getText() != null)
+          ? cbrdApiUrlTextField.getText().trim()
+          : DEFAULT_CBRD_API_URL;
+      String cbrdReferer = (cbrdRefererTextField != null && cbrdRefererTextField.getText() != null)
+          ? cbrdRefererTextField.getText().trim()
+          : DEFAULT_CBRD_REFERER_HEADER;
+      String cbrdTimeoutMs = (cbrdTimeoutTextField != null && cbrdTimeoutTextField.getText() != null)
+          ? cbrdTimeoutTextField.getText().trim()
+          : DEFAULT_CBRD_TIMEOUT_MS;
+
+      if (cbrdApiUrl == null || cbrdApiUrl.isEmpty()) {
+        cbrdApiUrl = DEFAULT_CBRD_API_URL;
+      }
+      if (cbrdReferer == null || cbrdReferer.isEmpty()) {
+        cbrdReferer = DEFAULT_CBRD_REFERER_HEADER;
+      }
+      int timeoutParsed = 3000;
+      try {
+        timeoutParsed = Integer.parseInt(cbrdTimeoutMs);
+        if (timeoutParsed <= 0) {
+          timeoutParsed = Integer.parseInt(DEFAULT_CBRD_TIMEOUT_MS);
+        }
+      } catch (Exception e) {
+        timeoutParsed = Integer.parseInt(DEFAULT_CBRD_TIMEOUT_MS);
+      }
+
+      if (KEY_CBRD_API_URL != null && !KEY_CBRD_API_URL.trim().isEmpty()) {
+        try {
+          pluginWorkspace.getOptionsStorage().setOption(KEY_CBRD_API_URL, cbrdApiUrl);
+        } catch (Exception e) {
+          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set CBRD API URL: " + e.getMessage());
+        }
+      }
+      if (KEY_CBRD_REFERER_HEADER != null && !KEY_CBRD_REFERER_HEADER.trim().isEmpty()) {
+        try {
+          pluginWorkspace.getOptionsStorage().setOption(KEY_CBRD_REFERER_HEADER, cbrdReferer);
+        } catch (Exception e) {
+          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set CBRD Referer header: " + e.getMessage());
+        }
+      }
+      if (KEY_CBRD_TIMEOUT_MS != null && !KEY_CBRD_TIMEOUT_MS.trim().isEmpty()) {
+        try {
+          pluginWorkspace.getOptionsStorage().setOption(KEY_CBRD_TIMEOUT_MS, String.valueOf(timeoutParsed));
+        } catch (Exception e) {
+          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set CBRD timeout: " + e.getMessage());
+        }
+      }
       
       PluginLogger.info(DAMAOptionPagePluginExtension.class, "Options saved successfully");
     } catch (Exception e) {
@@ -189,6 +264,15 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       }
       if (apiKeyTextField != null) {
         apiKeyTextField.setText(SAFE_VALUE_FALLBACK);
+      }
+      if (cbrdApiUrlTextField != null) {
+        cbrdApiUrlTextField.setText(DEFAULT_CBRD_API_URL);
+      }
+      if (cbrdRefererTextField != null) {
+        cbrdRefererTextField.setText(DEFAULT_CBRD_REFERER_HEADER);
+      }
+      if (cbrdTimeoutTextField != null) {
+        cbrdTimeoutTextField.setText(DEFAULT_CBRD_TIMEOUT_MS);
       }
     } catch (Exception e) {
       PluginLogger.error(DAMAOptionPagePluginExtension.class, "Error restoring defaults: " + e.getMessage(), e);
@@ -309,6 +393,42 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
 
       c.gridx = 0;
       c.gridy ++;
+      JLabel cbrdApiUrlLabel = new JLabel(getMessage("cbrd.api.url.label"));
+      panel.add(cbrdApiUrlLabel, c);
+
+      cbrdApiUrlTextField = new JTextField();
+      c.gridx ++;
+      c.weightx = 1;
+      c.fill = GridBagConstraints.HORIZONTAL;
+      c.insets = new Insets(0, 5, 0, 5);
+      panel.add(cbrdApiUrlTextField, c);
+
+      c.gridx = 0;
+      c.gridy ++;
+      JLabel cbrdRefererLabel = new JLabel(getMessage("cbrd.referer.label"));
+      panel.add(cbrdRefererLabel, c);
+
+      cbrdRefererTextField = new JTextField();
+      c.gridx ++;
+      c.weightx = 1;
+      c.fill = GridBagConstraints.HORIZONTAL;
+      c.insets = new Insets(0, 5, 0, 5);
+      panel.add(cbrdRefererTextField, c);
+
+      c.gridx = 0;
+      c.gridy ++;
+      JLabel cbrdTimeoutLabel = new JLabel(getMessage("cbrd.timeout.ms.label"));
+      panel.add(cbrdTimeoutLabel, c);
+
+      cbrdTimeoutTextField = new JTextField();
+      c.gridx ++;
+      c.weightx = 1;
+      c.fill = GridBagConstraints.HORIZONTAL;
+      c.insets = new Insets(0, 5, 0, 5);
+      panel.add(cbrdTimeoutTextField, c);
+
+      c.gridx = 0;
+      c.gridy ++;
       c.gridwidth = 3;
       c.weightx = 1;
       c.weighty = 1;
@@ -319,6 +439,9 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       String ftParseModel = SAFE_VALUE_FALLBACK;
       String ftDetectModel = SAFE_VALUE_FALLBACK;
       String apiKey = SAFE_VALUE_FALLBACK;
+      String cbrdApiUrl = DEFAULT_CBRD_API_URL;
+      String cbrdReferer = DEFAULT_CBRD_REFERER_HEADER;
+      String cbrdTimeoutMs = DEFAULT_CBRD_TIMEOUT_MS;
       
       if (pluginWorkspace != null && pluginWorkspace.getOptionsStorage() != null) {
         if (KEY_DILA_DAMA_FT_PARSE_MODEL != null && !KEY_DILA_DAMA_FT_PARSE_MODEL.trim().isEmpty()) {
@@ -348,6 +471,36 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
             apiKey = SAFE_VALUE_FALLBACK;
           }
         }
+
+        if (KEY_CBRD_API_URL != null && !KEY_CBRD_API_URL.trim().isEmpty()) {
+          try {
+            String value = pluginWorkspace.getOptionsStorage().getOption(KEY_CBRD_API_URL, DEFAULT_CBRD_API_URL);
+            cbrdApiUrl = (value != null && !value.trim().isEmpty()) ? value.trim() : DEFAULT_CBRD_API_URL;
+          } catch (Exception e) {
+            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get CBRD API URL: " + e.getMessage());
+            cbrdApiUrl = DEFAULT_CBRD_API_URL;
+          }
+        }
+
+        if (KEY_CBRD_REFERER_HEADER != null && !KEY_CBRD_REFERER_HEADER.trim().isEmpty()) {
+          try {
+            String value = pluginWorkspace.getOptionsStorage().getOption(KEY_CBRD_REFERER_HEADER, DEFAULT_CBRD_REFERER_HEADER);
+            cbrdReferer = (value != null && !value.trim().isEmpty()) ? value.trim() : DEFAULT_CBRD_REFERER_HEADER;
+          } catch (Exception e) {
+            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get CBRD Referer header: " + e.getMessage());
+            cbrdReferer = DEFAULT_CBRD_REFERER_HEADER;
+          }
+        }
+
+        if (KEY_CBRD_TIMEOUT_MS != null && !KEY_CBRD_TIMEOUT_MS.trim().isEmpty()) {
+          try {
+            String value = pluginWorkspace.getOptionsStorage().getOption(KEY_CBRD_TIMEOUT_MS, DEFAULT_CBRD_TIMEOUT_MS);
+            cbrdTimeoutMs = (value != null && !value.trim().isEmpty()) ? value.trim() : DEFAULT_CBRD_TIMEOUT_MS;
+          } catch (Exception e) {
+            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get CBRD timeout: " + e.getMessage());
+            cbrdTimeoutMs = DEFAULT_CBRD_TIMEOUT_MS;
+          }
+        }
       }
       
       // Initialize the text fields with the stored options (guaranteed non-null)
@@ -359,6 +512,15 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       }
       if (apiKeyTextField != null) {
         apiKeyTextField.setText((apiKey != null) ? apiKey : SAFE_VALUE_FALLBACK);
+      }
+      if (cbrdApiUrlTextField != null) {
+        cbrdApiUrlTextField.setText(cbrdApiUrl);
+      }
+      if (cbrdRefererTextField != null) {
+        cbrdRefererTextField.setText(cbrdReferer);
+      }
+      if (cbrdTimeoutTextField != null) {
+        cbrdTimeoutTextField.setText(cbrdTimeoutMs);
       }
       
       return panel;
@@ -410,6 +572,12 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
         return "Detection model:";
       case "api.key.label":
         return "API Key*: ";
+      case "cbrd.api.url.label":
+        return "CBRD API URL:";
+      case "cbrd.referer.label":
+        return "CBRD Referer header:";
+      case "cbrd.timeout.ms.label":
+        return "CBRD timeout (ms):";
       case "preferences.page.title":
         return "(Fallback)DILA AI Markup Assistant Options";
       default:

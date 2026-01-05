@@ -5,12 +5,18 @@
 <plugin 
        id="com.dila.ai.markup" 
        name="DILA AI Markup Assistant"
-       version="0.3.0" 
+       version="0.4.0" 
        vendor="DILA"
        classLoaderType="preferReferencedResources">
 
        <description>
               <p>This plugin provides an AI-empowered markup assistant for editing TEI XML documents.</p>
+              <h3>Release Notes v0.4.0:</h3>
+              <ul>
+                     <li><strong>Ref-to-Link Action:</strong> Convert selected &lt;ref&gt; elements to CBRD links and replace existing &lt;ptr&gt; safely</li>
+                     <li><strong>CBRD Preferences:</strong> Configurable endpoint, referer, and timeout settings</li>
+                     <li><strong>Validation &amp; Errors:</strong> Clear feedback for invalid selections, missing components, and API failures</li>
+              </ul>
               <h3>Release Notes v0.3.0:</h3>
               <ul>
                      <li><strong>Complete Java Migration:</strong> Migrated entire implementation from JavaScript to pure Java for better performance and reliability
@@ -52,14 +58,14 @@
        </description>
 
        <runtime>
-              <library name="lib/dila-ai-markup-plugin-0.3.0.jar" />
+              <library name="lib/dila-ai-markup-plugin-0.4.0.jar" />
        </runtime>
 
        <extension 
               type="WorkspaceAccess" 
               class="com.dila.dama.plugin.workspace.DAMAWorkspaceAccessPluginExtension"/>
               
-       <!-- Note: Complete Java Implementation - All functionality migrated from JavaScript to pure Java (v0.3.0) -->
+       <!-- Note: Complete Java Implementation - All functionality migrated from JavaScript to pure Java. -->
 
        <extension 
               type="OptionPage" 

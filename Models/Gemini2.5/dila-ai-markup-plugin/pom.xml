@@ -4,7 +4,7 @@
 
   <groupId>dila</groupId>
   <artifactId>dila-ai-markup-plugin</artifactId>
-  <version>0.3.0</version>
+  <version>0.4.0</version>
   <packaging>jar</packaging>
 
   <name>DILA AI Markup Plugin</name>
@@ -79,6 +79,13 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- JSON parsing for CBRD API responses (runtime) -->
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20240303</version>
+    </dependency>
+
   </dependencies>
   <!-- Choose the Java compiler according to the platform. -->
   <profiles>
@@ -134,13 +141,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
+        <version>3.11.0</version>
         <configuration>
           <fork>true</fork>
           <executable>${javac.path}</executable>
-          <compilerVersion>1.8</compilerVersion>
-          <source>1.8</source>
-          <target>1.8</target>
+          <release>${maven.compiler.release}</release>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
           <debug>true</debug>
         </configuration>
       </plugin>

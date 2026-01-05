@@ -12,7 +12,18 @@ import ro.sync.exml.workspace.api.editor.page.text.WSTextEditorPage;
 import ro.sync.exml.plugin.workspace.WorkspaceAccessPluginExtension;
 
 import com.dila.dama.plugin.utf8.UTF8ValidationService;
+import com.dila.dama.plugin.application.command.ConvertReferenceCommand;
+import com.dila.dama.plugin.application.command.ConvertReferenceResult;
+import com.dila.dama.plugin.domain.model.InvalidReferenceException;
+import com.dila.dama.plugin.domain.service.ComponentTransformer;
+import com.dila.dama.plugin.domain.service.NumeralConverter;
+import com.dila.dama.plugin.domain.service.RefElementRewriter;
+import com.dila.dama.plugin.domain.service.ReferenceParser;
+import com.dila.dama.plugin.infrastructure.api.CBRDAPIClient;
+import com.dila.dama.plugin.infrastructure.api.HttpUrlConnectionFactory;
+import com.dila.dama.plugin.preferences.DAMAOptionPagePluginExtension;
 import com.dila.dama.plugin.util.PluginLogger;
+import com.dila.dama.plugin.util.XmlDomUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,6 +37,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Complete Java implementation of DILA AI Markup Plugin
@@ -43,8 +56,13 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     private JTextArea resultArea;
     private JPanel buttonPanel;
     private JButton replaceButton;
+    private JButton convertButton;
     private JButton transferButton;
     private JButton cancelButton;
+
+    // Ref-to-Link workflow state (in-memory only)
+    private String currentRefToLinkUrl;
+    private String currentRefToLinkSelection;
     
     // UTF-8 workflow state
     private List<Path> currentNonUtf8Files = null;
@@ -61,7 +79,8 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         AI_MARKUP,      // AI Markup operation
         TAG_REMOVAL,    // Tag Removal operation
         UTF8_CHECK,     // UTF-8 Check operation
-        UTF8_CONVERT    // UTF-8 Conversion operation
+        UTF8_CONVERT,   // UTF-8 Conversion operation
+        REF_TO_LINK     // <ref> to link operation
     }
     
     // Current operation context
@@ -192,9 +211,11 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         JMenu menuActions = new JMenu(i18n("menu.actions")); // "Actions"
         JMenuItem menuItemActionAIMarkup = new JMenuItem(i18n("menuItem.ai.markup")); // "AI Markup"
         JMenuItem menuItemActionTagRemoval = new JMenuItem(i18n("menuItem.tag.removal")); // "Tag Removal"
+        JMenuItem menuItemRefToLink = new JMenuItem(i18n("menuItem.ref.to.link")); // "<ref> to link"
 
         menuActions.add(menuItemActionAIMarkup);
         menuActions.add(menuItemActionTagRemoval);
+        menuActions.add(menuItemRefToLink);
         menuBar.add(menuActions);
         
         // Tools Menu  
@@ -215,6 +236,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         // Add action listeners
         menuItemActionAIMarkup.addActionListener(new AIMarkupActionListener());
         menuItemActionTagRemoval.addActionListener(new TagRemovalActionListener());
+        menuItemRefToLink.addActionListener(new RefToLinkActionListener());
         menuItemUtf8Check.addActionListener(new UTF8CheckActionListener());
         menuItemOption.addActionListener(new OptionsActionListener());
         
@@ -311,10 +333,12 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         buttonPanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         
         replaceButton = new JButton(i18n("button.replace")); // "Replace", with translation
+        convertButton = new JButton(i18n("button.convert")); // "Convert", with translation
         transferButton = new JButton(i18n("button.transfer.utf8")); // "Transfer to UTF-8", with translation
         cancelButton = new JButton(i18n("button.cancel")); // "Cancel", with translation
         
         buttonPanel.add(replaceButton);
+        buttonPanel.add(convertButton);
         buttonPanel.add(transferButton);
         buttonPanel.add(cancelButton);
         
@@ -323,6 +347,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         
         // Add action listeners
         replaceButton.addActionListener(new ReplaceButtonActionListener());
+        convertButton.addActionListener(new ConvertButtonActionListener());
         transferButton.addActionListener(new TransferButtonActionListener());
         cancelButton.addActionListener(new CancelButtonActionListener());
     }
@@ -402,6 +427,122 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             setResultWithReplaceButton(result);
         }
     }
+
+    /**
+     * Ref to Link action listener (001-ref-to-link-action)
+     */
+    private class RefToLinkActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            PluginLogger.info("[RefToLinkActionListener]Ref to Link action triggered");
+
+            currentOperation = OperationType.REF_TO_LINK;
+            currentRefToLinkUrl = null;
+            currentRefToLinkSelection = null;
+
+            infoArea.setText(i18n("action.ref.to.link.selected") + "\n\n");
+            resultArea.setText("");
+            hideAllButtons();
+
+            String selectedText = fetchSelectedRefToLinkText();
+            if (selectedText.isEmpty()) {
+                return;
+            }
+            if (currentRefToLinkSelection != null && !currentRefToLinkSelection.equals(selectedText)) {
+                PluginLogger.warn("[ReplaceButtonActionListener]Ref selection changed since Convert");
+            }
+            currentRefToLinkSelection = selectedText;
+            currentRefToLinkSelection = selectedText;
+
+            infoArea.append(i18n("selected.text", selectedText) + "\n"
+                + i18n("text.with.length", selectedText.length()) + "\n\n");
+
+            showConvertButton();
+        }
+    }
+
+    /**
+     * Convert button action listener (CBRD API) (001-ref-to-link-action)
+     */
+    private class ConvertButtonActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (currentOperation != OperationType.REF_TO_LINK) {
+                return;
+            }
+
+            PluginLogger.info("[ConvertButtonActionListener]Convert button triggered");
+
+            String selectedText = fetchSelectedRefToLinkText();
+            if (selectedText.isEmpty()) {
+                return;
+            }
+
+            // Read CBRD configuration from options storage (fallback to defaults)
+            String apiUrl = "https://cbss.dila.edu.tw/dev/cbrd/link";
+            String referer = "CBRD@dila.edu.tw";
+            int timeoutMs = 3000;
+            try {
+                if (optionStorage != null) {
+                    String optUrl = optionStorage.getOption(DAMAOptionPagePluginExtension.KEY_CBRD_API_URL, apiUrl);
+                    String optReferer = optionStorage.getOption(DAMAOptionPagePluginExtension.KEY_CBRD_REFERER_HEADER, referer);
+                    String optTimeout = optionStorage.getOption(DAMAOptionPagePluginExtension.KEY_CBRD_TIMEOUT_MS, String.valueOf(timeoutMs));
+                    if (optUrl != null && !optUrl.trim().isEmpty()) {
+                        apiUrl = optUrl.trim();
+                    }
+                    if (optReferer != null && !optReferer.trim().isEmpty()) {
+                        referer = optReferer.trim();
+                    }
+                    try {
+                        timeoutMs = Integer.parseInt(optTimeout);
+                    } catch (Exception ignored) {
+                        timeoutMs = 3000;
+                    }
+                }
+            } catch (Exception ex) {
+                PluginLogger.warn("[ConvertButtonActionListener]Failed to read CBRD options, using defaults: " + ex.getMessage());
+            }
+
+            ConvertReferenceCommand command = new ConvertReferenceCommand(
+                new ReferenceParser(),
+                new ComponentTransformer(new NumeralConverter()),
+                new CBRDAPIClient(apiUrl, referer, timeoutMs, new HttpUrlConnectionFactory())
+            );
+
+            CompletableFuture.supplyAsync(() -> command.execute(selectedText), executor)
+                .thenAccept(result -> SwingUtilities.invokeLater(() -> {
+                    handleConvertResult(result);
+                }))
+                .exceptionally(throwable -> {
+                    SwingUtilities.invokeLater(() -> {
+                        currentRefToLinkUrl = null;
+                        resultArea.setText(i18n("error.api.connection"));
+                        showConvertButton();
+                    });
+                    return null;
+                });
+        }
+
+        private void handleConvertResult(ConvertReferenceResult result) {
+            if (result == null) {
+                currentRefToLinkUrl = null;
+                resultArea.setText(i18n("error.api.response"));
+                showConvertButton();
+                return;
+            }
+
+            if (result.isSuccess()) {
+                currentRefToLinkUrl = result.getUrl();
+                resultArea.setText(currentRefToLinkUrl != null ? currentRefToLinkUrl : "");
+                infoArea.append(i18n("success.link.generated") + "\n");
+                showConvertAndReplaceButtons();
+            } else {
+                currentRefToLinkUrl = null;
+                resultArea.setText(i18n(result.getMessageKey(), result.getMessageParams()));
+                showConvertButton();
+            }
+        }
+    }
     
     /**
      * UTF-8 Check action listener(i18n)
@@ -475,6 +616,11 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         @Override
         public void actionPerformed(ActionEvent e) {
             PluginLogger.info("[ReplaceButtonActionListener]Replace button triggered");
+
+            if (currentOperation == OperationType.REF_TO_LINK) {
+                handleRefToLinkReplace();
+                return;
+            }
             
             String resultText = resultArea.getText();
             if (resultText == null || resultText.trim().isEmpty()) {
@@ -537,6 +683,41 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             } catch (Exception ex) {
                 PluginLogger.error("[ReplaceButtonActionListener]Error accessing editor: " + ex.getMessage());
                 setResultInformational(i18n("error.accessing.editor", ex.getMessage())); // "Error accessing editor: {0}"
+            }
+        }
+
+        private void handleRefToLinkReplace() {
+            if (currentRefToLinkUrl == null || currentRefToLinkUrl.trim().isEmpty()) {
+                resultArea.setText(i18n("error.no.results"));
+                showConvertButton();
+                return;
+            }
+
+            String selectedText = fetchSelectedRefToLinkText();
+            if (selectedText.isEmpty()) {
+                return;
+            }
+
+            String rewritten;
+            try {
+                rewritten = new RefElementRewriter().rewrite(selectedText, currentRefToLinkUrl);
+            } catch (InvalidReferenceException ex) {
+                resultArea.setText(i18n(ex.getMessageKey(), ex.getParams()));
+                showConvertButton();
+                return;
+            }
+
+            try {
+                if (replaceSelectionWithText(rewritten)) {
+                    currentOperation = OperationType.NONE;
+                    currentRefToLinkUrl = null;
+                    currentRefToLinkSelection = null;
+                    infoArea.append(i18n("success.replacement.complete") + "\n");
+                    hideAllButtons();
+                }
+            } catch (Exception ex) {
+                PluginLogger.error("[ReplaceButtonActionListener]Ref-to-link replacement error: " + ex.getMessage());
+                setResultInformational(i18n("error.replacing.text", ex.getMessage()));
             }
         }
     }
@@ -635,6 +816,51 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     /**
      * Fetch selected text from current editor(i18n)
      */
+    private String fetchSelectedRefToLinkText() {
+        try {
+            WSEditor editorAccess = pluginWorkspaceAccess.getCurrentEditorAccess(PluginWorkspace.MAIN_EDITING_AREA);
+            if (editorAccess != null) {
+                WSEditorPage pageAccess = editorAccess.getCurrentPage();
+                if (pageAccess instanceof WSTextEditorPage) {
+                    WSTextEditorPage textPage = (WSTextEditorPage) pageAccess;
+                    String selectedText = textPage.getSelectedText();
+                    if (selectedText != null && !selectedText.trim().isEmpty()) {
+                        try {
+                            Document doc = XmlDomUtils.parseXml(selectedText.trim());
+                            Element root = doc.getDocumentElement();
+                            if (root == null || !isRefElement(root)) {
+                                resultArea.setText(i18n("error.not.ref.element"));
+                                return "";
+                            }
+                        } catch (Exception ex) {
+                            resultArea.setText(i18n("error.invalid.xml"));
+                            return "";
+                        }
+                        return selectedText;
+                    }
+                    resultArea.setText(i18n("error.no.selection"));
+                    return "";
+                }
+                resultArea.setText(i18n("not.text.mode") + "\n");
+                return "";
+            }
+            resultArea.setText(i18n("no.editor.open") + "\n");
+            return "";
+        } catch (Exception e) {
+            resultArea.setText(i18n("error.fetching.selected.text", e.getMessage()) + "\n");
+            return "";
+        }
+    }
+
+    private static boolean isRefElement(Element element) {
+        String local = element.getLocalName();
+        if ("ref".equals(local)) {
+            return true;
+        }
+        String name = element.getNodeName();
+        return "ref".equals(name) || name.endsWith(":ref");
+    }
+
     private String fetchSelectedText(JTextArea area) {
         try {
             WSEditor editorAccess = pluginWorkspaceAccess.getCurrentEditorAccess(PluginWorkspace.MAIN_EDITING_AREA);
@@ -666,13 +892,66 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             return "";
         }
     }
+
+    private boolean replaceSelectionWithText(String replacementText) throws Exception {
+        WSEditor editorAccess = pluginWorkspaceAccess.getCurrentEditorAccess(PluginWorkspace.MAIN_EDITING_AREA);
+        if (editorAccess == null) {
+            infoArea.append(i18n("no.editor.open") + "\n");
+            return false;
+        }
+
+        WSEditorPage pageAccess = editorAccess.getCurrentPage();
+        if (!(pageAccess instanceof WSTextEditorPage)) {
+            infoArea.append(i18n("not.text.mode") + "\n");
+            return false;
+        }
+
+        return replaceSelectionText((WSTextEditorPage) pageAccess, replacementText);
+    }
+
+    boolean replaceSelectionText(WSTextEditorPage textPage, String replacementText) throws Exception {
+        int selectionStart = textPage.getSelectionStart();
+        int selectionEnd = textPage.getSelectionEnd();
+
+        if (selectionStart == selectionEnd) {
+            return false;
+        }
+
+        textPage.deleteSelection();
+
+        int currentOffset = textPage.getCaretOffset();
+        javax.swing.text.Document doc = textPage.getDocument();
+        doc.insertString(currentOffset, replacementText, null);
+        return true;
+    }
     
     /**
      * Show only replace button
      */
     private void showReplaceButton() {
+        convertButton.setVisible(false);
         transferButton.setVisible(false);
         cancelButton.setVisible(false);
+        replaceButton.setVisible(true);
+        buttonPanel.setVisible(true);
+        buttonPanel.revalidate();
+        buttonPanel.repaint();
+    }
+
+    private void showConvertButton() {
+        replaceButton.setVisible(false);
+        transferButton.setVisible(false);
+        cancelButton.setVisible(false);
+        convertButton.setVisible(true);
+        buttonPanel.setVisible(true);
+        buttonPanel.revalidate();
+        buttonPanel.repaint();
+    }
+
+    private void showConvertAndReplaceButtons() {
+        transferButton.setVisible(false);
+        cancelButton.setVisible(false);
+        convertButton.setVisible(true);
         replaceButton.setVisible(true);
         buttonPanel.setVisible(true);
         buttonPanel.revalidate();
@@ -811,7 +1090,23 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             "error.no.parse.model",
             "llm.error",
             "error.replacing.text",
-            "error.accessing.editor"
+            "error.accessing.editor",
+
+            // Ref to Link errors (001-ref-to-link-action)
+            "error.no.selection",
+            "error.invalid.xml",
+            "error.not.ref.element",
+            "error.missing.canon",
+            "error.missing.volume",
+            "error.missing.page",
+            "error.unknown.canon",
+            "error.invalid.numerals",
+            "error.unknown.column",
+            "error.api.timeout",
+            "error.api.http",
+            "error.api.connection",
+            "error.api.response",
+            "error.no.results"
         };
         
         for (String errorKey : errorKeys) {
@@ -838,6 +1133,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      */
     private void showTransferButtons() {
         replaceButton.setVisible(false);
+        convertButton.setVisible(false);
         transferButton.setVisible(true);
         cancelButton.setVisible(true);
         buttonPanel.setVisible(true);

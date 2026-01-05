@@ -52,6 +52,7 @@ This guide provides a quick reference for developers implementing the Ref to Lin
 **Services**:
 - `ReferenceParser` - Parse `<ref>` XML to extract components
 - `ComponentTransformer` - Transform components for API format
+- `RefElementRewriter` - Rewrite `<ref>` contents for replacement (ptr/checked)
 
 **Exceptions**:
 - `InvalidReferenceException` - Thrown when XML parsing fails

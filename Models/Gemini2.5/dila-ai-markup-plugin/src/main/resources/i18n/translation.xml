@@ -1,75 +1,75 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <translation>
   <languageList>
     <language description="English US" lang="en_US"/>
-    <language description="中文" lang="zh_CN"/>
-    <language description="繁體中文" lang="zh_TW"/>
+    <language description="ä¸­æ–‡" lang="zh_CN"/>
+    <language description="ç¹é«”ä¸­æ–‡" lang="zh_TW"/>
   </languageList>
   <key value="view.title">
     <comment>viewInfo.setTitle()@DAMAViewComponentCustomizer()</comment>
     <val lang="en_US">DILA AI Markup Assistant</val>
-    <val lang="zh_CN">DILA AI 標記助手</val>
-    <val lang="zh_TW">DILA AI 標記助手</val>
+    <val lang="zh_CN">DILA AI 标注助手</val>
+    <val lang="zh_TW">DILA AI 標註助手</val>
   </key>
   <key value="menu.actions">
     <comment>JMenu()@createMenuBar()</comment>
     <val lang="en_US">Actions</val>
-    <val lang="zh_CN">標記功能</val>
-    <val lang="zh_TW">標記功能</val>
+    <val lang="zh_CN">操作</val>
+    <val lang="zh_TW">操作</val>
   </key>
   <key value="menuItem.ai.markup">
     <comment>JMenuItem()@createMenuBar()</comment>
     <val lang="en_US">AI Markup</val>
-    <val lang="zh_CN">AI 標記</val>
-    <val lang="zh_TW">AI 標記</val>
+    <val lang="zh_CN">AI 标注</val>
+    <val lang="zh_TW">AI 標註</val>
   </key>
   <key value="menuItem.tag.removal">
     <comment>JMenuItem()@createMenuBar()</comment>
     <val lang="en_US">Tag Removal</val>
-    <val lang="zh_CN">移除標籤</val>
+    <val lang="zh_CN">移除标签</val>
     <val lang="zh_TW">移除標籤</val>
   </key>
   <key value="menu.tools">
     <comment>JMenu()@createMenuBar()</comment>
     <val lang="en_US">Tools</val>
-    <val lang="zh_CN">工具</val>
-    <val lang="zh_TW">工具</val>
+    <val lang="zh_CN">å·¥å…· 中</val>
+    <val lang="zh_TW">å·¥å…· 繁</val>
   </key>
   <key value="menuItem.utf8.check.convert">
     <comment>JMenuItem()@createMenuBar()</comment>
     <val lang="en_US">UTF-8 Check/Convert</val>
-    <val lang="zh_CN">UTF-8 檢查/轉換</val>
-    <val lang="zh_TW">UTF-8 檢查/轉換</val>
+    <val lang="zh_CN">UTF-8 æª¢æŸ¥/è½‰æ› 中</val>
+    <val lang="zh_TW">UTF-8 æª¢æŸ¥/è½‰æ› 繁</val>
   </key>
   <key value="menuItem.preferences">
     <comment>JMenuItem()@createMenuBar()</comment>
     <val lang="en_US">Preferences...</val>
-    <val lang="zh_CN">偏好設定...</val>
+    <val lang="zh_CN">偏好设置...</val>
     <val lang="zh_TW">偏好設定...</val>
   </key>
   <key value="menu.options">
     <comment>menuOptions.setText()@createOptionsMenu(),menuOptions.setToolTipText()@createOptionsMenu()</comment>
     <val lang="en_US">Options</val>
-    <val lang="zh_CN">選項</val>
+    <val lang="zh_CN">选项</val>
     <val lang="zh_TW">選項</val>
   </key>
   <key value="initial.info">
     <comment>JTextArea()@createTextAreas()</comment>
     <val lang="en_US">Please select any function from the Actions/Tools menu, or select Preferences from the Gear icon(Options menu) to configure parameters.</val>
-    <val lang="zh_CN">請從「標記功能」/「工具」菜單選擇任何功能，或從齒輪圖示(「選項」菜單)選擇「偏好設定」以設定參數。</val>
-    <val lang="zh_TW">請從「標記功能」/「工具」菜單選擇任何功能，或從齒輪圖示(「選項」菜單)選擇「偏好設定」以設定參數。</val>
+    <val lang="zh_CN">è«‹å¾žã€Œæ¨™è¨˜åŠŸèƒ½ã€/ã€Œå·¥å…·ã€èœå–®é¸æ“‡ä»»ä½•åŠŸèƒ½ï¼Œæˆ–å¾žé½’è¼ªåœ–ç¤º(ã€Œé¸é …ã€èœå–®)é¸æ“‡ã€Œåå¥½è¨­å®šã€ä»¥è¨­å®šåƒæ•¸ã€‚ 中</val>
+    <val lang="zh_TW">è«‹å¾žã€Œæ¨™è¨˜åŠŸèƒ½ã€/ã€Œå·¥å…·ã€èœå–®é¸æ“‡ä»»ä½•åŠŸèƒ½ï¼Œæˆ–å¾žé½’è¼ªåœ–ç¤º(ã€Œé¸é …ã€èœå–®)é¸æ“‡ã€Œåå¥½è¨­å®šã€ä»¥è¨­å®šåƒæ•¸ã€‚ 繁</val>
   </key>
   <key value="button.replace">
     <comment>JButton()@createButtonPanel()</comment>
     <val lang="en_US">Replace</val>
-    <val lang="zh_CN">替換</val>
+    <val lang="zh_CN">替换</val>
     <val lang="zh_TW">替換</val>
   </key>
   <key value="button.transfer.utf8">
     <comment>JButton()@createButtonPanel()</comment>
-    <val lang="en_US">Transfer to UTF-8</val>
-    <val lang="zh_CN">轉換為 UTF-8</val>
-    <val lang="zh_TW">轉換為 UTF-8</val>
+    <val lang="en_US">UTF-8 Convert</val>
+    <val lang="zh_CN">UTF-8 转换</val>
+    <val lang="zh_TW">UTF-8 轉換</val>
   </key>
   <key value="button.cancel">
     <comment>JButton()@createButtonPanel()</comment>
@@ -80,308 +80,441 @@
   <key value="action.ai.markup.selected">
     <comment>infoArea.setText()@AIMarkupActionListener()</comment>
     <val lang="en_US">Action selected: AI Markup (Use AI for reference tagging)</val>
-    <val lang="zh_CN">選取標記功能：AI 標記 (用 AI 來標記選取的參照文字)</val>
-    <val lang="zh_TW">選取標記功能：AI 標記 (用 AI 來標記選取的參照文字)</val>
+    <val lang="zh_CN">é¸å–æ¨™è¨˜åŠŸèƒ½ï¼šAI æ¨™è¨˜ (ç”¨ AI ä¾†æ¨™è¨˜é¸å–çš„åƒç…§æ–‡å­—) 中</val>
+    <val lang="zh_TW">é¸å–æ¨™è¨˜åŠŸèƒ½ï¼šAI æ¨™è¨˜ (ç”¨ AI ä¾†æ¨™è¨˜é¸å–çš„åƒç…§æ–‡å­—) 繁</val>
   </key>
   <key value="action.tag.removal.selected">
     <comment>infoArea.setText()@TagRemovalActionListener()</comment>
     <val lang="en_US">Action selected: Tag Removal (Remove tags from selected text).</val>
-    <val lang="zh_CN">選取標記功能： 移除標籤(移除選取參照文字的標籤)。</val>
-    <val lang="zh_TW">選取標記功能： 移除標籤(移除選取參照文字的標籤)。</val>
+    <val lang="zh_CN">é¸å–æ¨™è¨˜åŠŸèƒ½ï¼š ç§»é™¤æ¨™ç±¤(ç§»é™¤é¸å–åƒç…§æ–‡å­—çš„æ¨™ç±¤)ã€‚ 中</val>
+    <val lang="zh_TW">é¸å–æ¨™è¨˜åŠŸèƒ½ï¼š ç§»é™¤æ¨™ç±¤(ç§»é™¤é¸å–åƒç…§æ–‡å­—çš„æ¨™ç±¤)ã€‚ 繁</val>
   </key>
   <key value="selected.text">
     <comment>infoArea.append().2@AIMarkupActionListener(),TagRemovalActionListener()</comment>
     <val lang="en_US">Selected text: {0}</val>
-    <val lang="zh_CN">選取文字: {0}</val>
-    <val lang="zh_TW">選取文字: {0}</val>
+    <val lang="zh_CN">é¸å–æ–‡å­—: {0} 中</val>
+    <val lang="zh_TW">é¸å–æ–‡å­—: {0} 繁</val>
   </key>
   <key value="text.with.length">
     <comment>infoArea.append().3@AIMarkupActionListener(),TagRemovalActionListener()</comment>
     <val lang="en_US">Text length: {0} characters</val>
-    <val lang="zh_CN">文字長度：{0} 個字符</val>
-    <val lang="zh_TW">文字長度：{0} 個字符</val>
+    <val lang="zh_CN">æ–‡å­—é•·åº¦ï¼š{0} å€‹å­—ç¬¦ 中</val>
+    <val lang="zh_TW">æ–‡å­—é•·åº¦ï¼š{0} å€‹å­—ç¬¦ 繁</val>
   </key>
   <key value="error.processing.ai.markup">
     <comment>resultArea.append()@AIMarkupActionListener()</comment>
     <val lang="en_US">Error processing AI markup: {0}</val>
-    <val lang="zh_CN">處理 AI 標記時出錯：{0}</val>
-    <val lang="zh_TW">處理 AI 標記時出錯：{0}</val>
+    <val lang="zh_CN">è™•ç† AI æ¨™è¨˜æ™‚å‡ºéŒ¯ï¼š{0} 中</val>
+    <val lang="zh_TW">è™•ç† AI æ¨™è¨˜æ™‚å‡ºéŒ¯ï¼š{0} 繁</val>
   </key>
   <key value="action.utf8.check.transfer.selected">
     <comment>infoArea.setText()@UTF8CheckActionListener()</comment>
     <val lang="en_US">Tool selected: UTF-8 Check/Convert (for UTF-8 compliance of the selected files or directories).</val>
-    <val lang="zh_CN">選取工具功能： UTF-8 檢查/轉換 (選取檔案或資料夾的 UTF-8 相容性)。</val>
-    <val lang="zh_TW">選取工具功能： UTF-8 檢查/轉換 (選取檔案或資料夾的 UTF-8 相容性)。</val>
+    <val lang="zh_CN">é¸å–å·¥å…·åŠŸèƒ½ï¼š UTF-8 æª¢æŸ¥/è½‰æ› (é¸å–æª”æ¡ˆæˆ–è³‡æ–™å¤¾çš„ UTF-8 ç›¸å®¹æ€§)ã€‚ 中</val>
+    <val lang="zh_TW">é¸å–å·¥å…·åŠŸèƒ½ï¼š UTF-8 æª¢æŸ¥/è½‰æ› (é¸å–æª”æ¡ˆæˆ–è³‡æ–™å¤¾çš„ UTF-8 ç›¸å®¹æ€§)ã€‚ 繁</val>
   </key>
   <key value="dialog.directories.files.selection">
     <comment>fileChooser.setDialogTitle()@UTF8CheckActionListener()</comment>
     <val lang="en_US">Select files or directories to check UTF-8 encoding</val>
-    <val lang="zh_CN">選擇文件或目錄以檢查 UTF-8 編碼</val>
-    <val lang="zh_TW">選擇文件或目錄以檢查 UTF-8 編碼</val>
+    <val lang="zh_CN">é¸æ“‡æ–‡ä»¶æˆ–ç›®éŒ„ä»¥æª¢æŸ¥ UTF-8 ç·¨ç¢¼ 中</val>
+    <val lang="zh_TW">é¸æ“‡æ–‡ä»¶æˆ–ç›®éŒ„ä»¥æª¢æŸ¥ UTF-8 ç·¨ç¢¼ 繁</val>
   </key>
   <key value="utf8.check.scanning.files">
     <comment>infoArea.append()@UTF8CheckActionListener()</comment>
     <val lang="en_US">Scanning files for UTF-8 compliance...</val>
-    <val lang="zh_CN">正在掃描檔案的 UTF-8 相容性...</val>
-    <val lang="zh_TW">正在掃描檔案的 UTF-8 相容性...</val>
+    <val lang="zh_CN">æ­£åœ¨æŽƒææª”æ¡ˆçš„ UTF-8 ç›¸å®¹æ€§... 中</val>
+    <val lang="zh_TW">æ­£åœ¨æŽƒææª”æ¡ˆçš„ UTF-8 ç›¸å®¹æ€§... 繁</val>
   </key>
   <key value="error.checking.utf8">
     <comment>resultArea.append()@UTF8CheckActionListener()</comment>
     <val lang="en_US">Error checking UTF-8 files: {0}</val>
-    <val lang="zh_CN">檢查 UTF-8 檔案時出錯：{0}</val>
-    <val lang="zh_TW">檢查 UTF-8 檔案時出錯：{0}</val>
+    <val lang="zh_CN">æª¢æŸ¥ UTF-8 æª”æ¡ˆæ™‚å‡ºéŒ¯ï¼š{0} 中</val>
+    <val lang="zh_TW">æª¢æŸ¥ UTF-8 æª”æ¡ˆæ™‚å‡ºéŒ¯ï¼š{0} 繁</val>
   </key>
   <key value="no.text.to.replace">
     <comment>infoArea.append()@ReplaceButtonActionListener()</comment>
     <val lang="en_US">No text to replace.</val>
-    <val lang="zh_CN">無文字可替換。</val>
-    <val lang="zh_TW">無文字可替換。</val>
+    <val lang="zh_CN">ç„¡æ–‡å­—å¯æ›¿æ›ã€‚ 中</val>
+    <val lang="zh_TW">ç„¡æ–‡å­—å¯æ›¿æ›ã€‚ 繁</val>
   </key>
   <key value="no.editor.open">
     <comment>infoArea.append()@ReplaceButtonActionListener(),area.append()@fetchSelectedText()</comment>
     <val lang="en_US">No open Text mode editor.</val>
-    <val lang="zh_CN">目前沒有開啟的文本(Text)模式編輯器。</val>
-    <val lang="zh_TW">目前沒有開啟的文本(Text)模式編輯器。</val>
+    <val lang="zh_CN">ç›®å‰æ²’æœ‰é–‹å•Ÿçš„æ–‡æœ¬(Text)æ¨¡å¼ç·¨è¼¯å™¨ã€‚ 中</val>
+    <val lang="zh_TW">ç›®å‰æ²’æœ‰é–‹å•Ÿçš„æ–‡æœ¬(Text)æ¨¡å¼ç·¨è¼¯å™¨ã€‚ 繁</val>
   </key>
   <key value="text.replaced">
     <comment>infoArea.append()@ReplaceButtonActionListener()</comment>
     <val lang="en_US">Selected text has been replaced.</val>
-    <val lang="zh_CN">選取文字已替換。</val>
-    <val lang="zh_TW">選取文字已替換。</val>
+    <val lang="zh_CN">é¸å–æ–‡å­—å·²æ›¿æ›ã€‚ 中</val>
+    <val lang="zh_TW">é¸å–æ–‡å­—å·²æ›¿æ›ã€‚ 繁</val>
   </key>
   <key value="error.replacing.text">
     <comment>infoArea.append()@ReplaceButtonActionListener()</comment>
     <val lang="en_US">Error during text replacement: </val>
-    <val lang="zh_CN">替換文字時發生錯誤: </val>
-    <val lang="zh_TW">替換文字時發生錯誤: </val>
+    <val lang="zh_CN">æ›¿æ›æ–‡å­—æ™‚ç™¼ç”ŸéŒ¯èª¤:  中</val>
+    <val lang="zh_TW">æ›¿æ›æ–‡å­—æ™‚ç™¼ç”ŸéŒ¯èª¤:  繁</val>
   </key>
   <key value="no.text.selected">
     <comment>infoArea.append()@ReplaceButtonActionListener(),area.append()@fetchSelectedText()</comment>
     <val lang="en_US">No text selected in the editor.</val>
-    <val lang="zh_CN">編輯器內未選取文字。</val>
-    <val lang="zh_TW">編輯器內未選取文字。</val>
+    <val lang="zh_CN">ç·¨è¼¯å™¨å…§æœªé¸å–æ–‡å­—ã€‚ 中</val>
+    <val lang="zh_TW">ç·¨è¼¯å™¨å…§æœªé¸å–æ–‡å­—ã€‚ 繁</val>
   </key>
   <key value="error.accessing.editor">
     <comment>infoArea.append()@ReplaceButtonActionListener()</comment>
     <val lang="en_US">Error accessing editor: {0}</val>
-    <val lang="zh_CN">訪問編輯器時出錯：{0}</val>
-    <val lang="zh_TW">訪問編輯器時出錯：{0}</val>
+    <val lang="zh_CN">è¨ªå•ç·¨è¼¯å™¨æ™‚å‡ºéŒ¯ï¼š{0} 中</val>
+    <val lang="zh_TW">è¨ªå•ç·¨è¼¯å™¨æ™‚å‡ºéŒ¯ï¼š{0} 繁</val>
   </key>
   <key value="no.files.to.convert">
     <comment>infoArea.append()@TransferButtonActionListener()</comment>
     <val lang="en_US">No files to convert.</val>
-    <val lang="zh_CN">沒有檔案需要轉換。</val>
-    <val lang="zh_TW">沒有檔案需要轉換。</val>
+    <val lang="zh_CN">æ²’æœ‰æª”æ¡ˆéœ€è¦è½‰æ›ã€‚ 中</val>
+    <val lang="zh_TW">æ²’æœ‰æª”æ¡ˆéœ€è¦è½‰æ›ã€‚ 繁</val>
   </key>
   <key value="utf8.Converting">
     <comment>infoArea.append()@TransferButtonActionListener()</comment>
     <val lang="en_US">Converting files to UTF-8...</val>
-    <val lang="zh_CN">正在將檔案轉換為 UTF-8...</val>
-    <val lang="zh_TW">正在將檔案轉換為 UTF-8...</val>
+    <val lang="zh_CN">æ­£åœ¨å°‡æª”æ¡ˆè½‰æ›ç‚º UTF-8... 中</val>
+    <val lang="zh_TW">æ­£åœ¨å°‡æª”æ¡ˆè½‰æ›ç‚º UTF-8... 繁</val>
   </key>
   <key value="error.converting.files">
     <comment>infoArea.append()@TransferButtonActionListener()</comment>
     <val lang="en_US">Error converting files: {0}</val>
-    <val lang="zh_CN">轉換檔案時出錯：{0}</val>
-    <val lang="zh_TW">轉換檔案時出錯：{0}</val>
+    <val lang="zh_CN">è½‰æ›æª”æ¡ˆæ™‚å‡ºéŒ¯ï¼š{0} 中</val>
+    <val lang="zh_TW">è½‰æ›æª”æ¡ˆæ™‚å‡ºéŒ¯ï¼š{0} 繁</val>
   </key>  
   <key value="utf8.conversion.cancelled">
     <comment>infoArea.append()@CancelButtonActionListener()</comment>
     <val lang="en_US">UTF-8 conversion cancelled.</val>
-    <val lang="zh_CN">UTF-8 轉換已取消。</val>
-    <val lang="zh_TW">UTF-8 轉換已取消。</val>
+    <val lang="zh_CN">UTF-8 è½‰æ›å·²å–æ¶ˆã€‚ 中</val>
+    <val lang="zh_TW">UTF-8 è½‰æ›å·²å–æ¶ˆã€‚ 繁</val>
   </key>  
   <key value="not.text.mode">
     <comment>area.append()@fetchSelectedText()</comment>
     <val lang="en_US">Current page is not a Text mode editor.</val>
-    <val lang="zh_CN">當前頁面不是Text模式編輯器。</val>
-    <val lang="zh_TW">當前頁面不是Text模式編輯器。</val>
+    <val lang="zh_CN">ç•¶å‰é é¢ä¸æ˜¯Textæ¨¡å¼ç·¨è¼¯å™¨ã€‚ 中</val>
+    <val lang="zh_TW">ç•¶å‰é é¢ä¸æ˜¯Textæ¨¡å¼ç·¨è¼¯å™¨ã€‚ 繁</val>
   </key>
   <key value="error.fetching.selected.text">
     <comment>area.append()@fetchSelectedText()</comment>
     <val lang="en_US">Error fetching selected text: {0}</val>
-    <val lang="zh_CN">抓取所選文字時出錯： {0}</val>
-    <val lang="zh_TW">抓取所選文字時出錯： {0}</val>
+    <val lang="zh_CN">æŠ“å–æ‰€é¸æ–‡å­—æ™‚å‡ºéŒ¯ï¼š {0} 中</val>
+    <val lang="zh_TW">æŠ“å–æ‰€é¸æ–‡å­—æ™‚å‡ºéŒ¯ï¼š {0} 繁</val>
   </key>
   <key value="error.no.APIKey">
     <comment>infoArea.append()@processAIMarkup()</comment>
     <val lang="en_US">Error: API key not configured. Please set up your API key in Preferences.</val>
-    <val lang="zh_CN">錯誤：API 金鑰未配置。請在偏好設定中設置您的 API 金鑰。</val>
-    <val lang="zh_TW">錯誤：API 金鑰未配置。請在偏好設定中設置您的 API 金鑰。</val>
+    <val lang="zh_CN">éŒ¯èª¤ï¼šAPI é‡‘é‘°æœªé…ç½®ã€‚è«‹åœ¨åå¥½è¨­å®šä¸­è¨­ç½®æ‚¨çš„ API é‡‘é‘°ã€‚ 中</val>
+    <val lang="zh_TW">éŒ¯èª¤ï¼šAPI é‡‘é‘°æœªé…ç½®ã€‚è«‹åœ¨åå¥½è¨­å®šä¸­è¨­ç½®æ‚¨çš„ API é‡‘é‘°ã€‚ 繁</val>
   </key>
   <key value="error.no.parse.model">
     <comment>infoArea.append()@processAIMarkup()</comment>
     <val lang="en_US">Error: Parse model not configured. Please set up your model in Preferences.</val>
-    <val lang="zh_CN">錯誤：解析模型未配置。請在偏好設定中設置您的模型。</val>
-    <val lang="zh_TW">錯誤：解析模型未配置。請在偏好設定中設置您的模型。</val>
+    <val lang="zh_CN">éŒ¯èª¤ï¼šè§£æžæ¨¡åž‹æœªé…ç½®ã€‚è«‹åœ¨åå¥½è¨­å®šä¸­è¨­ç½®æ‚¨çš„æ¨¡åž‹ã€‚ 中</val>
+    <val lang="zh_TW">éŒ¯èª¤ï¼šè§£æžæ¨¡åž‹æœªé…ç½®ã€‚è«‹åœ¨åå¥½è¨­å®šä¸­è¨­ç½®æ‚¨çš„æ¨¡åž‹ã€‚ 繁</val>
   </key>
   <key value="system.prompt.ai.markup">
     <comment>String systemPrompt = i18n("system.prompt.ai.markup")@processAIMarkup()</comment>
     <val lang="en_US">Please add XML tags for all sutra, volume, page, column, and line references related to "sutra references" in the selected text.</val>
-    <val lang="zh_CN">請將選取文字中，只要與「藏經參照」相關的藏經、冊、頁、欄、行等均標上 XML 標籤。</val>
-    <val lang="zh_TW">請將選取文字中，只要與「藏經參照」相關的藏經、冊、頁、欄、行等均標上 XML 標籤。</val>
+    <val lang="zh_CN">è«‹å°‡é¸å–æ–‡å­—ä¸­ï¼Œåªè¦èˆ‡ã€Œè—ç¶“åƒç…§ã€ç›¸é—œçš„è—ç¶“ã€å†Šã€é ã€æ¬„ã€è¡Œç­‰å‡æ¨™ä¸Š XML æ¨™ç±¤ã€‚ 中</val>
+    <val lang="zh_TW">è«‹å°‡é¸å–æ–‡å­—ä¸­ï¼Œåªè¦èˆ‡ã€Œè—ç¶“åƒç…§ã€ç›¸é—œçš„è—ç¶“ã€å†Šã€é ã€æ¬„ã€è¡Œç­‰å‡æ¨™ä¸Š XML æ¨™ç±¤ã€‚ 繁</val>
   </key>
   <key value="http.error">
     <comment>return i18n("http.error", responseCode, errorResponse.toString())@processAIMarkup()</comment>
     <val lang="en_US">HTTP error {0}: {1}</val>
-    <val lang="zh_CN">HTTP 錯誤 {0}: {1}</val>
-    <val lang="zh_TW">HTTP 錯誤 {0}: {1}</val>
+    <val lang="zh_CN">HTTP éŒ¯èª¤ {0}: {1} 中</val>
+    <val lang="zh_TW">HTTP éŒ¯èª¤ {0}: {1} 繁</val>
   </key>
   <key value="llm.error">
     <comment>return i18n("llm.error", e.getMessage())@processAIMarkup()</comment>
     <val lang="en_US">Error calling language model: {0}</val>
-    <val lang="zh_CN">呼叫語言模型發生錯誤: {0}</val>
-    <val lang="zh_TW">呼叫語言模型發生錯誤: {0}</val>
+    <val lang="zh_CN">å‘¼å«èªžè¨€æ¨¡åž‹ç™¼ç”ŸéŒ¯èª¤: {0} 中</val>
+    <val lang="zh_TW">å‘¼å«èªžè¨€æ¨¡åž‹ç™¼ç”ŸéŒ¯èª¤: {0} 繁</val>
   </key>
   <key value="utf8.all.valid">
     <comment>infoArea.append()@displayUtf8CheckResults()</comment>
     <val lang="en_US">All files are valid UTF-8!</val>
-    <val lang="zh_CN">所有檔案都是有效的 UTF-8 編碼！</val>
-    <val lang="zh_TW">所有檔案都是有效的 UTF-8 編碼！</val>
+    <val lang="zh_CN">æ‰€æœ‰æª”æ¡ˆéƒ½æ˜¯æœ‰æ•ˆçš„ UTF-8 ç·¨ç¢¼ï¼ 中</val>
+    <val lang="zh_TW">æ‰€æœ‰æª”æ¡ˆéƒ½æ˜¯æœ‰æ•ˆçš„ UTF-8 ç·¨ç¢¼ï¼ 繁</val>
   </key>
   <key value="more.files.to.convert">
     <comment>info.append()@displayUtf8CheckResults()</comment>
     <val lang="en_US">... and {0} more files\n</val>
-    <val lang="zh_CN">... 還有 {0} 個檔案\n</val>
-    <val lang="zh_TW">... 還有 {0} 個檔案\n</val>
+    <val lang="zh_CN">... é‚„æœ‰ {0} å€‹æª”æ¡ˆ\n 中</val>
+    <val lang="zh_TW">... é‚„æœ‰ {0} å€‹æª”æ¡ˆ\n 繁</val>
   </key>
   <key value="utf8.conversion.summary.header">
     <comment>return@convertFilesToUtf8()</comment>
     <val lang="en_US">Conversion summary:</val>
-    <val lang="zh_CN">轉換摘要：</val>
-    <val lang="zh_TW">轉換摘要：</val>
+    <val lang="zh_CN">è½‰æ›æ‘˜è¦ï¼š 中</val>
+    <val lang="zh_TW">è½‰æ›æ‘˜è¦ï¼š 繁</val>
   </key>
   <key value="utf8.conversion.success.count">
     <comment>return@convertFilesToUtf8()</comment>
     <val lang="en_US">Successfully converted {0} files</val>
-    <val lang="zh_CN">成功轉換 {0} 個檔案</val>
-    <val lang="zh_TW">成功轉換 {0} 個檔案</val>
+    <val lang="zh_CN">æˆåŠŸè½‰æ› {0} å€‹æª”æ¡ˆ 中</val>
+    <val lang="zh_TW">æˆåŠŸè½‰æ› {0} å€‹æª”æ¡ˆ 繁</val>
   </key>
   <key value="utf8.conversion.failure.count">
     <comment>return@convertFilesToUtf8()</comment>
     <val lang="en_US">Failed conversions {0} files</val>
-    <val lang="zh_CN">轉換失敗 {0} 個檔案</val>
-    <val lang="zh_TW">轉換失敗 {0} 個檔案</val>
+    <val lang="zh_CN">è½‰æ›å¤±æ•— {0} å€‹æª”æ¡ˆ 中</val>
+    <val lang="zh_TW">è½‰æ›å¤±æ•— {0} å€‹æª”æ¡ˆ 繁</val>
   </key>
   <key value="utf8.conversion.details.header">
     <comment>return@convertFilesToUtf8()</comment>
     <val lang="en_US">Details:</val>
-    <val lang="zh_CN">詳情：</val>
-    <val lang="zh_TW">詳情：</val>
+    <val lang="zh_CN">è©³æƒ…ï¼š 中</val>
+    <val lang="zh_TW">è©³æƒ…ï¼š 繁</val>
+  </key>
+  <key value="utf8.conversion.no.details">
+    <comment>Fallback when conversion details are empty</comment>
+    <val lang="en_US">No conversion details available.</val>
+    <val lang="zh_CN">没有可用的转换明细</val>
+    <val lang="zh_TW">沒有可用的轉換明細</val>
   </key>
   <key value="utf8.conversion.completed">
     <comment>infoArea.setText()@displayConversionResults()</comment>
     <val lang="en_US">UTF-8 conversion completed.</val>
-    <val lang="zh_CN">UTF-8 轉換完成。</val>
-    <val lang="zh_TW">UTF-8 轉換完成。</val>
+    <val lang="zh_CN">UTF-8 è½‰æ›å®Œæˆã€‚ 中</val>
+    <val lang="zh_TW">UTF-8 è½‰æ›å®Œæˆã€‚ 繁</val>
   </key>
   <key value="utf8.conversion.backup.note">
     <val lang="en_US">Note: Original files backed up with .bak extension</val>
-    <val lang="zh_CN">注意：原檔案已備份為 .bak 副檔名</val>
-    <val lang="zh_TW">注意：原檔案已備份為 .bak 副檔名</val>
+    <val lang="zh_CN">æ³¨æ„ï¼šåŽŸæª”æ¡ˆå·²å‚™ä»½ç‚º .bak å‰¯æª”å 中</val>
+    <val lang="zh_TW">æ³¨æ„ï¼šåŽŸæª”æ¡ˆå·²å‚™ä»½ç‚º .bak å‰¯æª”å 繁</val>
   </key>  
   <key value="ft.parse.model.label">
     <comment>JLabel()</comment>
     <val lang="en_US">Parsing model:</val>
-    <val lang="zh_CN">解析參照模型：</val>
-    <val lang="zh_TW">解析參照模型：</val>
+    <val lang="zh_CN">è§£æžåƒç…§æ¨¡åž‹ï¼š 中</val>
+    <val lang="zh_TW">è§£æžåƒç…§æ¨¡åž‹ï¼š 繁</val>
   </key>
   <key value="ft.detect.model.label">
     <comment>JLabel()</comment>
     <val lang="en_US">Detection model:</val>
-    <val lang="zh_CN">偵測參照模型：</val>
-    <val lang="zh_TW">偵測參照模型：</val>
+    <val lang="zh_CN">åµæ¸¬åƒç…§æ¨¡åž‹ï¼š 中</val>
+    <val lang="zh_TW">åµæ¸¬åƒç…§æ¨¡åž‹ï¼š 繁</val>
   </key>
   <key value="api.key.label">
     <comment>JLabel()</comment>
     <val lang="en_US">API Key*: </val>
-    <val lang="zh_CN">API 金鑰*： </val>
-    <val lang="zh_TW">API 金鑰*： </val>
+    <val lang="zh_CN">API é‡‘é‘°*ï¼š  中</val>
+    <val lang="zh_TW">API é‡‘é‘°*ï¼š  繁</val>
   </key>
   <key value="utf8.check.cancelled">
     <val lang="en_US">File selection cancelled.</val>
-    <val lang="zh_CN">檔案選擇已取消。</val>
-    <val lang="zh_TW">檔案選擇已取消。</val>
+    <val lang="zh_CN">æª”æ¡ˆé¸æ“‡å·²å–æ¶ˆã€‚ 中</val>
+    <val lang="zh_TW">æª”æ¡ˆé¸æ“‡å·²å–æ¶ˆã€‚ 繁</val>
   </key>
   <key value="utf8.check.found.non.utf8">
     <comment>info.append()@displayUtf8CheckResults() - {0} = non-UTF-8 file count, {1} = total files scanned</comment>
     <val lang="en_US">Found {0} files that are not valid UTF-8 out of {1} files:</val>
-    <val lang="zh_CN">在掃描的 {1} 個檔案中，發現 {0} 個非有效 UTF-8 編碼的檔案：</val>
-    <val lang="zh_TW">在掃描的 {1} 個檔案中，發現 {0} 個非有效 UTF-8 編碼的檔案：</val>
+    <val lang="zh_CN">åœ¨æŽƒæçš„ {1} å€‹æª”æ¡ˆä¸­ï¼Œç™¼ç¾ {0} å€‹éžæœ‰æ•ˆ UTF-8 ç·¨ç¢¼çš„æª”æ¡ˆï¼š 中</val>
+    <val lang="zh_TW">åœ¨æŽƒæçš„ {1} å€‹æª”æ¡ˆä¸­ï¼Œç™¼ç¾ {0} å€‹éžæœ‰æ•ˆ UTF-8 ç·¨ç¢¼çš„æª”æ¡ˆï¼š 繁</val>
   </key>
   <key value="utf8.conversion.backing.up">
     <val lang="en_US">The original files are backed up under the same directory.</val>
-    <val lang="zh_CN">原始檔案已備份至相同目錄內。</val>
-    <val lang="zh_TW">原始檔案已備份至相同目錄內。</val>
+    <val lang="zh_CN">åŽŸå§‹æª”æ¡ˆå·²å‚™ä»½è‡³ç›¸åŒç›®éŒ„å…§ã€‚ 中</val>
+    <val lang="zh_TW">åŽŸå§‹æª”æ¡ˆå·²å‚™ä»½è‡³ç›¸åŒç›®éŒ„å…§ã€‚ 繁</val>
   </key>
   <!-- <key value="utf8.check.more.files">
     <val lang="en_US">and {0} more files</val>
-    <val lang="zh_CN">還有 {0} 個檔案</val>
-    <val lang="zh_TW">還有 {0} 個檔案</val>
+    <val lang="zh_CN">é‚„æœ‰ {0} å€‹æª”æ¡ˆ 中</val>
+    <val lang="zh_TW">é‚„æœ‰ {0} å€‹æª”æ¡ˆ 繁</val>
   </key> -->
   <!-- <key value="utf8.check.select.encoding">
     <val lang="en_US">Select the source encoding for conversion:</val>
-    <val lang="zh_CN">請選擇轉換的源編碼：</val>
-    <val lang="zh_TW">請選擇轉換的源編碼：</val>
+    <val lang="zh_CN">è«‹é¸æ“‡è½‰æ›çš„æºç·¨ç¢¼ï¼š 中</val>
+    <val lang="zh_TW">è«‹é¸æ“‡è½‰æ›çš„æºç·¨ç¢¼ï¼š 繁</val>
   </key> -->
   <!-- <key value="action.settings.selected">
     <val lang="en_US">Option selected: Settings for fine-tuning model and API Key parameters.</val>
-    <val lang="zh_CN">選取選項：設定微調模型與 API 金鑰參數。</val>
-    <val lang="zh_TW">選取選項：設定微調模型與 API 金鑰參數。</val>
+    <val lang="zh_CN">é¸å–é¸é …ï¼šè¨­å®šå¾®èª¿æ¨¡åž‹èˆ‡ API é‡‘é‘°åƒæ•¸ã€‚ 中</val>
+    <val lang="zh_TW">é¸å–é¸é …ï¼šè¨­å®šå¾®èª¿æ¨¡åž‹èˆ‡ API é‡‘é‘°åƒæ•¸ã€‚ 繁</val>
   </key> -->
   <!-- <key value="options.panel.title">
     <val lang="en_US">DILA AI Markup Assistant Settings</val>
-    <val lang="zh_CN">DILA AI標記助手設定</val>
-    <val lang="zh_TW">DILA AI標記助手設定</val>
+    <val lang="zh_CN">DILA AIæ¨™è¨˜åŠ©æ‰‹è¨­å®š 中</val>
+    <val lang="zh_TW">DILA AIæ¨™è¨˜åŠ©æ‰‹è¨­å®š 繁</val>
   </key> -->
   <!-- <key value="options.info">
     <val lang="en_US">Configure the OpenAI models and API key used for reference parsing and detection. The parsing model processes selected text to add XML markup tags, while the detection model identifies potential references. Your API key is stored locally with basic encoding for security.</val>
-    <val lang="zh_CN">設定用於參照解析和偵測的OpenAI模型和API金鑰。解析模型處理選取文字以添加XML標記標籤，偵測模型識別潛在參照。您的API金鑰會以基本編碼方式儲存在本機以確保安全。</val>
-    <val lang="zh_TW">設定用於參照解析和偵測的OpenAI模型和API金鑰。解析模型處理選取文字以添加XML標記標籤，偵測模型識別潛在參照。您的API金鑰會以基本編碼方式儲存在本機以確保安全。</val>
+    <val lang="zh_CN">è¨­å®šç”¨æ–¼åƒç…§è§£æžå’Œåµæ¸¬çš„OpenAIæ¨¡åž‹å’ŒAPIé‡‘é‘°ã€‚è§£æžæ¨¡åž‹è™•ç†é¸å–æ–‡å­—ä»¥æ·»åŠ XMLæ¨™è¨˜æ¨™ç±¤ï¼Œåµæ¸¬æ¨¡åž‹è­˜åˆ¥æ½›åœ¨åƒç…§ã€‚æ‚¨çš„APIé‡‘é‘°æœƒä»¥åŸºæœ¬ç·¨ç¢¼æ–¹å¼å„²å­˜åœ¨æœ¬æ©Ÿä»¥ç¢ºä¿å®‰å…¨ã€‚ 中</val>
+    <val lang="zh_TW">è¨­å®šç”¨æ–¼åƒç…§è§£æžå’Œåµæ¸¬çš„OpenAIæ¨¡åž‹å’ŒAPIé‡‘é‘°ã€‚è§£æžæ¨¡åž‹è™•ç†é¸å–æ–‡å­—ä»¥æ·»åŠ XMLæ¨™è¨˜æ¨™ç±¤ï¼Œåµæ¸¬æ¨¡åž‹è­˜åˆ¥æ½›åœ¨åƒç…§ã€‚æ‚¨çš„APIé‡‘é‘°æœƒä»¥åŸºæœ¬ç·¨ç¢¼æ–¹å¼å„²å­˜åœ¨æœ¬æ©Ÿä»¥ç¢ºä¿å®‰å…¨ã€‚ 繁</val>
   </key> -->
   <!-- <key value="options.saved.successfully">
     <val lang="en_US">Options saved successfully.</val>
-    <val lang="zh_CN">選項已成功儲存。</val>
-    <val lang="zh_TW">選項已成功儲存。</val>
+    <val lang="zh_CN">é¸é …å·²æˆåŠŸå„²å­˜ã€‚ 中</val>
+    <val lang="zh_TW">é¸é …å·²æˆåŠŸå„²å­˜ã€‚ 繁</val>
   </key>
   <key value="options.saved.failed">
     <val lang="en_US">Failed to save options.</val>
-    <val lang="zh_CN">儲存選項失敗。</val>
-    <val lang="zh_TW">儲存選項失敗。</val>
+    <val lang="zh_CN">å„²å­˜é¸é …å¤±æ•—ã€‚ 中</val>
+    <val lang="zh_TW">å„²å­˜é¸é …å¤±æ•—ã€‚ 繁</val>
   </key>
   <key value="save.button">
     <val lang="en_US">Save</val>
-    <val lang="zh_CN">儲存</val>
-    <val lang="zh_TW">儲存</val>
+    <val lang="zh_CN">å„²å­˜ 中</val>
+    <val lang="zh_TW">å„²å­˜ 繁</val>
   </key> -->
   <!-- <key value="preferences.page.title">
     <val lang="en_US">DILA AI Markup Assistant Options</val>
-    <val lang="zh_CN">DILA AI 標記助手偏好設定</val>
-    <val lang="zh_TW">DILA AI 標記助手偏好設定</val>
+    <val lang="zh_CN">DILA AI æ¨™è¨˜åŠ©æ‰‹åå¥½è¨­å®š 中</val>
+    <val lang="zh_TW">DILA AI æ¨™è¨˜åŠ©æ‰‹åå¥½è¨­å®š 繁</val>
   </key> -->
   <!-- <key value="ui.text.replaced.successfully">
     <val lang="en_US">Text replaced successfully in document.</val>
-    <val lang="zh_CN">文件中的文字已成功替換。</val>
-    <val lang="zh_TW">文件中的文字已成功替換。</val>
+    <val lang="zh_CN">æ–‡ä»¶ä¸­çš„æ–‡å­—å·²æˆåŠŸæ›¿æ›ã€‚ 中</val>
+    <val lang="zh_TW">æ–‡ä»¶ä¸­çš„æ–‡å­—å·²æˆåŠŸæ›¿æ›ã€‚ 繁</val>
   </key> -->
   <!-- <key value="button.convert">
     <val lang="en_US">Convert</val>
-    <val lang="zh_CN">轉換</val>
+    <val lang="zh_CN">转换</val>
     <val lang="zh_TW">轉換</val>
   </key> -->
   <!-- <key value="utf8.check.dialog.title">
     <val lang="en_US">UTF-8 Encoding Tool</val>
-    <val lang="zh_CN">UTF-8 編碼工具</val>
-    <val lang="zh_TW">UTF-8 編碼工具</val>
+    <val lang="zh_CN">UTF-8 ç·¨ç¢¼å·¥å…· 中</val>
+    <val lang="zh_TW">UTF-8 ç·¨ç¢¼å·¥å…· 繁</val>
   </key> -->
   <!-- <key value="text.mode.not.active.for.replace">
     <val lang="en_US">\nText mode editor is not open. Please switch to text mode to use this feature.</val>
-    <val lang="zh_CN">\n文字模式編輯器未開啟，請切換到文字模式再使用。</val>
-    <val lang="zh_TW">\n文字模式編輯器未開啟，請切換到文字模式再使用。</val>
+    <val lang="zh_CN">\næ–‡å­—æ¨¡å¼ç·¨è¼¯å™¨æœªé–‹å•Ÿï¼Œè«‹åˆ‡æ›åˆ°æ–‡å­—æ¨¡å¼å†ä½¿ç”¨ã€‚ 中</val>
+    <val lang="zh_TW">\næ–‡å­—æ¨¡å¼ç·¨è¼¯å™¨æœªé–‹å•Ÿï¼Œè«‹åˆ‡æ›åˆ°æ–‡å­—æ¨¡å¼å†ä½¿ç”¨ã€‚ 繁</val>
   </key>
   <key value="text.editor.not.open">
     <val lang="en_US">\nText mode editor is not open.</val>
-    <val lang="zh_CN">\nText 模式編輯器未開啟。</val>
-    <val lang="zh_TW">\nText 模式編輯器未開啟。</val>
+    <val lang="zh_CN">\nText æ¨¡å¼ç·¨è¼¯å™¨æœªé–‹å•Ÿã€‚ 中</val>
+    <val lang="zh_TW">\nText æ¨¡å¼ç·¨è¼¯å™¨æœªé–‹å•Ÿã€‚ 繁</val>
   </key> -->
+
+  <!-- Ref to Link Action (001-ref-to-link-action) -->
+  <key value="menuItem.ref.to.link">
+    <comment>JMenuItem()@createMenuBar() - Ref to Link action</comment>
+    <val lang="en_US">&lt;ref&gt; to link</val>
+    <val lang="zh_CN">&lt;ref&gt; 转链接</val>
+    <val lang="zh_TW">&lt;ref&gt; 轉連結</val>
+  </key>
+  <key value="button.convert">
+    <comment>JButton() - Convert (CBRD API)</comment>
+    <val lang="en_US">Convert</val>
+    <val lang="zh_CN">转换</val>
+    <val lang="zh_TW">轉換</val>
+  </key>
+  <key value="action.ref.to.link.selected">
+    <comment>infoArea.setText()@RefToLinkActionListener()</comment>
+    <val lang="en_US">Action selected: &lt;ref&gt; to link</val>
+    <val lang="zh_CN">已选择动作：&lt;ref&gt; 转链接</val>
+    <val lang="zh_TW">已選擇動作：&lt;ref&gt; 轉連結</val>
+  </key>
+  <key value="success.link.generated">
+    <comment>Displayed after successful CBRD API call</comment>
+    <val lang="en_US">CBETA link generated successfully</val>
+    <val lang="zh_CN">已生成 CBETA 链接</val>
+    <val lang="zh_TW">已產生 CBETA 連結</val>
+  </key>
+  <key value="success.replacement.complete">
+    <comment>Displayed after replacing &lt;ptr&gt; and setting checked=&quot;2&quot;</comment>
+    <val lang="en_US">Replacement complete, checked attribute updated</val>
+    <val lang="zh_CN">替换完成，已更新 checked 属性</val>
+    <val lang="zh_TW">替換完成，已更新 checked 屬性</val>
+  </key>
+
+  <!-- Ref to Link errors -->
+  <key value="error.no.selection">
+    <val lang="en_US">No text selected</val>
+    <val lang="zh_CN">未选择文本</val>
+    <val lang="zh_TW">未選擇文字</val>
+  </key>
+  <key value="error.invalid.xml">
+    <val lang="en_US">Selected text is not valid XML</val>
+    <val lang="zh_CN">选中文本不是有效 XML</val>
+    <val lang="zh_TW">選取文字不是有效 XML</val>
+  </key>
+  <key value="error.not.ref.element">
+    <val lang="en_US">Selected text is not a &lt;ref&gt; element</val>
+    <val lang="zh_CN">选中文本不是 &lt;ref&gt; 元素</val>
+    <val lang="zh_TW">選取文字不是 &lt;ref&gt; 元素</val>
+  </key>
+  <key value="error.missing.canon">
+    <val lang="en_US">Missing required &lt;canon&gt; element</val>
+    <val lang="zh_CN">缺少必需的 &lt;canon&gt; 元素</val>
+    <val lang="zh_TW">缺少必要的 &lt;canon&gt; 元素</val>
+  </key>
+  <key value="error.missing.volume">
+    <val lang="en_US">Missing required &lt;v&gt; (volume) element</val>
+    <val lang="zh_CN">缺少必需的 &lt;v&gt;（卷）元素</val>
+    <val lang="zh_TW">缺少必要的 &lt;v&gt;（卷）元素</val>
+  </key>
+  <key value="error.missing.page">
+    <val lang="en_US">Missing required &lt;p&gt; (page) element</val>
+    <val lang="zh_CN">缺少必需的 &lt;p&gt;（页）元素</val>
+    <val lang="zh_TW">缺少必要的 &lt;p&gt;（頁）元素</val>
+  </key>
+  <key value="error.unknown.canon">
+    <val lang="en_US">Unknown canon: {0}</val>
+    <val lang="zh_CN">未知藏别：{0}</val>
+    <val lang="zh_TW">未知藏別：{0}</val>
+  </key>
+  <key value="error.invalid.numerals">
+    <val lang="en_US">Invalid numeral format: {0}</val>
+    <val lang="zh_CN">数字格式无效：{0}</val>
+    <val lang="zh_TW">數字格式無效：{0}</val>
+  </key>
+  <key value="error.unknown.column">
+    <val lang="en_US">Unknown column position: {0}</val>
+    <val lang="zh_CN">未知栏位：{0}</val>
+    <val lang="zh_TW">未知欄位：{0}</val>
+  </key>
+  <key value="error.api.timeout">
+    <val lang="en_US">CBRD API timeout (&gt;3s)</val>
+    <val lang="zh_CN">CBRD API 超时（>3s）</val>
+    <val lang="zh_TW">CBRD API 逾時（>3s）</val>
+  </key>
+  <key value="error.api.http">
+    <val lang="en_US">CBRD API error: HTTP {0}</val>
+    <val lang="zh_CN">CBRD API 错误：HTTP {0}</val>
+    <val lang="zh_TW">CBRD API 錯誤：HTTP {0}</val>
+  </key>
+  <key value="error.api.connection">
+    <val lang="en_US">Cannot connect to CBRD API</val>
+    <val lang="zh_CN">无法连接 CBRD API</val>
+    <val lang="zh_TW">無法連線 CBRD API</val>
+  </key>
+  <key value="error.api.response">
+    <val lang="en_US">Invalid API response format</val>
+    <val lang="zh_CN">API 响应格式无效</val>
+    <val lang="zh_TW">API 回應格式無效</val>
+  </key>
+  <key value="error.no.results">
+    <val lang="en_US">No CBETA links found for this reference</val>
+    <val lang="zh_CN">未找到 CBETA 链接</val>
+    <val lang="zh_TW">未找到 CBETA 連結</val>
+  </key>
+
+  <!-- CBRD preferences -->
+  <key value="cbrd.api.url.label">
+    <comment>Preferences label</comment>
+    <val lang="en_US">CBRD API URL:</val>
+    <val lang="zh_CN">CBRD API 地址：</val>
+    <val lang="zh_TW">CBRD API 位址：</val>
+  </key>
+  <key value="cbrd.referer.label">
+    <comment>Preferences label</comment>
+    <val lang="en_US">CBRD Referer header:</val>
+    <val lang="zh_CN">CBRD Referer 标头：</val>
+    <val lang="zh_TW">CBRD Referer 標頭：</val>
+  </key>
+  <key value="cbrd.timeout.ms.label">
+    <comment>Preferences label</comment>
+    <val lang="en_US">CBRD timeout (ms):</val>
+    <val lang="zh_CN">CBRD 超时（毫秒）：</val>
+    <val lang="zh_TW">CBRD 逾時（毫秒）：</val>
+  </key>
 </translation> 
+
+
+

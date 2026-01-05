@@ -10,8 +10,8 @@
 |----------|-------|
 | **Document Type** | RUP Design Document |
 | **Project** | DILA AI Markup Assistant Plugin |
-| **Version** | 0.3.0 |
-| **Date** | October 10, 2025 |
+| **Version** | 0.4.0 |
+| **Date** | January 5, 2026 |
 | **Author** | Jeff Y.H. Wu (jeffwu@dila.edu.tw) |
 | **Status** | In Development |
 

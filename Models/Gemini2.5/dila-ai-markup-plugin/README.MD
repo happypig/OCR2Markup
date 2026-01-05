@@ -1,4 +1,4 @@
-# DILA AI Markup Assistant Plugin
+﻿# DILA AI Markup Assistant Plugin
 
 **Product Requirements Document & User Guide**
 
@@ -14,7 +14,7 @@ The DILA AI Markup Assistant is an Oxygen XML Editor plugin designed to accelera
 
 ### Version Information
 
-- **Released Version**: 0.3.0
+- **Released Version**: 0.4.0
 - **Target Platform**: Oxygen XML Editor 27.0+
 - **Java Compatibility**: JDK 1.8+
 
@@ -350,7 +350,7 @@ dila-ai-markup-plugin/
 │   │           └── translation.xml  # 3 languages
 │   │
 │   └── test/
-│       ├── java/                    # Test code (70+ tests)
+│       ├── java/                    # Test code (99 tests)
 │       │   └── com/dila/dama/plugin/
 │       │       ├── i18n/            # 5 test classes
 │       │       ├── test/            # 1 test class
@@ -362,7 +362,7 @@ dila-ai-markup-plugin/
 │               └── translation.xml
 │
 └── target/                          # Build output
-    ├── dila-ai-markup-plugin-0.3.0.jar
+    ├── dila-ai-markup-plugin-0.4.0.jar
     └── dilaAIMarkupPlugin.zip       # Distribution package
 ```
 
@@ -987,7 +987,7 @@ optionsStorage.setOption("dila.dama.ft.parse.model", parseModel);
 
 ### Test Coverage
 
-**Total Tests**: 70+ comprehensive tests
+**Total Tests**: 99 comprehensive tests
 **Success Rate**: 100% (all tests passing)
 **Test Framework**: JUnit 4 with Mockito and AssertJ
 
@@ -1044,7 +1044,7 @@ mvn install -DskipTests
 
 ## Development Status
 
-### Current Version: 0.3.0
+### Current Version: 0.4.0
 
 **Branch**: `feature/utf8-tool-java`  
 **Status**: Active Development  
@@ -1095,7 +1095,13 @@ mvn install -DskipTests
 
 ### Version History
 
-#### Version 0.3.0 (Released)
+#### Version 0.4.0 (Released)
+- ƒo. Ref-to-Link action for converting `<ref>` to CBRD links and safe `<ptr>` replacement
+- ƒo. CBRD preferences for endpoint, referer, and timeout settings
+- ƒo. Clear validation and error handling for invalid selections and API failures
+- ƒo. Expanded automated test coverage (99 tests passing)
+
+#### Version 0.3.0 (Previous)
 - ✅ Full Java implementation (pure Java, no JavaScript)
 - ✅ UTF-8 validation service with comprehensive encoding support
 - ✅ Enhanced localization (3 languages)
@@ -1126,14 +1132,14 @@ mvn install -DskipTests
 
 ### Roadmap
 
-#### Version 0.4.0 (Planned)
+#### Version 0.5.0 (Planned)
 - [ ] Enhanced AI prompt customization
 - [ ] Batch processing for multiple files
 - [ ] Custom tag templates
 - [ ] Performance monitoring dashboard
 - [ ] Additional language support
 
-#### Version 0.5.0 (Planned)
+#### Version 0.6.0 (Planned)
 - [ ] Local LLM support (offline mode)
 - [ ] Advanced UTF-8 validation reporting
 - [ ] Integration with version control
@@ -1313,13 +1319,13 @@ A: Yes, use Ctrl+Z (Cmd+Z on Mac) or Edit → Undo.
 A: Text files (.xml, .txt, .html, .java, .py, etc.). Binary files are skipped.
 
 **Q: Can I batch process multiple documents?**  
-A: Currently, batch processing is limited to UTF-8 validation. Full batch processing planned for v0.4.0.
+A: Currently, batch processing is limited to UTF-8 validation. Full batch processing planned for v0.5.0.
 
 **Q: How do I report bugs?**  
 A: Email jeffwu@dila.edu.tw with version info, steps to reproduce, and error messages.
 
 ---
 
-*Last Updated: Jan 4, 2026*
+*Last Updated: Jan 5, 2026*
 *Document Version: 1.0 (PRD Format)*
-*Plugin Version: 0.3.0*
+*Plugin Version: 0.4.0*

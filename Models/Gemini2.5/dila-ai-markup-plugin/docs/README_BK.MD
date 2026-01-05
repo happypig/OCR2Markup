@@ -1,4 +1,4 @@
-# DILA AI Markup Plugin
+﻿# DILA AI Markup Plugin
 
 An **Oxygen XML Editor Plugin** that provides AI-powered assistance for marking up TEI (Text Encoding Initiative) XML documents with comprehensive UTF-8 validation and multi-language support.
 
@@ -256,7 +256,13 @@ Feature: Document Integration and Workflow
 
 ## Key Features
 
-### Version 0.3.0 (Current)
+### Version 0.4.0 (Current)
+- **Ref-to-Link Action**: Convert selected `<ref>` elements to CBRD links and safely replace `<ptr>`
+- **CBRD Preferences**: Configurable endpoint, referer, and timeout settings
+- **Validation & Errors**: Clear feedback for invalid selections and API failures
+- **Expanded Test Coverage**: 99 automated tests passing
+
+### Version 0.3.0
 - **Full Java Implementation**: Complete rewrite in Java for better integration and performance
 - **UTF-8 Validation Service**: Comprehensive tools for detecting and converting non-UTF-8 files
 - **Enhanced Localization**: Support for English, Simplified Chinese, and Traditional Chinese
@@ -295,7 +301,7 @@ Feature: Document Integration and Workflow
 
 #### Key Features
 - **Maven project** with groupId: `dila`, artifactId: `dila-ai-markup-plugin`
-- **Version:** 0.3.0 (Java implementation)
+- **Version:** 0.4.0 (Java implementation)
 - **Packaging:** Builds a JAR file and packages it as a ZIP for Oxygen XML Editor
 - **Dependencies:** Oxygen SDK version 27.1.0.3, comprehensive testing framework
 
@@ -606,7 +612,7 @@ dila-ai-markup-plugin/
 │       └── resources/               # Test resources
 │           └── i18n/                # Test translation files
 └── target/                          # Build output directory
-    ├── dila-ai-markup-plugin-0.3.0.jar # Main plugin JAR
+    ├── dila-ai-markup-plugin-0.4.0.jar # Main plugin JAR
     └── dilaAIMarkupPlugin.zip       # Distribution package
 ```
 

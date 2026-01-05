@@ -9,7 +9,14 @@ import static org.mockito.Mockito.*;
 import ro.sync.exml.workspace.api.PluginResourceBundle;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * Comprehensive test suite for localization (i18n) functionality
@@ -32,9 +39,9 @@ public class LocalizationTest {
         "selected.text", "text.with.length", "text.replaced",
         
         // UTF-8 related messages
-        "utf8.all.valid", "utf8.non.utf8.found", 
+        "utf8.all.valid", "utf8.check.found.non.utf8", 
         "utf8.conversion.completed", "utf8.conversion.cancelled",
-        "utf8.conversion.success.count", "utf8.conversion.fail.count",
+        "utf8.conversion.success.count", "utf8.conversion.failure.count",
         
         // Error messages
         "error.processing.ai.markup", "error.checking.utf8",
@@ -48,12 +55,14 @@ public class LocalizationTest {
 
     private StandalonePluginWorkspace mockWorkspace;
     private PluginResourceBundle mockResourceBundle;
+    private Map<String, Map<String, String>> translationMap;
 
     @Before
     public void setUp() {
         mockWorkspace = mock(StandalonePluginWorkspace.class);
         mockResourceBundle = mock(PluginResourceBundle.class);
         when(mockWorkspace.getResourceBundle()).thenReturn(mockResourceBundle);
+        translationMap = loadTranslations();
     }
 
     // ========================================
@@ -318,17 +327,12 @@ public class LocalizationTest {
 
     @Test(timeout = 1000)
     public void testTranslationPerformance() {
-        // Setup mocks once before the performance test
-        for (String key : CRITICAL_KEYS) {
-            when(mockResourceBundle.getMessage(key)).thenReturn(getMockTranslation(key, "en_US"));
-        }
-        
-        // Test that translation lookup is fast
+        // Test that translation lookup is fast without mock overhead
         long startTime = System.currentTimeMillis();
         
         for (int i = 0; i < 1000; i++) {
             for (String key : CRITICAL_KEYS) {
-                mockResourceBundle.getMessage(key);
+                getMockTranslation(key, "en_US");
             }
         }
         
@@ -345,14 +349,51 @@ public class LocalizationTest {
     // ========================================
 
     private String getMockTranslation(String key, String locale) {
-        // Mock translation data based on actual translation.xml structure
-        Map<String, Map<String, String>> translations = createMockTranslations();
-        
-        if (translations.containsKey(key) && translations.get(key).containsKey(locale)) {
-            return translations.get(key).get(locale);
+        if (translationMap != null && translationMap.containsKey(key)) {
+            Map<String, String> perLang = translationMap.get(key);
+            if (perLang != null && perLang.containsKey(locale)) {
+                String value = perLang.get(locale);
+                if (value != null && !value.trim().isEmpty()) {
+                    return value;
+                }
+            }
         }
-        
-        return key; // Fallback to key
+        return key;
+    }
+
+    private Map<String, Map<String, String>> loadTranslations() {
+        Map<String, Map<String, String>> translations = new HashMap<>();
+        String translationPath = "src/main/resources/i18n/translation.xml";
+        if (!Files.exists(Paths.get(translationPath))) {
+            return translations;
+        }
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            org.w3c.dom.Document doc = builder.parse(new File(translationPath));
+
+            NodeList keyNodes = doc.getElementsByTagName("key");
+            for (int i = 0; i < keyNodes.getLength(); i++) {
+                Element keyElement = (Element) keyNodes.item(i);
+                String keyValue = keyElement.getAttribute("value");
+                if (keyValue == null || keyValue.isEmpty()) {
+                    continue;
+                }
+                Map<String, String> perLang = new HashMap<>();
+                NodeList valNodes = keyElement.getElementsByTagName("val");
+                for (int j = 0; j < valNodes.getLength(); j++) {
+                    Element valElement = (Element) valNodes.item(j);
+                    String lang = valElement.getAttribute("lang");
+                    if (lang != null && !lang.isEmpty()) {
+                        perLang.put(lang, valElement.getTextContent());
+                    }
+                }
+                translations.put(keyValue, perLang);
+            }
+        } catch (Exception e) {
+            return translations;
+        }
+        return translations;
     }
 
     private Map<String, Map<String, String>> createMockTranslations() {

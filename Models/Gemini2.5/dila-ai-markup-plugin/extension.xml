@@ -2,13 +2,19 @@
 <xt:extensions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xt="http://www.oxygenxml.com/ns/extension" xsi:schemaLocation="http://www.oxygenxml.com/ns/extension http://www.oxygenxml.com/ns/extension/extensions.xsd">
     <xt:extension id="com.dila.ai.markup">
         <xt:location href="dilaAIMarkupPlugin.zip"/>
-        <xt:version>0.3.0</xt:version>
+        <xt:version>0.4.0</xt:version>
         <xt:oxy_version>27.0+</xt:oxy_version>
         <xt:type>plugin</xt:type>
         <xt:author>DILA DA</xt:author>
         <xt:name>DILA AI Markup Assistant</xt:name>
         <xt:description xmlns="http://www.w3.org/1999/xhtml">
             <p>This plugin provides an AI-empowered markup assistant for editing TEI XML documents.</p>
+              <h3>Release Notes v0.4.0:</h3>
+              <ul>
+                     <li><strong>Ref-to-Link Action:</strong> Convert selected &lt;ref&gt; elements to CBRD links and replace existing &lt;ptr&gt; safely</li>
+                     <li><strong>CBRD Preferences:</strong> Configurable endpoint, referer, and timeout settings</li>
+                     <li><strong>Validation &amp; Errors:</strong> Clear feedback for invalid selections, missing components, and API failures</li>
+              </ul>
               <h3>Release Notes v0.3.0:</h3>
               <ul>
                      <li><strong>Complete Java Migration:</strong> Migrated entire implementation from JavaScript to pure Java for better performance and reliability

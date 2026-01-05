@@ -1,11 +1,11 @@
-# DILA AI Markup Plugin - Implementation Overview
+﻿# DILA AI Markup Plugin - Implementation Overview
 
-**Version:** 0.3.0
+**Version:** 0.4.0
 **Framework:** Oxygen XML Author Plugin (Java-based)
 **Build System:** Maven
 **Target Platform:** Oxygen XML SDK 27.1.0.3
 **Java Compatibility:** Java 8 (1.8)
-**Last Updated:** Jan 4 2026
+**Last Updated:** Jan 5 2026
 
 > **📘 For Users**: Looking for installation instructions, user guide, and features? See [README.MD](README.MD)
 >
@@ -718,7 +718,7 @@ mvn clean install
 ```
 dilaAIMarkupPlugin/
 ├── lib/
-│   └── dila-ai-markup-plugin-0.3.0.jar
+│   └── dila-ai-markup-plugin-0.4.0.jar
 ├── i18n/
 │   └── translation.xml
 ├── images/
@@ -753,7 +753,7 @@ dilaAIMarkupPlugin/
 | `UTF8ValidationServiceTest` | UTF-8 validation and conversion | Multiple |
 | `DAMAWorkspaceAccessPluginExtensionTest` | Workspace extension functionality | Multiple |
 
-**Total Tests**: 70
+**Total Tests**: 99
 **Status**: ✅ All passing (0 failures, 0 errors)
 
 ### 5.2 Test Dependencies
@@ -845,7 +845,8 @@ dilaAIMarkupPlugin/
 | Version | Status | Key Features |
 |---------|--------|--------------|
 | **0.2.4** | Legacy | JavaScript implementation, 90% UTF-8 accuracy |
-| **0.3.0** | Current | Pure Java, 95% accuracy, BOM detection, enterprise UX |
+| **0.4.0** | Current | Ref-to-Link action, CBRD preferences, improved validation |
+| **0.3.0** | Previous | Pure Java, 95% accuracy, BOM detection, enterprise UX |
 
 ### 7.2 Major Milestones
 
@@ -856,7 +857,7 @@ dilaAIMarkupPlugin/
 5. **Java Migration Phase 3**: AI Markup and LLM API integration
 6. **Java Migration Phase 4**: Tag removal and options
 7. **Java Migration Phase 5**: JavaScript cleanup and finalization
-8. **Testing & Refinement**: 70 tests, systematic test failure fixing
+8. **Testing & Refinement**: 99 tests, systematic test failure fixing
 
 ---
 
@@ -900,12 +901,13 @@ From documentation analysis:
 
 ## 10. Summary
 
-The DILA AI Markup Plugin is a mature, well-architected Oxygen XML Author plugin that has successfully migrated from a JavaScript-based implementation to a pure Java implementation. The current version (0.3.0) demonstrates enterprise-grade features including:
+The DILA AI Markup Plugin is a mature, well-architected Oxygen XML Author plugin that has successfully migrated from a JavaScript-based implementation to a pure Java implementation. The current version (0.4.0) demonstrates enterprise-grade features including:
 
 - **Professional UTF-8 validation** with 95% accuracy and BOM/UTF-16 detection
+- **Ref-to-Link conversion** with safe `<ptr>` replacement and CBRD integration
 - **Non-blocking UI** with background processing and progress feedback
 - **Data safety** through automatic backups and comprehensive error handling
-- **Complete test coverage** with 70 passing tests
+- **Complete test coverage** with 99 passing tests
 - **Clean architecture** with centralized logging and proper separation of concerns
 - **Comprehensive documentation** tracking implementation evolution and decision rationale
 
