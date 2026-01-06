@@ -441,7 +441,7 @@ INITIALIZED → PARSING → TRANSFORMING → CALLING_API → COMPLETED → REPLA
 **Risk**: CBRD API may be slow or unreachable
 
 **Mitigation**:
-- Configurable timeout (default 3000ms per attempt)
+- Configurable timeout (default 10000ms per attempt)
 - Async execution (never block UI)
 - Clear timeout error message
 - Automatic retry on timeouts (up to 3 attempts with backoff)

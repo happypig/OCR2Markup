@@ -229,7 +229,7 @@ When the selected `<ref>` element contains incomplete reference information or t
 
 - **SC-001**: Users can convert a Tripitaka reference to a CBETA link in under 30 seconds from selection to replacement
 - **SC-002**: 95% of valid Tripitaka references successfully convert to correct CBETA links
-- **SC-003**: Users receive clear feedback within the configured timeout window (default 3 seconds per attempt, up to 3 attempts plus backoff) after clicking [Convert]
+- **SC-003**: Users receive clear feedback within the configured timeout window (default 10 sec per attempt, up to 3 attempts plus backoff) after clicking [Convert]
 - **SC-004**: The action follows the same UI pattern as existing actions (AI Markup, Tag Removal), requiring no additional user training
 - **SC-005**: Zero data loss - original `<ref>` element content outside of `<ptr>` elements is preserved during replacement
 

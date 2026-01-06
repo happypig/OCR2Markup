@@ -133,7 +133,7 @@ Based on API example and spec.md FR-003:
 Based on FR-014, the plugin should allow configuration of:
 - **API Base URL**: `https://cbss.dila.edu.tw/dev/cbrd/link` (configurable for different environments)
 - **Referer Header Value**: `CBRD@dila.edu.tw` (configurable if needed)
-- **Timeout**: API call timeout in milliseconds (default 3000ms per attempt)
+- **Timeout**: API call timeout in milliseconds (default 10000ms per attempt)
 - **Retry Policy**: Automatic retries on timeout (default: 3 attempts with exponential backoff), manual retry via Convert button per FR-013
 
 ### Implementation Approach
@@ -144,7 +144,7 @@ Based on FR-014, the plugin should allow configuration of:
 public class CBRDAPIClient {
     private String apiUrl = "https://cbss.dila.edu.tw/dev/cbrd/link";
     private String refererHeader = "CBRD@dila.edu.tw";
-    private int timeout = 3000; // 3 seconds per attempt
+    private int timeout = 10000; // 10 seconds per attempt
 
     /**
      * Call CBRD API to convert reference to CBETA link
@@ -235,8 +235,8 @@ This appears to be a simple authentication/tracking mechanism. The API requires 
 ### Performance Requirements
 
 From SC-003:
-- **API call response**: Within configured timeout window (default 3 seconds per attempt, up to 3 attempts plus backoff)
-- **Timeout configuration**: Set to 3000ms per attempt by default
+- **API call response**: Within configured timeout window (default 10 seconds per attempt, up to 3 attempts plus backoff)
+- **Timeout configuration**: Set to 10000ms per attempt by default
 - **Async execution**: Call API in background thread to avoid blocking UI (Principle VIII)
 
 ### Alternatives Considered

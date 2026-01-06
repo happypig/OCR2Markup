@@ -210,7 +210,7 @@ No local normalization is applied before calling the API. The selected `<ref>` X
 **Stored in Oxygen's WSOptionsStorage**:
 - `cbrd.api.url` - CBRD API endpoint (default: `https://cbss.dila.edu.tw/dev/cbrd/link`)
 - `cbrd.referer.header` - Referer header value (default: `CBRD@dila.edu.tw`)
-- `cbrd.timeout` - API timeout in ms (default: `3000`, per attempt)
+- `cbrd.timeout` - API timeout in ms (default: `10000`, per attempt)
 
 **Retry behavior (fixed)**:
 - Up to 3 attempts on timeout with exponential backoff (250ms, 500ms)
@@ -337,11 +337,11 @@ No local normalization is applied before calling the API. The selected `<ref>` X
 
 From Success Criteria:
 - **SC-001**: Complete workflow in <30 seconds
-- **SC-003**: API response within configured timeout window (default 3 seconds per attempt, up to 3 attempts plus backoff)
+- **SC-003**: API response within configured timeout window (default 10 seconds per attempt, up to 3 attempts plus backoff)
 - **SC-005**: Zero data loss during replacement
 
 **Configuration**:
-- Per-attempt timeout: 3000ms (3 seconds) by default
+- Per-attempt timeout: 10000ms (10 seconds) by default
 - Connection timeout: matches per-attempt timeout
 - Read timeout: matches per-attempt timeout
 - Timeout retries: 3 attempts with 250ms/500ms backoff

@@ -296,7 +296,7 @@ COMPLETED
 **Configuration**:
 - `apiUrl`: String (default: `https://cbss.dila.edu.tw/dev/cbrd/link`)
 - `refererHeader`: String (default: `CBRD@dila.edu.tw`)
-- `timeout`: int (default: 3000ms, per-attempt connect/read timeout)
+- `timeout`: int (default: 10000ms, per-attempt connect/read timeout)
 - `maxAttempts`: int (default: 3, timeout retries)
 - `baseBackoffMs`: long (default: 250ms, exponential backoff between retries)
 
@@ -419,7 +419,7 @@ Headers:
 3. Column position must be in mapping table (reject unknown positions)
 
 ### API Call Validation
-1. Per-attempt timeout uses configured `timeout`; retries increase timeout by attempt (e.g., 3000ms, 6000ms, 9000ms)
+1. Per-attempt timeout uses configured `timeout`; retries increase timeout by attempt (e.g., 10000ms, 20000ms, 30000ms)
 2. URL must be valid HTTP/HTTPS URL
 3. Response must be valid JSON
 4. Response must contain `success` boolean and `found` array
