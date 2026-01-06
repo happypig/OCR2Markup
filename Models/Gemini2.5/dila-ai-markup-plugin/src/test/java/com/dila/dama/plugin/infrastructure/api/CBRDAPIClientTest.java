@@ -26,7 +26,7 @@ public class CBRDAPIClientTest {
         CBRDAPIClient client = new CBRDAPIClient(
             "https://cbss.dila.edu.tw/dev/cbrd/link",
             "CBRD@dila.edu.tw",
-            3000,
+            10000,
             factory
         );
 

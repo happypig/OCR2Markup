@@ -58,7 +58,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
   
   private static final String DEFAULT_CBRD_API_URL = "https://cbss.dila.edu.tw/dev/cbrd/link";
   private static final String DEFAULT_CBRD_REFERER_HEADER = "CBRD@dila.edu.tw";
-  private static final String DEFAULT_CBRD_TIMEOUT_MS = "3000";
+  private static final String DEFAULT_CBRD_TIMEOUT_MS = "10000";
   
   /**
    * Safe fallback values to prevent null pointer exceptions in Oxygen's options system.
@@ -210,7 +210,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       if (cbrdReferer == null || cbrdReferer.isEmpty()) {
         cbrdReferer = DEFAULT_CBRD_REFERER_HEADER;
       }
-      int timeoutParsed = 3000;
+      int timeoutParsed = Integer.parseInt(DEFAULT_CBRD_TIMEOUT_MS);
       try {
         timeoutParsed = Integer.parseInt(cbrdTimeoutMs);
         if (timeoutParsed <= 0) {

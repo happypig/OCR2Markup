@@ -4,6 +4,9 @@ import com.dila.dama.plugin.domain.model.InvalidReferenceException;
 import com.dila.dama.plugin.domain.model.TripitakaComponents;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -34,8 +37,8 @@ public class ReferenceParserTest {
 
     @Test
     public void parseReference_invalidXml_throws() {
-        assertThatThrownBy(() -> parser.parseReference("<ref><canon>X</canon>"))
-            .isInstanceOf(InvalidReferenceException.class);
+        withSilencedErr(() -> assertThatThrownBy(() -> parser.parseReference("<ref><canon>X</canon>"))
+            .isInstanceOf(InvalidReferenceException.class));
     }
 
     @Test
@@ -64,5 +67,14 @@ public class ReferenceParserTest {
         assertThatThrownBy(() -> parser.parseReference(xml))
             .isInstanceOf(InvalidReferenceException.class);
     }
-}
 
+    private void withSilencedErr(Runnable action) {
+        PrintStream originalErr = System.err;
+        try {
+            System.setErr(new PrintStream(new ByteArrayOutputStream()));
+            action.run();
+        } finally {
+            System.setErr(originalErr);
+        }
+    }
+}

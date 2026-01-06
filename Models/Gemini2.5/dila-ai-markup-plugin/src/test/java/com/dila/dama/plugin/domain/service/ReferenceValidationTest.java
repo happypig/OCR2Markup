@@ -3,6 +3,9 @@ package com.dila.dama.plugin.domain.service;
 import com.dila.dama.plugin.domain.model.InvalidReferenceException;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
@@ -12,7 +15,7 @@ public class ReferenceValidationTest {
 
     @Test
     public void invalidXml_reportsInvalidXmlKey() {
-        assertInvalid("<ref><canon>T</canon>", "error.invalid.xml");
+        withSilencedErr(() -> assertInvalid("<ref><canon>T</canon>", "error.invalid.xml"));
     }
 
     @Test
@@ -41,6 +44,16 @@ public class ReferenceValidationTest {
             fail("Expected InvalidReferenceException");
         } catch (InvalidReferenceException ex) {
             assertThat(ex.getMessageKey()).isEqualTo(expectedKey);
+        }
+    }
+
+    private void withSilencedErr(Runnable action) {
+        PrintStream originalErr = System.err;
+        try {
+            System.setErr(new PrintStream(new ByteArrayOutputStream()));
+            action.run();
+        } finally {
+            System.setErr(originalErr);
         }
     }
 }

@@ -498,7 +498,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         // Read CBRD configuration from options storage (fallback to defaults)
         String apiUrl = "https://cbss.dila.edu.tw/dev/cbrd/link";
         String referer = "CBRD@dila.edu.tw";
-        int timeoutMs = 3000;
+        int timeoutMs = 10000;
         try {
             if (optionStorage != null) {
                 String optUrl = optionStorage.getOption(DAMAOptionPagePluginExtension.KEY_CBRD_API_URL, apiUrl);
@@ -513,7 +513,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
                 try {
                     timeoutMs = Integer.parseInt(optTimeout);
                 } catch (Exception ignored) {
-                    timeoutMs = 3000;
+                    timeoutMs = 10000;
                 }
             }
         } catch (Exception ex) {
