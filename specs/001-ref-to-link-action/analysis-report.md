@@ -54,6 +54,21 @@
 - Duplication Count: 0
 - Critical Issues Count: 3
 
+**Status vs Analysis Items**
+
+| ID | Status | Evidence | Notes |
+|----|--------|----------|-------|
+| C1 | Not resolved | `Models/Gemini2.5/dila-ai-markup-plugin/pom.xml:28` | Build still targets Java 1.8. |
+| C2 | Not resolved | `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/application/command/ConvertReferenceCommand.java:19` | Command returns `ConvertReferenceResult`. |
+| C3 | Not resolved | `specs/001-ref-to-link-action/spec.md:214`, `specs/001-ref-to-link-action/spec.md:215` | FR-014/FR-015 listed; no BDD acceptance scenarios cover them. |
+| I1 | Not resolved | `specs/001-ref-to-link-action/spec.md:197`, `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/service/ReferenceParser.java:44` | Spec says `<p>` optional; implementation requires `<p>`. |
+| I2 | Not resolved | `specs/001-ref-to-link-action/spec.md:205`, `specs/001-ref-to-link-action/data-model.md:320`, `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/application/command/ConvertReferenceCommand.java:25` | Implementation sends raw `<ref>`; data-model describes constructed query. |
+| I3 | Not resolved | `specs/001-ref-to-link-action/tasks.md:103`, `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/api/CBRDAPIClient.java:17` | Tasks say no auto-retry; code auto-retries. |
+| G1 | Not resolved | `specs/001-ref-to-link-action/spec.md:230`, `specs/001-ref-to-link-action/spec.md:231`, `specs/001-ref-to-link-action/tasks.md` | No explicit perf/accuracy tasks/tests found. |
+| G2 | Partially resolved | `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/api/CBRDAPIClient.java:113`, `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/api/HttpUrlConnectionFactory.java:12` | Headers/proxy implemented; tasks/tests still lack explicit coverage. |
+| A1 | Not resolved | `specs/001-ref-to-link-action/spec.md:212` | FR-012 remains vague. |
+| T1 | Not resolved | `specs/001-ref-to-link-action/spec.md:205`, `specs/001-ref-to-link-action/plan.md:23`, `specs/001-ref-to-link-action/tasks.md:46` | CBETA vs CBRD naming drift remains. |
+
 **Next Actions**
 
 - Resolve CRITICAL constitution conflicts before `/speckit.implement`.
