@@ -14,7 +14,7 @@ The DILA AI Markup Assistant is an Oxygen XML Editor plugin designed to accelera
 
 ### Version Information
 
-- **Released Version**: 0.4.0
+- **Released Version**: 0.4.2
 - **Target Platform**: Oxygen XML Editor 27.0+
 - **Java Compatibility**: JDK 1.8+
 
@@ -1094,6 +1094,11 @@ mvn install -DskipTests
 | `getInstance()` | DAMAWorkspaceAccessPlugin | ❌ Never called |
 
 ### Version History
+
+#### Version 0.4.1 (Current)
+- 🚀 **API Endpoint Update**: Migrated CBRD API from development to production endpoint (https://cbss.dila.edu.tw/cbrd/link)
+- 🔧 **Error Handling Enhancement**: Improved parsing of API error responses with "msg" field support
+- ✅ All 99 tests passing with updated endpoint
 
 #### Version 0.4.0 (Released)
 - ƒo. Ref-to-Link action for converting `<ref>` to CBRD links and safe `<ptr>` replacement

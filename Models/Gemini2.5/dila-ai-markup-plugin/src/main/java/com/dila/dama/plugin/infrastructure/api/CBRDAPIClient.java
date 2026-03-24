@@ -113,7 +113,7 @@ public class CBRDAPIClient {
         conn.setRequestProperty("Referer", refererHeaderValue);
         conn.setRequestProperty("Accept", "application/json");
         conn.setRequestProperty("Accept-Charset", "UTF-8");
-        conn.setRequestProperty("User-Agent", "DILA-AI-Markup/0.4.0");
+        conn.setRequestProperty("User-Agent", "DILA-AI-Markup/0.4.2");
         logRequestHeaders(url, conn);
 
         int status = conn.getResponseCode();
@@ -133,8 +133,10 @@ public class CBRDAPIClient {
         }
 
         if (!response.isSuccess()) {
-            PluginLogger.warn("[CBRDAPIClient]API returned success=false: " + response.getError());
-            throw new CBRDAPIException("error.api.response");
+            String errorMsg = response.getError();
+            PluginLogger.warn("[CBRDAPIClient]API returned success=false: " + errorMsg);
+            // Throw with actual error message from API (supports both "error" and "msg" fields)
+            throw new CBRDAPIException("error.api.failed", errorMsg);
         }
 
         String first = response.getFirstUrl();

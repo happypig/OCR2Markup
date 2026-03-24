@@ -54,7 +54,11 @@ public final class CBRDResponse {
             }
         }
 
+        // API returns error message in "msg" field when success=false
         String error = obj.optString("error", null);
+        if (error == null) {
+            error = obj.optString("msg", null);
+        }
         return new CBRDResponse(success, found, error);
     }
 }

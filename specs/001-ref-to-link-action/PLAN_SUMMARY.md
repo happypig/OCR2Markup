@@ -18,7 +18,7 @@
 
 ### Phase 0: Research ✅
 📄 **[research.md](research.md)** (1,200+ lines)
-- **CBETA API**: CBRD REST API at `https://cbss.dila.edu.tw/dev/cbrd/link`
+- **CBETA API**: CBRD REST API at `https://cbss.dila.edu.tw/cbrd/link`
   - GET request with XML query parameter `q`
   - Requires `Referer: CBRD@dila.edu.tw` header
   - Returns JSON: `{"success": true, "found": ["url"]}`
@@ -61,7 +61,7 @@
 ### Critical API Discovery
 **CBRD (CBETA Reference Detection) REST API** officially documented:
 ```
-Endpoint: https://cbss.dila.edu.tw/dev/cbrd/link
+Endpoint: https://cbss.dila.edu.tw/cbrd/link
 Method: GET with ?q=<ref>...</ref>
 Auth: Referer: CBRD@dila.edu.tw
 Response: {"success": true, "found": ["url"]}

@@ -489,6 +489,11 @@
     <val lang="zh_CN">API 回應格式無效</val>
     <val lang="zh_TW">API 回應格式無效</val>
   </key>
+  <key value="error.api.failed">
+    <val lang="en_US">CBRD API error: {0}</val>
+    <val lang="zh_CN">CBRD API 錯誤：{0}</val>
+    <val lang="zh_TW">CBRD API 錯誤：{0}</val>
+  </key>
   <key value="error.no.results">
     <val lang="en_US">No CBETA links found for this reference</val>
     <val lang="zh_CN">未找到 CBETA 連結</val>
@@ -520,7 +525,3 @@
     <val lang="zh_TW">CBRD 逾時（毫秒）：</val>
   </key>
 </translation> 
-
-
-
-

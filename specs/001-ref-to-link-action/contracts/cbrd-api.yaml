@@ -13,8 +13,8 @@ info:
     url: https://cbss.dila.edu.tw
 
 servers:
-  - url: https://cbss.dila.edu.tw/dev/cbrd
-    description: Development server (used in production until official endpoint provided)
+  - url: https://cbss.dila.edu.tw/cbrd
+    description: Production server
 
 paths:
   /link:
@@ -94,10 +94,15 @@ paths:
                     success: true
                     found: []
                 error_response:
-                  summary: Processing error
+                  summary: Processing error (error field)
                   value:
                     success: false
                     error: 'Invalid reference format'
+                error_response_msg:
+                  summary: Processing error (msg field - actual API format)
+                  value:
+                    success: false
+                    msg: '冊號不存在'
                     found: []
 
         '400':
@@ -160,9 +165,14 @@ components:
             - 'https://cbetaonline.dila.edu.tw/T1514'
         error:
           type: string
-          description: Error message (only present when success is false)
+          description: Error message (only present when success is false). Note - actual API may return this in "msg" field instead.
           nullable: true
           example: null
+        msg:
+          type: string
+          description: Alternative error message field used by actual API (only present when success is false)
+          nullable: true
+          example: '冊號不存在'
 
     ErrorResponse:
       type: object

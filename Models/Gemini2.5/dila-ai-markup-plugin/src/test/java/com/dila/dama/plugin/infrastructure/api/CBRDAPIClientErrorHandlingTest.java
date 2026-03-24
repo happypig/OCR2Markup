@@ -40,6 +40,20 @@ public class CBRDAPIClientErrorHandlingTest {
     }
 
     @Test
+    public void convertToFirstLink_successFalseWithMsgField_reportsFailedKeyWithMessage() {
+        // Actual CBETA API returns error message in "msg" field instead of "error" field
+        CBRDAPIClient client = newClient(new FakeConnectionFactory(200, "{\"success\":false,\"msg\":\"冊號不存在\"}", false));
+
+        assertThatThrownBy(() -> client.convertToFirstLink(sampleComponents()))
+            .isInstanceOf(CBRDAPIException.class)
+            .satisfies(ex -> {
+                CBRDAPIException apiEx = (CBRDAPIException) ex;
+                assertThat(apiEx.getMessageKey()).isEqualTo("error.api.failed");
+                assertThat(apiEx.getParams()).containsExactly("冊號不存在");
+            });
+    }
+
+    @Test
     public void convertToFirstLink_emptyFound_reportsNoResultsKey() {
         CBRDAPIClient client = newClient(new FakeConnectionFactory(200, "{\"success\":true,\"found\":[]}", false));
 
@@ -76,7 +90,7 @@ public class CBRDAPIClientErrorHandlingTest {
 
     private CBRDAPIClient newClient(HttpUrlConnectionFactory factory) {
         return new CBRDAPIClient(
-            "https://cbss.dila.edu.tw/dev/cbrd/link",
+            "https://cbss.dila.edu.tw/cbrd/link",
             "CBRD@dila.edu.tw",
             10000,
             factory

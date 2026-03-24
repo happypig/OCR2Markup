@@ -24,7 +24,7 @@ public class CBRDAPIClientTest {
         );
 
         CBRDAPIClient client = new CBRDAPIClient(
-            "https://cbss.dila.edu.tw/dev/cbrd/link",
+            "https://cbss.dila.edu.tw/cbrd/link",
             "CBRD@dila.edu.tw",
             10000,
             factory
@@ -36,7 +36,7 @@ public class CBRDAPIClientTest {
         assertThat(factory.lastUrl.toString()).contains("?q=");
         assertThat(factory.lastUrl.toString()).doesNotContain("<ref>");
         assertThat(factory.lastRequestProperties.get("Referer")).isEqualTo("CBRD@dila.edu.tw");
-        assertThat(factory.lastRequestProperties.get("User-Agent")).isEqualTo("DILA-AI-Markup/0.4.0");
+        assertThat(factory.lastRequestProperties.get("User-Agent")).isEqualTo("DILA-AI-Markup/0.4.2");
     }
 
     private static final class CapturingConnectionFactory extends HttpUrlConnectionFactory {

@@ -496,7 +496,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         showRefToLinkConvertingState();
 
         // Read CBRD configuration from options storage (fallback to defaults)
-        String apiUrl = "https://cbss.dila.edu.tw/dev/cbrd/link";
+        String apiUrl = "https://cbss.dila.edu.tw/cbrd/link";
         String referer = "CBRD@dila.edu.tw";
         int timeoutMs = 10000;
         try {

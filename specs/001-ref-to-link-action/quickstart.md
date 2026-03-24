@@ -101,14 +101,14 @@ This guide provides a quick reference for developers implementing the Ref to Lin
 
 ## CBRD API Quick Reference
 
-**Endpoint**: `https://cbss.dila.edu.tw/dev/cbrd/link`
+**Endpoint**: `https://cbss.dila.edu.tw/cbrd/link`
 
 **Request**:
 ```
 GET /dev/cbrd/link?q=<ref><canon>T</canon><v>25</v>.<w>1514</w></ref>
 Headers:
   Referer: CBRD@dila.edu.tw
-  User-Agent: DILA-AI-Markup/0.4.0
+  User-Agent: DILA-AI-Markup/0.4.1
   Accept-Charset: UTF-8
 ```
 
@@ -208,7 +208,7 @@ No local normalization is applied before calling the API. The selected `<ref>` X
 ## Configuration
 
 **Stored in Oxygen's WSOptionsStorage**:
-- `cbrd.api.url` - CBRD API endpoint (default: `https://cbss.dila.edu.tw/dev/cbrd/link`)
+- `cbrd.api.url` - CBRD API endpoint (default: `https://cbss.dila.edu.tw/cbrd/link`)
 - `cbrd.referer.header` - Referer header value (default: `CBRD@dila.edu.tw`)
 - `cbrd.timeout` - API timeout in ms (default: `10000`, per attempt)
 

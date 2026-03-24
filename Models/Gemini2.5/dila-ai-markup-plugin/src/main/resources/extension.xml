@@ -2,13 +2,22 @@
 <xt:extensions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xt="http://www.oxygenxml.com/ns/extension" xsi:schemaLocation="http://www.oxygenxml.com/ns/extension http://www.oxygenxml.com/ns/extension/extensions.xsd">
     <xt:extension id="com.dila.ai.markup">
         <xt:location href="dilaAIMarkupPlugin.zip"/>
-        <xt:version>0.4.0</xt:version>
+        <xt:version>0.4.2</xt:version>
         <xt:oxy_version>27.0+</xt:oxy_version>
         <xt:type>plugin</xt:type>
         <xt:author>DILA DA</xt:author>
         <xt:name>DILA AI Markup Assistant</xt:name>
         <xt:description xmlns="http://www.w3.org/1999/xhtml">
             <p>This plugin provides an AI-empowered markup assistant for editing TEI XML documents.</p>
+              <h3>Release Notes v0.4.2:</h3>
+              <ul>
+                     <li><strong>Error Display:</strong> Fixed error messages to show actual API error text (e.g., "冊號不存在") instead of generic "Invalid API response format"</li>
+              </ul>
+              <h3>Release Notes v0.4.1:</h3>
+              <ul>
+                     <li><strong>API Endpoint Update:</strong> Updated CBRD API to production endpoint (https://cbss.dila.edu.tw/cbrd/link)</li>
+                     <li><strong>Error Handling:</strong> Improved error message parsing for API responses with "msg" field</li>
+              </ul>
               <h3>Release Notes v0.4.0:</h3>
               <ul>
                      <li><strong>Ref-to-Link Action:</strong> Convert selected &lt;ref&gt; elements to CBRD links and replace existing &lt;ptr&gt; safely</li>

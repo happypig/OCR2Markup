@@ -56,7 +56,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
   public static final String KEY_CBRD_REFERER_HEADER = "cbrd.referer.header";
   public static final String KEY_CBRD_TIMEOUT_MS = "cbrd.timeout";
   
-  private static final String DEFAULT_CBRD_API_URL = "https://cbss.dila.edu.tw/dev/cbrd/link";
+  private static final String DEFAULT_CBRD_API_URL = "https://cbss.dila.edu.tw/cbrd/link";
   private static final String DEFAULT_CBRD_REFERER_HEADER = "CBRD@dila.edu.tw";
   private static final String DEFAULT_CBRD_TIMEOUT_MS = "10000";
   

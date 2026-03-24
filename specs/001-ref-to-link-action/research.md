@@ -17,7 +17,7 @@ This document consolidates research findings from three key areas needed for imp
 
 ### Decision
 
-**Use CBRD (CBETA Reference Detection) REST API at `https://cbss.dila.edu.tw/dev/cbrd/link`**
+**Use CBRD (CBETA Reference Detection) REST API at `https://cbss.dila.edu.tw/cbrd/link`**
 
 ### Rationale
 
@@ -27,7 +27,7 @@ CBETA provides a formal REST API endpoint specifically designed for converting T
 
 **CBRD API Endpoint:**
 ```
-https://cbss.dila.edu.tw/dev/cbrd/link
+https://cbss.dila.edu.tw/cbrd/link
 ```
 
 **Request Method:** HTTP GET
@@ -131,7 +131,7 @@ Based on API example and spec.md FR-003:
 ### Configuration Requirements
 
 Based on FR-014, the plugin should allow configuration of:
-- **API Base URL**: `https://cbss.dila.edu.tw/dev/cbrd/link` (configurable for different environments)
+- **API Base URL**: `https://cbss.dila.edu.tw/cbrd/link` (configurable for different environments)
 - **Referer Header Value**: `CBRD@dila.edu.tw` (configurable if needed)
 - **Timeout**: API call timeout in milliseconds (default 10000ms per attempt)
 - **Retry Policy**: Automatic retries on timeout (default: 3 attempts with exponential backoff), manual retry via Convert button per FR-013
@@ -142,7 +142,7 @@ Based on FR-014, the plugin should allow configuration of:
 
 ```java
 public class CBRDAPIClient {
-    private String apiUrl = "https://cbss.dila.edu.tw/dev/cbrd/link";
+    private String apiUrl = "https://cbss.dila.edu.tw/cbrd/link";
     private String refererHeader = "CBRD@dila.edu.tw";
     private int timeout = 10000; // 10 seconds per attempt
 
@@ -1168,7 +1168,7 @@ In `src/main/resources/i18n/translation.xml`:
 
 | Research Area | Decision | Key Rationale |
 |---------------|----------|---------------|
-| **CBETA API** | Use CBRD REST API at `https://cbss.dila.edu.tw/dev/cbrd/link` | Official API provided by CBETA/DILA; handles validation and edge cases |
+| **CBETA API** | Use CBRD REST API at `https://cbss.dila.edu.tw/cbrd/link` | Official API provided by CBETA/DILA; handles validation and edge cases |
 | **XML Parsing** | Java DOM with `DocumentBuilder` | Simple, standard library, perfect for small fragments |
 | **SDK Integration** | Follow existing DAMA plugin patterns | Ensures consistency, reuses infrastructure |
 
