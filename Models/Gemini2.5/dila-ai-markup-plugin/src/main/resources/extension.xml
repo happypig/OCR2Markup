@@ -2,14 +2,14 @@
 <xt:extensions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xt="http://www.oxygenxml.com/ns/extension" xsi:schemaLocation="http://www.oxygenxml.com/ns/extension http://www.oxygenxml.com/ns/extension/extensions.xsd">
     <xt:extension id="com.dila.ai.markup">
         <xt:location href="dilaAIMarkupPlugin.zip"/>
-        <xt:version>0.4.2</xt:version>
+        <xt:version>${project.version}</xt:version>
         <xt:oxy_version>27.0+</xt:oxy_version>
         <xt:type>plugin</xt:type>
         <xt:author>DILA DA</xt:author>
         <xt:name>DILA AI Markup Assistant</xt:name>
         <xt:description xmlns="http://www.w3.org/1999/xhtml">
             <p>This plugin provides an AI-empowered markup assistant for editing TEI XML documents.</p>
-              <h3>Release Notes v0.4.2:</h3>
+              <h3>Release Notes v${project.version}:</h3>
               <ul>
                      <li><strong>Error Display:</strong> Fixed error messages to show actual API error text (e.g., "冊號不存在") instead of generic "Invalid API response format"</li>
               </ul>
@@ -68,3 +68,4 @@
         </xt:license>
     </xt:extension>
 </xt:extensions>
+

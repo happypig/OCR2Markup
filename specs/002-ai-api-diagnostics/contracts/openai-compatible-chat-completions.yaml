@@ -6,6 +6,9 @@ info:
     External contract subset for the DAMA AI Markup diagnostics feature.
     The plugin uses this contract to validate request construction and classify
     success/error responses from OpenAI-hosted or OpenAI-compatible chat completions endpoints.
+    The current implementation sends `model`, `messages`, and `max_tokens`, and
+    treats 400 responses as malformed-request or endpoint-compatibility candidates
+    based on the returned error envelope.
 
 servers:
   - url: https://api.openai.com
@@ -89,10 +92,12 @@ components:
         max_tokens:
           type: integer
           minimum: 1
+          description: Maximum completion tokens requested by the DAMA AI Markup action
         temperature:
           type: number
           minimum: 0
           maximum: 2
+          description: Optional compatibility field; not currently sent by the plugin
       additionalProperties: true
 
     ChatMessage:
@@ -151,6 +156,7 @@ components:
       properties:
         message:
           type: string
+          description: Service-provided error text captured for sanitized diagnostics
         type:
           type: string
         code:

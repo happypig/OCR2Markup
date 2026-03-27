@@ -524,4 +524,214 @@
     <val lang="zh_CN">CBRD 逾時（毫秒）：</val>
     <val lang="zh_TW">CBRD 逾時（毫秒）：</val>
   </key>
+  <key value="api.base.url.label">
+    <comment>Preferences label</comment>
+    <val lang="en_US">AI API base URL:</val>
+    <val lang="zh_CN">AI API 基礎網址：</val>
+    <val lang="zh_TW">AI API 基礎網址：</val>
+  </key>
+  <key value="api.chat.path.label">
+    <comment>Preferences label</comment>
+    <val lang="en_US">AI chat path:</val>
+    <val lang="zh_CN">AI 對話路徑：</val>
+    <val lang="zh_TW">AI 對話路徑：</val>
+  </key>
+  <key value="api.timeout.ms.label">
+    <comment>Preferences label</comment>
+    <val lang="en_US">AI timeout (ms):</val>
+    <val lang="zh_CN">AI 逾時（毫秒）：</val>
+    <val lang="zh_TW">AI 逾時（毫秒）：</val>
+  </key>
+  <key value="button.export.diagnostics">
+    <comment>Diagnostics export button</comment>
+    <val lang="en_US">Export Diagnostics</val>
+    <val lang="zh_CN">匯出診斷資料</val>
+    <val lang="zh_TW">匯出診斷資料</val>
+  </key>
+  <key value="ai.markup.diagnostic.processing">
+    <comment>Shown while AI markup request is running</comment>
+    <val lang="en_US">AI Markup request is processing. Diagnostics will appear here if the request fails.</val>
+    <val lang="zh_CN">AI 標記請求處理中。如失敗，診斷結果將顯示於此。</val>
+    <val lang="zh_TW">AI 標記請求處理中。如失敗，診斷結果將顯示於此。</val>
+  </key>
+  <key value="ai.markup.diagnostic.in.progress">
+    <comment>Shown when another AI Markup operation is already running</comment>
+    <val lang="en_US">Another AI Markup operation is already in progress. Please wait for it to finish.</val>
+    <val lang="zh_CN">另一個 AI 標記作業正在進行中。請等待完成後再試。</val>
+    <val lang="zh_TW">另一個 AI 標記作業正在進行中。請等待完成後再試。</val>
+  </key>
+  <key value="ai.markup.diagnostic.selection.required">
+    <comment>Shown when no selected text is available for AI markup diagnostics</comment>
+    <val lang="en_US">AI Markup needs selected text before the request can be validated.</val>
+    <val lang="zh_CN">AI 標記需要先選取文字，才能驗證請求。</val>
+    <val lang="zh_TW">AI 標記需要先選取文字，才能驗證請求。</val>
+  </key>
+  <key value="ai.markup.diagnostic.credentials">
+    <comment>Credential failure guidance</comment>
+    <val lang="en_US">The request was rejected as a credential problem. Verify the configured API key and try again.</val>
+    <val lang="zh_CN">此請求被判定為憑證問題。請確認已設定正確的 API 金鑰後再試。</val>
+    <val lang="zh_TW">此請求被判定為憑證問題。請確認已設定正確的 API 金鑰後再試。</val>
+  </key>
+  <key value="ai.markup.diagnostic.credentials.windows">
+    <comment>Windows credential failure guidance</comment>
+    <val lang="en_US">The request was rejected as a credential problem. Verify the configured API key in Preferences on Windows and try again.</val>
+    <val lang="zh_CN">此請求被判定為憑證問題。請在 Windows 偏好設定中確認 API 金鑰後再試。</val>
+    <val lang="zh_TW">此請求被判定為憑證問題。請在 Windows 偏好設定中確認 API 金鑰後再試。</val>
+  </key>
+  <key value="ai.markup.diagnostic.credentials.macos">
+    <comment>macOS credential failure guidance</comment>
+    <val lang="en_US">The request was rejected as a credential problem. Verify the configured API key in Preferences on macOS and try again.</val>
+    <val lang="zh_CN">此請求被判定為憑證問題。請在 macOS 偏好設定中確認 API 金鑰後再試。</val>
+    <val lang="zh_TW">此請求被判定為憑證問題。請在 macOS 偏好設定中確認 API 金鑰後再試。</val>
+  </key>
+  <key value="ai.markup.diagnostic.model.access">
+    <comment>Model access guidance</comment>
+    <val lang="en_US">The configured model appears invalid, inaccessible, or incompatible with the current request path. Verify the selected model.</val>
+    <val lang="zh_CN">已設定的模型可能無效、不可存取，或與目前的請求路徑不相容。請確認選取的模型。</val>
+    <val lang="zh_TW">已設定的模型可能無效、不可存取，或與目前的請求路徑不相容。請確認選取的模型。</val>
+  </key>
+  <key value="ai.markup.diagnostic.model.access.windows">
+    <comment>Windows model access guidance</comment>
+    <val lang="en_US">The configured model appears invalid, inaccessible, or incompatible with the current request path. Verify the selected model in Windows Preferences.</val>
+    <val lang="zh_CN">已設定的模型可能無效、不可存取，或與目前的請求路徑不相容。請在 Windows 偏好設定中確認模型。</val>
+    <val lang="zh_TW">已設定的模型可能無效、不可存取，或與目前的請求路徑不相容。請在 Windows 偏好設定中確認模型。</val>
+  </key>
+  <key value="ai.markup.diagnostic.model.access.macos">
+    <comment>macOS model access guidance</comment>
+    <val lang="en_US">The configured model appears invalid, inaccessible, or incompatible with the current request path. Verify the selected model in macOS Preferences.</val>
+    <val lang="zh_CN">已設定的模型可能無效、不可存取，或與目前的請求路徑不相容。請在 macOS 偏好設定中確認模型。</val>
+    <val lang="zh_TW">已設定的模型可能無效、不可存取，或與目前的請求路徑不相容。請在 macOS 偏好設定中確認模型。</val>
+  </key>
+  <key value="ai.markup.diagnostic.malformed.request">
+    <comment>Malformed request guidance</comment>
+    <val lang="en_US">The request shape appears invalid for the selected service. Verify endpoint, payload expectations, and timeout settings.</val>
+    <val lang="zh_CN">此請求格式對目前服務而言可能無效。請確認 endpoint、請求格式要求與逾時設定。</val>
+    <val lang="zh_TW">此請求格式對目前服務而言可能無效。請確認 endpoint、請求格式要求與逾時設定。</val>
+  </key>
+  <key value="ai.markup.diagnostic.malformed.request.windows">
+    <comment>Windows malformed request guidance</comment>
+    <val lang="en_US">The request shape appears invalid for the selected service. Verify endpoint, payload expectations, and timeout settings in Windows Preferences.</val>
+    <val lang="zh_CN">此請求格式對目前服務而言可能無效。請在 Windows 偏好設定中確認 endpoint、請求格式要求與逾時設定。</val>
+    <val lang="zh_TW">此請求格式對目前服務而言可能無效。請在 Windows 偏好設定中確認 endpoint、請求格式要求與逾時設定。</val>
+  </key>
+  <key value="ai.markup.diagnostic.malformed.request.macos">
+    <comment>macOS malformed request guidance</comment>
+    <val lang="en_US">The request shape appears invalid for the selected service. Verify endpoint, payload expectations, and timeout settings in macOS Preferences.</val>
+    <val lang="zh_CN">此請求格式對目前服務而言可能無效。請在 macOS 偏好設定中確認 endpoint、請求格式要求與逾時設定。</val>
+    <val lang="zh_TW">此請求格式對目前服務而言可能無效。請在 macOS 偏好設定中確認 endpoint、請求格式要求與逾時設定。</val>
+  </key>
+  <key value="ai.markup.diagnostic.endpoint.compatibility">
+    <comment>Endpoint compatibility guidance</comment>
+    <val lang="en_US">The configured endpoint or chat path does not match the selected request style. Verify the base URL and chat completions path.</val>
+    <val lang="zh_CN">已設定的 endpoint 或對話路徑與目前請求樣式不相容。請確認基礎網址與對話路徑。</val>
+    <val lang="zh_TW">已設定的 endpoint 或對話路徑與目前請求樣式不相容。請確認基礎網址與對話路徑。</val>
+  </key>
+  <key value="ai.markup.diagnostic.endpoint.compatibility.windows">
+    <comment>Windows endpoint compatibility guidance</comment>
+    <val lang="en_US">The configured endpoint or chat path does not match the selected request style. Verify the base URL and chat path in Windows Preferences.</val>
+    <val lang="zh_CN">已設定的 endpoint 或對話路徑與目前請求樣式不相容。請在 Windows 偏好設定中確認基礎網址與對話路徑。</val>
+    <val lang="zh_TW">已設定的 endpoint 或對話路徑與目前請求樣式不相容。請在 Windows 偏好設定中確認基礎網址與對話路徑。</val>
+  </key>
+  <key value="ai.markup.diagnostic.endpoint.compatibility.macos">
+    <comment>macOS endpoint compatibility guidance</comment>
+    <val lang="en_US">The configured endpoint or chat path does not match the selected request style. Verify the base URL and chat path in macOS Preferences.</val>
+    <val lang="zh_CN">已設定的 endpoint 或對話路徑與目前請求樣式不相容。請在 macOS 偏好設定中確認基礎網址與對話路徑。</val>
+    <val lang="zh_TW">已設定的 endpoint 或對話路徑與目前請求樣式不相容。請在 macOS 偏好設定中確認基礎網址與對話路徑。</val>
+  </key>
+  <key value="ai.markup.diagnostic.connectivity.proxy">
+    <comment>Connectivity or proxy guidance</comment>
+    <val lang="en_US">The request could not reach the service reliably. Check proxy, VPN, firewall, or network routing settings.</val>
+    <val lang="zh_CN">此請求無法穩定連上服務。請檢查代理伺服器、VPN、防火牆或網路路由設定。</val>
+    <val lang="zh_TW">此請求無法穩定連上服務。請檢查代理伺服器、VPN、防火牆或網路路由設定。</val>
+  </key>
+  <key value="ai.markup.diagnostic.connectivity.proxy.windows">
+    <comment>Windows connectivity or proxy guidance</comment>
+    <val lang="en_US">The request could not reach the service reliably. Check Windows proxy, VPN, firewall, or network routing settings.</val>
+    <val lang="zh_CN">此請求無法穩定連上服務。請檢查 Windows 代理伺服器、VPN、防火牆或網路路由設定。</val>
+    <val lang="zh_TW">此請求無法穩定連上服務。請檢查 Windows 代理伺服器、VPN、防火牆或網路路由設定。</val>
+  </key>
+  <key value="ai.markup.diagnostic.connectivity.proxy.macos">
+    <comment>macOS connectivity or proxy guidance</comment>
+    <val lang="en_US">The request could not reach the service reliably. Check macOS proxy, VPN, firewall, or network routing settings.</val>
+    <val lang="zh_CN">此請求無法穩定連上服務。請檢查 macOS 代理伺服器、VPN、防火牆或網路路由設定。</val>
+    <val lang="zh_TW">此請求無法穩定連上服務。請檢查 macOS 代理伺服器、VPN、防火牆或網路路由設定。</val>
+  </key>
+  <key value="ai.markup.diagnostic.rate.limit">
+    <comment>Rate limit guidance</comment>
+    <val lang="en_US">The service is rate-limiting or out of capacity. Wait and retry later, or verify account/project limits.</val>
+    <val lang="zh_CN">服務目前遇到速率限制或容量不足。請稍後再試，或確認帳號/專案配額限制。</val>
+    <val lang="zh_TW">服務目前遇到速率限制或容量不足。請稍後再試，或確認帳號/專案配額限制。</val>
+  </key>
+  <key value="ai.markup.diagnostic.rate.limit.windows">
+    <comment>Windows rate limit guidance</comment>
+    <val lang="en_US">The service is rate-limiting or out of capacity. Wait and retry later, or verify account/project limits from Windows.</val>
+    <val lang="zh_CN">服務目前遇到速率限制或容量不足。請稍後再試，或從 Windows 環境確認帳號/專案配額限制。</val>
+    <val lang="zh_TW">服務目前遇到速率限制或容量不足。請稍後再試，或從 Windows 環境確認帳號/專案配額限制。</val>
+  </key>
+  <key value="ai.markup.diagnostic.rate.limit.macos">
+    <comment>macOS rate limit guidance</comment>
+    <val lang="en_US">The service is rate-limiting or out of capacity. Wait and retry later, or verify account/project limits from macOS.</val>
+    <val lang="zh_CN">服務目前遇到速率限制或容量不足。請稍後再試，或從 macOS 環境確認帳號/專案配額限制。</val>
+    <val lang="zh_TW">服務目前遇到速率限制或容量不足。請稍後再試，或從 macOS 環境確認帳號/專案配額限制。</val>
+  </key>
+  <key value="ai.markup.diagnostic.service.failure">
+    <comment>Service failure guidance</comment>
+    <val lang="en_US">The service returned an unknown failure. Review the exported sanitized diagnostics for support.</val>
+    <val lang="zh_CN">服務回傳未知失敗。請匯出已淨化的診斷資料供支援人員查看。</val>
+    <val lang="zh_TW">服務回傳未知失敗。請匯出已淨化的診斷資料供支援人員查看。</val>
+  </key>
+  <key value="ai.markup.diagnostic.service.failure.windows">
+    <comment>Windows service failure guidance</comment>
+    <val lang="en_US">The service returned an unknown failure. Export sanitized diagnostics from Windows for support review.</val>
+    <val lang="zh_CN">服務回傳未知失敗。請從 Windows 匯出已淨化的診斷資料供支援人員查看。</val>
+    <val lang="zh_TW">服務回傳未知失敗。請從 Windows 匯出已淨化的診斷資料供支援人員查看。</val>
+  </key>
+  <key value="ai.markup.diagnostic.service.failure.macos">
+    <comment>macOS service failure guidance</comment>
+    <val lang="en_US">The service returned an unknown failure. Export sanitized diagnostics from macOS for support review.</val>
+    <val lang="zh_CN">服務回傳未知失敗。請從 macOS 匯出已淨化的診斷資料供支援人員查看。</val>
+    <val lang="zh_TW">服務回傳未知失敗。請從 macOS 匯出已淨化的診斷資料供支援人員查看。</val>
+  </key>
+  <key value="ai.markup.diagnostic.unknown">
+    <comment>Fallback diagnostic guidance</comment>
+    <val lang="en_US">The failure could not be classified confidently. Export sanitized diagnostics for support review.</val>
+    <val lang="zh_CN">此失敗目前無法明確分類。請匯出已淨化的診斷資料供支援人員查看。</val>
+    <val lang="zh_TW">此失敗目前無法明確分類。請匯出已淨化的診斷資料供支援人員查看。</val>
+  </key>
+  <key value="ai.markup.diagnostic.export.dialog.title">
+    <comment>Dialog title for diagnostic export</comment>
+    <val lang="en_US">Choose a location for the sanitized diagnostic export</val>
+    <val lang="zh_CN">選擇已淨化診斷匯出的儲存位置</val>
+    <val lang="zh_TW">選擇已淨化診斷匯出的儲存位置</val>
+  </key>
+  <key value="ai.markup.diagnostic.export.processing">
+    <comment>Shown while exporting diagnostics</comment>
+    <val lang="en_US">Exporting sanitized diagnostics...</val>
+    <val lang="zh_CN">正在匯出已淨化的診斷資料...</val>
+    <val lang="zh_TW">正在匯出已淨化的診斷資料...</val>
+  </key>
+  <key value="ai.markup.diagnostic.export.success">
+    <comment>Shown after successful diagnostic export</comment>
+    <val lang="en_US">Sanitized diagnostics exported successfully: {0}</val>
+    <val lang="zh_CN">已成功匯出淨化診斷資料：{0}</val>
+    <val lang="zh_TW">已成功匯出淨化診斷資料：{0}</val>
+  </key>
+  <key value="ai.markup.diagnostic.export.failure">
+    <comment>Shown after failed diagnostic export</comment>
+    <val lang="en_US">Diagnostic export failed. Please try again or choose a different location.</val>
+    <val lang="zh_CN">診斷資料匯出失敗。請重試或改選其他位置。</val>
+    <val lang="zh_TW">診斷資料匯出失敗。請重試或改選其他位置。</val>
+  </key>
+  <key value="ai.markup.diagnostic.export.failure.detail">
+    <comment>Shown after failed diagnostic export with exception detail</comment>
+    <val lang="en_US">Diagnostic export failed: {0}</val>
+    <val lang="zh_CN">診斷資料匯出失敗：{0}</val>
+    <val lang="zh_TW">診斷資料匯出失敗：{0}</val>
+  </key>
+  <key value="ai.markup.diagnostic.export.unavailable">
+    <comment>Shown when no diagnostic record exists to export</comment>
+    <val lang="en_US">No sanitized troubleshooting record is available for export.</val>
+    <val lang="zh_CN">目前沒有可供匯出的已淨化診斷紀錄。</val>
+    <val lang="zh_TW">目前沒有可供匯出的已淨化診斷紀錄。</val>
+  </key>
 </translation> 

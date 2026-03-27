@@ -21,7 +21,8 @@
       "type": "string"
     },
     "exportReason": {
-      "type": "string"
+      "type": "string",
+      "description": "User-supplied reason for exporting the sanitized troubleshooting package"
     },
     "record": {
       "type": "object",
@@ -44,16 +45,19 @@
           "enum": ["windows", "macos"]
         },
         "endpointSummary": {
-          "type": "string"
+          "type": "string",
+          "description": "Redacted endpoint summary without embedded credentials or query secrets"
         },
         "requestSnapshot": {
-          "type": "string"
+          "type": "string",
+          "description": "Sanitized request metadata suitable for support triage"
         },
         "httpStatus": {
           "type": "integer"
         },
         "serviceErrorBody": {
-          "type": "string"
+          "type": "string",
+          "description": "Sanitized error response body captured from the remote service"
         },
         "failureCategory": {
           "type": "string",
@@ -68,7 +72,8 @@
           ]
         },
         "guidanceMessageKey": {
-          "type": "string"
+          "type": "string",
+          "description": "Canonical translation key used for the concise DAMA panel guidance"
         },
         "capturedAtEpochMs": {
           "type": "integer",

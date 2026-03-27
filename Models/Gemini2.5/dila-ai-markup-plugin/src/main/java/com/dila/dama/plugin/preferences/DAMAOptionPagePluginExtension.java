@@ -48,6 +48,9 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
    * The option key describing the API key.
    */
   public static final String KEY_DILA_DAMA_API_KEY = "dila.dama.api.key";
+  public static final String KEY_DILA_DAMA_API_BASE_URL = "dila.dama.api.base.url";
+  public static final String KEY_DILA_DAMA_CHAT_COMPLETIONS_PATH = "dila.dama.api.chat.path";
+  public static final String KEY_DILA_DAMA_API_TIMEOUT_MS = "dila.dama.api.timeout";
 
   /**
    * CBRD (CBETA Reference Detection) API options for Ref-to-Link action.
@@ -59,6 +62,9 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
   private static final String DEFAULT_CBRD_API_URL = "https://cbss.dila.edu.tw/cbrd/link";
   private static final String DEFAULT_CBRD_REFERER_HEADER = "CBRD@dila.edu.tw";
   private static final String DEFAULT_CBRD_TIMEOUT_MS = "10000";
+  private static final String DEFAULT_AI_API_BASE_URL = "https://api.openai.com";
+  private static final String DEFAULT_AI_CHAT_COMPLETIONS_PATH = "/v1/chat/completions";
+  private static final String DEFAULT_AI_TIMEOUT_MS = "30000";
   
   /**
    * Safe fallback values to prevent null pointer exceptions in Oxygen's options system.
@@ -80,6 +86,9 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
    * The text field for the API key.
    */
   private JTextField apiKeyTextField;
+  private JTextField apiBaseUrlTextField;
+  private JTextField chatCompletionsPathTextField;
+  private JTextField apiTimeoutTextField;
 
   /**
    * The text field for the CBRD API URL.
@@ -164,6 +173,12 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
           ? detectModelTextField.getText().trim() : "";
       String apiKeyText = (apiKeyTextField != null && apiKeyTextField.getText() != null) 
           ? apiKeyTextField.getText().trim() : "";
+      String apiBaseUrlText = (apiBaseUrlTextField != null && apiBaseUrlTextField.getText() != null)
+          ? apiBaseUrlTextField.getText().trim() : DEFAULT_AI_API_BASE_URL;
+      String chatPathText = (chatCompletionsPathTextField != null && chatCompletionsPathTextField.getText() != null)
+          ? chatCompletionsPathTextField.getText().trim() : DEFAULT_AI_CHAT_COMPLETIONS_PATH;
+      String apiTimeoutText = (apiTimeoutTextField != null && apiTimeoutTextField.getText() != null)
+          ? apiTimeoutTextField.getText().trim() : DEFAULT_AI_TIMEOUT_MS;
       
       // Only set options if keys are not null
       // Ultra-defensive option setting to prevent ConcurrentHashMap.putVal NPE
@@ -190,6 +205,36 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
           pluginWorkspace.getOptionsStorage().setSecretOption(KEY_DILA_DAMA_API_KEY, apiKeyText);
         } catch (Exception e) {
           PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set API key option: " + e.getMessage());
+        }
+      }
+      if (KEY_DILA_DAMA_API_BASE_URL != null && !KEY_DILA_DAMA_API_BASE_URL.trim().isEmpty()) {
+        try {
+          pluginWorkspace.getOptionsStorage().setOption(KEY_DILA_DAMA_API_BASE_URL, apiBaseUrlText.isEmpty() ? DEFAULT_AI_API_BASE_URL : apiBaseUrlText);
+        } catch (Exception e) {
+          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set AI API base URL option: " + e.getMessage());
+        }
+      }
+      if (KEY_DILA_DAMA_CHAT_COMPLETIONS_PATH != null && !KEY_DILA_DAMA_CHAT_COMPLETIONS_PATH.trim().isEmpty()) {
+        try {
+          pluginWorkspace.getOptionsStorage().setOption(KEY_DILA_DAMA_CHAT_COMPLETIONS_PATH, chatPathText.isEmpty() ? DEFAULT_AI_CHAT_COMPLETIONS_PATH : chatPathText);
+        } catch (Exception e) {
+          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set AI chat completions path option: " + e.getMessage());
+        }
+      }
+      if (KEY_DILA_DAMA_API_TIMEOUT_MS != null && !KEY_DILA_DAMA_API_TIMEOUT_MS.trim().isEmpty()) {
+        try {
+          int parsedTimeout = Integer.parseInt(DEFAULT_AI_TIMEOUT_MS);
+          try {
+            parsedTimeout = Integer.parseInt(apiTimeoutText);
+            if (parsedTimeout <= 0) {
+              parsedTimeout = Integer.parseInt(DEFAULT_AI_TIMEOUT_MS);
+            }
+          } catch (Exception e) {
+            parsedTimeout = Integer.parseInt(DEFAULT_AI_TIMEOUT_MS);
+          }
+          pluginWorkspace.getOptionsStorage().setOption(KEY_DILA_DAMA_API_TIMEOUT_MS, String.valueOf(parsedTimeout));
+        } catch (Exception e) {
+          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set AI timeout option: " + e.getMessage());
         }
       }
 
@@ -264,6 +309,15 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       }
       if (apiKeyTextField != null) {
         apiKeyTextField.setText(SAFE_VALUE_FALLBACK);
+      }
+      if (apiBaseUrlTextField != null) {
+        apiBaseUrlTextField.setText(DEFAULT_AI_API_BASE_URL);
+      }
+      if (chatCompletionsPathTextField != null) {
+        chatCompletionsPathTextField.setText(DEFAULT_AI_CHAT_COMPLETIONS_PATH);
+      }
+      if (apiTimeoutTextField != null) {
+        apiTimeoutTextField.setText(DEFAULT_AI_TIMEOUT_MS);
       }
       if (cbrdApiUrlTextField != null) {
         cbrdApiUrlTextField.setText(DEFAULT_CBRD_API_URL);
@@ -393,6 +447,42 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
 
       c.gridx = 0;
       c.gridy ++;
+      JLabel apiBaseUrlLabel = new JLabel(getMessage("api.base.url.label"));
+      panel.add(apiBaseUrlLabel, c);
+
+      apiBaseUrlTextField = new JTextField();
+      c.gridx ++;
+      c.weightx = 1;
+      c.fill = GridBagConstraints.HORIZONTAL;
+      c.insets = new Insets(0, 5, 0, 5);
+      panel.add(apiBaseUrlTextField, c);
+
+      c.gridx = 0;
+      c.gridy ++;
+      JLabel chatPathLabel = new JLabel(getMessage("api.chat.path.label"));
+      panel.add(chatPathLabel, c);
+
+      chatCompletionsPathTextField = new JTextField();
+      c.gridx ++;
+      c.weightx = 1;
+      c.fill = GridBagConstraints.HORIZONTAL;
+      c.insets = new Insets(0, 5, 0, 5);
+      panel.add(chatCompletionsPathTextField, c);
+
+      c.gridx = 0;
+      c.gridy ++;
+      JLabel apiTimeoutLabel = new JLabel(getMessage("api.timeout.ms.label"));
+      panel.add(apiTimeoutLabel, c);
+
+      apiTimeoutTextField = new JTextField();
+      c.gridx ++;
+      c.weightx = 1;
+      c.fill = GridBagConstraints.HORIZONTAL;
+      c.insets = new Insets(0, 5, 0, 5);
+      panel.add(apiTimeoutTextField, c);
+
+      c.gridx = 0;
+      c.gridy ++;
       JLabel cbrdApiUrlLabel = new JLabel(getMessage("cbrd.api.url.label"));
       panel.add(cbrdApiUrlLabel, c);
 
@@ -439,6 +529,9 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       String ftParseModel = SAFE_VALUE_FALLBACK;
       String ftDetectModel = SAFE_VALUE_FALLBACK;
       String apiKey = SAFE_VALUE_FALLBACK;
+      String apiBaseUrl = DEFAULT_AI_API_BASE_URL;
+      String chatPath = DEFAULT_AI_CHAT_COMPLETIONS_PATH;
+      String apiTimeoutMs = DEFAULT_AI_TIMEOUT_MS;
       String cbrdApiUrl = DEFAULT_CBRD_API_URL;
       String cbrdReferer = DEFAULT_CBRD_REFERER_HEADER;
       String cbrdTimeoutMs = DEFAULT_CBRD_TIMEOUT_MS;
@@ -469,6 +562,33 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
           } catch (Exception e) {
             PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get API key option: " + e.getMessage());
             apiKey = SAFE_VALUE_FALLBACK;
+          }
+        }
+        if (KEY_DILA_DAMA_API_BASE_URL != null && !KEY_DILA_DAMA_API_BASE_URL.trim().isEmpty()) {
+          try {
+            String value = pluginWorkspace.getOptionsStorage().getOption(KEY_DILA_DAMA_API_BASE_URL, DEFAULT_AI_API_BASE_URL);
+            apiBaseUrl = (value != null && !value.trim().isEmpty()) ? value.trim() : DEFAULT_AI_API_BASE_URL;
+          } catch (Exception e) {
+            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get AI API base URL: " + e.getMessage());
+            apiBaseUrl = DEFAULT_AI_API_BASE_URL;
+          }
+        }
+        if (KEY_DILA_DAMA_CHAT_COMPLETIONS_PATH != null && !KEY_DILA_DAMA_CHAT_COMPLETIONS_PATH.trim().isEmpty()) {
+          try {
+            String value = pluginWorkspace.getOptionsStorage().getOption(KEY_DILA_DAMA_CHAT_COMPLETIONS_PATH, DEFAULT_AI_CHAT_COMPLETIONS_PATH);
+            chatPath = (value != null && !value.trim().isEmpty()) ? value.trim() : DEFAULT_AI_CHAT_COMPLETIONS_PATH;
+          } catch (Exception e) {
+            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get AI chat completions path: " + e.getMessage());
+            chatPath = DEFAULT_AI_CHAT_COMPLETIONS_PATH;
+          }
+        }
+        if (KEY_DILA_DAMA_API_TIMEOUT_MS != null && !KEY_DILA_DAMA_API_TIMEOUT_MS.trim().isEmpty()) {
+          try {
+            String value = pluginWorkspace.getOptionsStorage().getOption(KEY_DILA_DAMA_API_TIMEOUT_MS, DEFAULT_AI_TIMEOUT_MS);
+            apiTimeoutMs = (value != null && !value.trim().isEmpty()) ? value.trim() : DEFAULT_AI_TIMEOUT_MS;
+          } catch (Exception e) {
+            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get AI timeout: " + e.getMessage());
+            apiTimeoutMs = DEFAULT_AI_TIMEOUT_MS;
           }
         }
 
@@ -512,6 +632,15 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       }
       if (apiKeyTextField != null) {
         apiKeyTextField.setText((apiKey != null) ? apiKey : SAFE_VALUE_FALLBACK);
+      }
+      if (apiBaseUrlTextField != null) {
+        apiBaseUrlTextField.setText(apiBaseUrl);
+      }
+      if (chatCompletionsPathTextField != null) {
+        chatCompletionsPathTextField.setText(chatPath);
+      }
+      if (apiTimeoutTextField != null) {
+        apiTimeoutTextField.setText(apiTimeoutMs);
       }
       if (cbrdApiUrlTextField != null) {
         cbrdApiUrlTextField.setText(cbrdApiUrl);
@@ -572,6 +701,12 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
         return "Detection model:";
       case "api.key.label":
         return "API Key*: ";
+      case "api.base.url.label":
+        return "AI API base URL:";
+      case "api.chat.path.label":
+        return "AI chat path:";
+      case "api.timeout.ms.label":
+        return "AI timeout (ms):";
       case "cbrd.api.url.label":
         return "CBRD API URL:";
       case "cbrd.referer.label":

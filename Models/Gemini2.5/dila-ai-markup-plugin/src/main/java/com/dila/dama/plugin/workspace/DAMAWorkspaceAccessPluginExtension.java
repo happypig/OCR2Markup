@@ -12,9 +12,15 @@ import ro.sync.exml.workspace.api.editor.page.text.WSTextEditorPage;
 import ro.sync.exml.plugin.workspace.WorkspaceAccessPluginExtension;
 
 import com.dila.dama.plugin.utf8.UTF8ValidationService;
+import com.dila.dama.plugin.application.command.RunAiMarkupDiagnosticsCommand;
 import com.dila.dama.plugin.application.command.ConvertReferenceCommand;
 import com.dila.dama.plugin.application.command.ConvertReferenceResult;
+import com.dila.dama.plugin.application.query.BuildDiagnosticExportQuery;
+import com.dila.dama.plugin.domain.model.AiMarkupDiagnosticSession;
 import com.dila.dama.plugin.domain.model.InvalidReferenceException;
+import com.dila.dama.plugin.domain.model.MarkupServiceConfiguration;
+import com.dila.dama.plugin.domain.model.SanitizedTroubleshootingRecord;
+import com.dila.dama.plugin.infrastructure.export.DiagnosticExportWriter;
 import com.dila.dama.plugin.domain.service.RefElementRewriter;
 import com.dila.dama.plugin.domain.service.ReferenceParser;
 import com.dila.dama.plugin.infrastructure.api.CBRDAPIClient;
@@ -57,6 +63,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     private JButton convertButton;
     private JButton transferButton;
     private JButton cancelButton;
+    private JButton exportButton;
 
     // Ref-to-Link workflow state (in-memory only)
     private String currentRefToLinkUrl;
@@ -64,6 +71,13 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     
     // UTF-8 workflow state
     private List<Path> currentNonUtf8Files = null;
+    private volatile boolean aiMarkupInProgress = false;
+    private AiMarkupDiagnosticSession lastDiagnosticSession;
+    private SanitizedTroubleshootingRecord lastTroubleshootingRecord;
+
+    private RunAiMarkupDiagnosticsCommand aiMarkupDiagnosticsCommand = new RunAiMarkupDiagnosticsCommand();
+    private BuildDiagnosticExportQuery diagnosticExportQuery = new BuildDiagnosticExportQuery();
+    private DiagnosticExportWriter diagnosticExportWriter = new DiagnosticExportWriter();
     // private int currentTotalFilesScanned = 0;
     
     // Thread pool for background operations
@@ -339,9 +353,11 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         convertButton = new JButton(i18n("button.convert")); // "Convert", with translation
         transferButton = new JButton(i18n("button.transfer.utf8")); // "Transfer to UTF-8", with translation
         cancelButton = new JButton(i18n("button.cancel")); // "Cancel", with translation
-        
+        exportButton = new JButton(i18n("button.export.diagnostics"));
+
         buttonPanel.add(replaceButton);
         buttonPanel.add(convertButton);
+        buttonPanel.add(exportButton);
         buttonPanel.add(transferButton);
         buttonPanel.add(cancelButton);
         
@@ -351,6 +367,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         // Add action listeners
         replaceButton.addActionListener(new ReplaceButtonActionListener());
         convertButton.addActionListener(new ConvertButtonActionListener());
+        exportButton.addActionListener(new ExportDiagnosticsButtonActionListener());
         transferButton.addActionListener(new TransferButtonActionListener());
         cancelButton.addActionListener(new CancelButtonActionListener());
     }
@@ -366,9 +383,17 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         @Override
         public void actionPerformed(ActionEvent e) {
             PluginLogger.info("[AIMarkupActionListener]AI Markup action triggered");
+
+            if (!tryStartAiMarkupOperation()) {
+                resultArea.setText(i18n("ai.markup.diagnostic.in.progress"));
+                hideAllButtons();
+                return;
+            }
             
             // Set operation context
             currentOperation = OperationType.AI_MARKUP;
+            lastDiagnosticSession = null;
+            lastTroubleshootingRecord = null;
             
             // Clear previous results
             infoArea.setText(i18n("action.ai.markup.selected") + "\n\n"); // "Action selected: AI Markup (Use AI for reference tagging)"
@@ -384,15 +409,18 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             
             infoArea.append(i18n("selected.text", selectedText) + "\n" // "Selected text: "
                             + i18n("text.with.length", selectedText.length()) + "\n\n"); // "Text length: {0} characters"
+            resultArea.setText(i18n("ai.markup.diagnostic.processing"));
             
             // Process AI markup in background
-            CompletableFuture.supplyAsync(() -> processAIMarkup(selectedText), executor)
+            CompletableFuture.supplyAsync(() -> runAiMarkup(selectedText), executor)
                 .thenAccept(result -> SwingUtilities.invokeLater(() -> {
-                    setResultWithReplaceButton(result);
+                    completeAiMarkupOperation(result);
                 }))
                 .exceptionally(throwable -> {
                     SwingUtilities.invokeLater(() -> {
-                        setResultWithReplaceButton(i18n("error.processing.ai.markup", throwable.getMessage())); // "Error processing AI Markup: {0}"
+                        resultArea.setText(i18n("error.processing.ai.markup", throwable.getMessage()));
+                        hideAllButtons();
+                        finishAiMarkupOperation();
                     });
                     return null;
                 });
@@ -945,6 +973,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      */
     private void showReplaceButton() {
         convertButton.setVisible(false);
+        exportButton.setVisible(false);
         transferButton.setVisible(false);
         cancelButton.setVisible(false);
         replaceButton.setVisible(true);
@@ -955,6 +984,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
 
     private void showConvertButton() {
         replaceButton.setVisible(false);
+        exportButton.setVisible(false);
         transferButton.setVisible(false);
         cancelButton.setVisible(false);
         convertButton.setVisible(true);
@@ -966,6 +996,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
 
     private void showRefToLinkConvertingState() {
         replaceButton.setVisible(false);
+        exportButton.setVisible(false);
         transferButton.setVisible(false);
         cancelButton.setVisible(false);
         convertButton.setVisible(true);
@@ -976,6 +1007,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     }
 
     private void showConvertAndReplaceButtons() {
+        exportButton.setVisible(false);
         transferButton.setVisible(false);
         cancelButton.setVisible(false);
         convertButton.setVisible(true);
@@ -1008,6 +1040,18 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             PluginLogger.info("[setResultWithReplaceButton]Hiding all buttons");
             hideAllButtons();
         }
+    }
+
+    private void showExportButton() {
+        replaceButton.setVisible(false);
+        convertButton.setVisible(false);
+        transferButton.setVisible(false);
+        cancelButton.setVisible(false);
+        exportButton.setVisible(true);
+        exportButton.setEnabled(true);
+        buttonPanel.setVisible(true);
+        buttonPanel.revalidate();
+        buttonPanel.repaint();
     }
     
     /**
@@ -1163,6 +1207,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     private void showTransferButtons() {
         replaceButton.setVisible(false);
         convertButton.setVisible(false);
+        exportButton.setVisible(false);
         transferButton.setVisible(true);
         cancelButton.setVisible(true);
         buttonPanel.setVisible(true);
@@ -1176,6 +1221,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     private void hideTransferButtons() {
         transferButton.setVisible(false);
         cancelButton.setVisible(false);
+        exportButton.setVisible(false);
         buttonPanel.setVisible(false);
         buttonPanel.revalidate();
         buttonPanel.repaint();
@@ -1185,6 +1231,7 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
      * Hide all buttons
      */
     private void hideAllButtons() {
+        exportButton.setVisible(false);
         buttonPanel.setVisible(false);
         buttonPanel.revalidate();
         buttonPanel.repaint();
@@ -1193,6 +1240,228 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     // ========================================
     // Processing Methods (Phase 2-4 implementation stubs)
     // ========================================
+
+    private synchronized boolean tryStartAiMarkupOperation() {
+        if (aiMarkupInProgress) {
+            return false;
+        }
+        aiMarkupInProgress = true;
+        return true;
+    }
+
+    private synchronized void finishAiMarkupOperation() {
+        aiMarkupInProgress = false;
+    }
+
+    RunAiMarkupDiagnosticsCommand.Result runAiMarkup(String text) {
+        MarkupServiceConfiguration configuration = buildAiMarkupConfiguration();
+        return aiMarkupDiagnosticsCommand.execute(text, configuration, i18n("system.prompt.ai.markup"), determinePlatform());
+    }
+
+    void completeAiMarkupOperation(RunAiMarkupDiagnosticsCommand.Result result) {
+        try {
+            lastDiagnosticSession = result == null ? null : result.getSession();
+            lastTroubleshootingRecord = result == null ? null : result.getTroubleshootingRecord();
+            if (result != null && result.isSuccess()) {
+                setResultWithReplaceButton(result.getMarkupResult());
+            } else if (result != null) {
+                resultArea.setText(resolveGuidanceMessage(result.getSummaryMessageKey()));
+                if (lastTroubleshootingRecord != null) {
+                    showExportButton();
+                } else {
+                    hideAllButtons();
+                }
+            } else {
+                resultArea.setText(i18n("ai.markup.diagnostic.unknown"));
+                hideAllButtons();
+            }
+        } finally {
+            finishAiMarkupOperation();
+        }
+    }
+
+    private class ExportDiagnosticsButtonActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (lastTroubleshootingRecord == null || lastDiagnosticSession == null) {
+                resultArea.setText(i18n("ai.markup.diagnostic.export.unavailable"));
+                hideAllButtons();
+                return;
+            }
+
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle(i18n("ai.markup.diagnostic.export.dialog.title"));
+            fileChooser.setSelectedFile(new File("ai-markup-diagnostics-" + lastDiagnosticSession.getSessionId() + ".json"));
+
+            int result = fileChooser.showSaveDialog(null);
+            if (result != JFileChooser.APPROVE_OPTION) {
+                return;
+            }
+
+            final File outputFile = fileChooser.getSelectedFile();
+            resultArea.setText(i18n("ai.markup.diagnostic.export.processing"));
+            hideAllButtons();
+            CompletableFuture.supplyAsync(() -> exportDiagnostics(outputFile, "manual_support_export"), executor)
+                .thenAccept(success -> SwingUtilities.invokeLater(() -> {
+                    resultArea.setText(success
+                        ? i18n("ai.markup.diagnostic.export.success", outputFile.getAbsolutePath())
+                        : i18n("ai.markup.diagnostic.export.failure"));
+                    if (!success && lastTroubleshootingRecord != null) {
+                        showExportButton();
+                    }
+                }))
+                .exceptionally(throwable -> {
+                    SwingUtilities.invokeLater(() -> {
+                        resultArea.setText(i18n("ai.markup.diagnostic.export.failure.detail", throwable.getMessage()));
+                        if (lastTroubleshootingRecord != null) {
+                            showExportButton();
+                        }
+                    });
+                    return null;
+                });
+        }
+    }
+
+    private MarkupServiceConfiguration buildAiMarkupConfiguration() {
+        String apiKey = optionValueSecret(DAMAOptionPagePluginExtension.KEY_DILA_DAMA_API_KEY, "");
+        String parseModel = optionValue(DAMAOptionPagePluginExtension.KEY_DILA_DAMA_FT_PARSE_MODEL, "");
+        String baseUrl = optionValue(DAMAOptionPagePluginExtension.KEY_DILA_DAMA_API_BASE_URL, "https://api.openai.com");
+        String chatPath = optionValue(DAMAOptionPagePluginExtension.KEY_DILA_DAMA_CHAT_COMPLETIONS_PATH, "/v1/chat/completions");
+        String timeoutValue = optionValue(DAMAOptionPagePluginExtension.KEY_DILA_DAMA_API_TIMEOUT_MS, "30000");
+        int timeoutMs = 30000;
+        try {
+            timeoutMs = Integer.parseInt(timeoutValue);
+        } catch (Exception e) {
+            timeoutMs = 30000;
+        }
+        String endpointKind = baseUrl != null && baseUrl.toLowerCase().contains("api.openai.com")
+            ? MarkupServiceConfiguration.ENDPOINT_KIND_OPENAI_HOSTED
+            : MarkupServiceConfiguration.ENDPOINT_KIND_OPENAI_COMPATIBLE;
+        return new MarkupServiceConfiguration(
+            baseUrl,
+            chatPath,
+            parseModel,
+            apiKey,
+            timeoutMs,
+            endpointKind,
+            true
+        );
+    }
+
+    private String optionValue(String key, String defaultValue) {
+        if (optionStorage == null) {
+            return defaultValue;
+        }
+        try {
+            return optionStorage.getOption(key, defaultValue);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    private String optionValueSecret(String key, String defaultValue) {
+        if (optionStorage == null) {
+            return defaultValue;
+        }
+        try {
+            return optionStorage.getSecretOption(key, defaultValue);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    private String determinePlatform() {
+        String osName = System.getProperty("os.name", "").toLowerCase();
+        if (osName.contains("mac")) {
+            return "macos";
+        }
+        if (osName.contains("win")) {
+            return "windows";
+        }
+        return "generic";
+    }
+
+    private String resolveGuidanceMessage(String guidanceKey) {
+        if (guidanceKey == null || guidanceKey.trim().isEmpty()) {
+            return i18n("ai.markup.diagnostic.unknown");
+        }
+        String direct = i18n(guidanceKey);
+        if (!guidanceKey.equals(direct)) {
+            return direct;
+        }
+        if (guidanceKey.endsWith(".windows") || guidanceKey.endsWith(".macos")) {
+            String baseKey = guidanceKey.substring(0, guidanceKey.lastIndexOf('.'));
+            String fallback = i18n(baseKey);
+            if (!baseKey.equals(fallback)) {
+                return fallback;
+            }
+        }
+        return direct;
+    }
+
+    boolean exportDiagnostics(File outputFile, String exportReason) {
+        if (outputFile == null || lastTroubleshootingRecord == null || lastDiagnosticSession == null) {
+            return false;
+        }
+        try {
+            diagnosticExportWriter.write(
+                diagnosticExportQuery.build(lastDiagnosticSession.getSessionId(), lastTroubleshootingRecord, exportReason),
+                outputFile
+            );
+            lastDiagnosticSession.exported(
+                diagnosticExportQuery.build(lastDiagnosticSession.getSessionId(), lastTroubleshootingRecord, exportReason)
+            );
+            return true;
+        } catch (Exception e) {
+            PluginLogger.error("[exportDiagnostics]Failed to export diagnostics: " + e.getMessage(), e);
+            return false;
+        }
+    }
+
+    void initializeUiForTests() {
+        createTextAreas();
+        createButtonPanel();
+    }
+
+    void setAiMarkupDiagnosticsCommandForTests(RunAiMarkupDiagnosticsCommand command) {
+        this.aiMarkupDiagnosticsCommand = command;
+    }
+
+    void setDiagnosticExportQueryForTests(BuildDiagnosticExportQuery query) {
+        this.diagnosticExportQuery = query;
+    }
+
+    void setDiagnosticExportWriterForTests(DiagnosticExportWriter writer) {
+        this.diagnosticExportWriter = writer;
+    }
+
+    void setOptionStorageForTests(WSOptionsStorage storage) {
+        this.optionStorage = storage;
+    }
+
+    JTextArea getResultAreaForTests() {
+        return resultArea;
+    }
+
+    JTextArea getInfoAreaForTests() {
+        return infoArea;
+    }
+
+    JButton getReplaceButtonForTests() {
+        return replaceButton;
+    }
+
+    JButton getExportButtonForTests() {
+        return exportButton;
+    }
+
+    boolean tryStartAiMarkupOperationForTests() {
+        return tryStartAiMarkupOperation();
+    }
+
+    boolean isAiMarkupInProgressForTests() {
+        return aiMarkupInProgress;
+    }
     
     /**
      * Process AI markup with LLM API integration(i18n)

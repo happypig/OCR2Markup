@@ -30,9 +30,9 @@ description: "Task list for implementing cross-platform AI Markup diagnostics"
 
 **Purpose**: Prepare feature-specific documentation scaffolding and test placeholders needed for strict test-first execution.
 
-- [ ] T001 Create acceptance-matrix directory and placeholder spec test files in `specs/002-ai-api-diagnostics/acceptance/`
-- [ ] T002 Create feature package directories under `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/model/`, `domain/service/`, `application/command/`, `application/query/`, `infrastructure/api/`, `infrastructure/export/`, and `infrastructure/logging/`
-- [ ] T003 [P] Create feature test package directories under `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/domain/model/`, `domain/service/`, `application/command/`, `application/query/`, `infrastructure/api/`, `infrastructure/export/`, and `workspace/`
+- [X] T001 Create acceptance-matrix directory and placeholder spec test files in `specs/002-ai-api-diagnostics/acceptance/`
+- [X] T002 Create feature package directories under `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/model/`, `domain/service/`, `application/command/`, `application/query/`, `infrastructure/api/`, `infrastructure/export/`, and `infrastructure/logging/`
+- [X] T003 [P] Create feature test package directories under `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/domain/model/`, `domain/service/`, `application/command/`, `application/query/`, `infrastructure/api/`, `infrastructure/export/`, and `workspace/`
 
 ---
 
@@ -42,12 +42,12 @@ description: "Task list for implementing cross-platform AI Markup diagnostics"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T004 Create shared diagnostic value objects in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/model/DiagnosticFailureCategory.java`, `DiagnosticStatus.java`, `MarkupServiceConfiguration.java`, `SanitizedTroubleshootingRecord.java`, `ExportedDiagnosticPackage.java`, and `AiMarkupDiagnosticSession.java`
-- [ ] T005 Create shared domain services in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/service/RequestValidationService.java`, `DiagnosticClassifier.java`, and `SecretRedactor.java`
-- [ ] T006 Create shared infrastructure DTO/client skeletons in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/api/OpenAiCompatibleChatClient.java`, `OpenAiErrorResponse.java`, and `RequestTraceSnapshot.java`
-- [ ] T007 Create shared export/logging skeletons in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/export/DiagnosticExportWriter.java` and `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/logging/SanitizedDiagnosticLogger.java`
-- [ ] T008 Create shared application orchestration skeletons in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/application/command/RunAiMarkupDiagnosticsCommand.java` and `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/application/query/BuildDiagnosticExportQuery.java`
-- [ ] T009 Refactor AI Markup integration seam in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtension.java` so the existing `processAIMarkup()` path delegates to feature collaborators instead of containing all request logic inline
+- [X] T004 Create shared diagnostic value objects in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/model/DiagnosticFailureCategory.java`, `DiagnosticStatus.java`, `MarkupServiceConfiguration.java`, `SanitizedTroubleshootingRecord.java`, `ExportedDiagnosticPackage.java`, and `AiMarkupDiagnosticSession.java`
+- [X] T005 Create shared domain services in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/service/RequestValidationService.java`, `DiagnosticClassifier.java`, and `SecretRedactor.java`
+- [X] T006 Create shared infrastructure DTO/client skeletons in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/api/OpenAiCompatibleChatClient.java`, `OpenAiErrorResponse.java`, and `RequestTraceSnapshot.java`
+- [X] T007 Create shared export/logging skeletons in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/export/DiagnosticExportWriter.java` and `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/logging/SanitizedDiagnosticLogger.java`
+- [X] T008 Create shared application orchestration skeletons in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/application/command/RunAiMarkupDiagnosticsCommand.java` and `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/application/query/BuildDiagnosticExportQuery.java`
+- [X] T009 Refactor AI Markup integration seam in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtension.java` so the existing `processAIMarkup()` path delegates to feature collaborators instead of containing all request logic inline
 
 **Checkpoint**: Foundational architecture is ready. User stories can now proceed in priority order.
 
@@ -63,23 +63,23 @@ description: "Task list for implementing cross-platform AI Markup diagnostics"
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T010-T-SPEC [P] [US1] Write specification acceptance matrix for failure-classification scenarios, including malformed payload and proxy-interference cases, in `specs/002-ai-api-diagnostics/acceptance/us1-diagnostic-failure-matrix.md`
-- [ ] T011-T-UNIT [P] [US1] Add unit tests for credential shape, model identifier, endpoint base URL, and proxy-setting validation rules in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/domain/service/RequestValidationServiceTest.java`
-- [ ] T012-T-UNIT [P] [US1] Add unit tests for HTTP failure classification across 400/401/403/404/429/5xx plus malformed-payload and endpoint-compatibility guidance in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/domain/service/DiagnosticClassifierTest.java`
-- [ ] T013-T-INTEGRATION [P] [US1] Add integration-style tests for OpenAI-compatible error parsing and partial/empty error bodies in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/infrastructure/api/OpenAiCompatibleChatClientTest.java`
-- [ ] T014-T-INTEGRATION [P] [US1] Add workspace integration tests for concise AI Markup failure summaries and non-blocking failure feedback in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtensionAiMarkupDiagnosticsTest.java`
+- [X] T010-T-SPEC [P] [US1] Write specification acceptance matrix for failure-classification scenarios, including malformed payload and proxy-interference cases, in `specs/002-ai-api-diagnostics/acceptance/us1-diagnostic-failure-matrix.md`
+- [X] T011-T-UNIT [P] [US1] Add unit tests for credential shape, model identifier, endpoint base URL, and proxy-setting validation rules in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/domain/service/RequestValidationServiceTest.java`
+- [X] T012-T-UNIT [P] [US1] Add unit tests for HTTP failure classification across 400/401/403/404/429/5xx plus malformed-payload and endpoint-compatibility guidance in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/domain/service/DiagnosticClassifierTest.java`
+- [X] T013-T-INTEGRATION [P] [US1] Add integration-style tests for OpenAI-compatible error parsing and partial/empty error bodies in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/infrastructure/api/OpenAiCompatibleChatClientTest.java`
+- [X] T014-T-INTEGRATION [P] [US1] Add workspace integration tests for concise AI Markup failure summaries and non-blocking failure feedback in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtensionAiMarkupDiagnosticsTest.java`
 
 ### Implementation for User Story 1
 
-- [ ] T015 [P] [US1] Implement configuration validation and request-shape validation for credential shape, model identifier, endpoint base URL, and proxy-related settings in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/service/RequestValidationService.java`
-- [ ] T016 [P] [US1] Implement failure-category mapping and guidance-key selection for malformed payloads, endpoint mismatch, proxy/connectivity failures, and unknown service errors in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/service/DiagnosticClassifier.java`
-- [ ] T017 [P] [US1] Implement structured OpenAI-compatible error parsing in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/api/OpenAiErrorResponse.java`
-- [ ] T018 [US1] Implement request construction and HTTP response handling for OpenAI-compatible payloads, endpoint-path checks, and sanitized error-body capture in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/api/OpenAiCompatibleChatClient.java`
-- [ ] T019 [US1] Implement diagnostic command orchestration in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/application/command/RunAiMarkupDiagnosticsCommand.java`
-- [ ] T020 [US1] Wire DAMA AI Markup failure handling to the diagnostic command and concise summary display, including explicit malformed-request and proxy-guidance branches, in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtension.java`
-- [ ] T021 [US1] Add user-facing AI Markup diagnostic message keys for all supported languages in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/resources/i18n/translation.xml`
-- [ ] T022 [US1] Add regression assertions for existing successful AI Markup behavior in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtensionTest.java`
-- [ ] T023 [US1] Run the US1 verification gate from `Models/Gemini2.5/dila-ai-markup-plugin/` with `mvn test -Dtest=RequestValidationServiceTest,DiagnosticClassifierTest,OpenAiCompatibleChatClientTest,DAMAWorkspaceAccessPluginExtensionAiMarkupDiagnosticsTest,DAMAWorkspaceAccessPluginExtensionTest`
+- [X] T015 [P] [US1] Implement configuration validation and request-shape validation for credential shape, model identifier, endpoint base URL, and proxy-related settings in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/service/RequestValidationService.java`
+- [X] T016 [P] [US1] Implement failure-category mapping and guidance-key selection for malformed payloads, endpoint mismatch, proxy/connectivity failures, and unknown service errors in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/service/DiagnosticClassifier.java`
+- [X] T017 [P] [US1] Implement structured OpenAI-compatible error parsing in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/api/OpenAiErrorResponse.java`
+- [X] T018 [US1] Implement request construction and HTTP response handling for OpenAI-compatible payloads, endpoint-path checks, and sanitized error-body capture in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/api/OpenAiCompatibleChatClient.java`
+- [X] T019 [US1] Implement diagnostic command orchestration in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/application/command/RunAiMarkupDiagnosticsCommand.java`
+- [X] T020 [US1] Wire DAMA AI Markup failure handling to the diagnostic command and concise summary display, including explicit malformed-request and proxy-guidance branches, in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtension.java`
+- [X] T021 [US1] Add user-facing AI Markup diagnostic message keys for all supported languages in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/resources/i18n/translation.xml`
+- [X] T022 [US1] Add regression assertions for existing successful AI Markup behavior in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtensionTest.java`
+- [X] T023 [US1] Run the US1 verification gate from `Models/Gemini2.5/dila-ai-markup-plugin/` with `mvn test -Dtest=RequestValidationServiceTest,DiagnosticClassifierTest,OpenAiCompatibleChatClientTest,DAMAWorkspaceAccessPluginExtensionAiMarkupDiagnosticsTest,DAMAWorkspaceAccessPluginExtensionTest`
 
 **Checkpoint**: User Story 1 should now classify and display AI Markup failures correctly and remain independently testable.
 
@@ -93,18 +93,18 @@ description: "Task list for implementing cross-platform AI Markup diagnostics"
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T024-T-SPEC [P] [US2] Write specification acceptance matrix for Windows/macOS parity scenarios, including semantically equivalent proxy-troubleshooting guidance, in `specs/002-ai-api-diagnostics/acceptance/us2-cross-platform-parity-matrix.md`
-- [ ] T025-T-UNIT [P] [US2] Add unit tests for platform-aware guidance selection with equivalent meaning across Windows and macOS in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/domain/service/DiagnosticClassifierPlatformParityTest.java`
-- [ ] T026-T-UNIT [P] [US2] Add unit tests for diagnostic session state transitions and concurrency guards in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/domain/model/AiMarkupDiagnosticSessionTest.java`
-- [ ] T027-T-INTEGRATION [P] [US2] Add workspace integration tests for async UI-safe updates, concurrent request suppression, and responsive status feedback in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtensionAsyncDiagnosticsTest.java`
+- [X] T024-T-SPEC [P] [US2] Write specification acceptance matrix for Windows/macOS parity scenarios, including semantically equivalent proxy-troubleshooting guidance, in `specs/002-ai-api-diagnostics/acceptance/us2-cross-platform-parity-matrix.md`
+- [X] T025-T-UNIT [P] [US2] Add unit tests for platform-aware guidance selection with equivalent meaning across Windows and macOS in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/domain/service/DiagnosticClassifierPlatformParityTest.java`
+- [X] T026-T-UNIT [P] [US2] Add unit tests for diagnostic session state transitions and concurrency guards in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/domain/model/AiMarkupDiagnosticSessionTest.java`
+- [X] T027-T-INTEGRATION [P] [US2] Add workspace integration tests for async UI-safe updates, concurrent request suppression, and responsive status feedback in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtensionAsyncDiagnosticsTest.java`
 
 ### Implementation for User Story 2
 
-- [ ] T028 [P] [US2] Implement diagnostic session lifecycle and concurrent-operation rules in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/model/AiMarkupDiagnosticSession.java`
-- [ ] T029 [P] [US2] Extend failure classification to support platform-specific wording with equivalent meaning in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/service/DiagnosticClassifier.java`
-- [ ] T030 [US2] Integrate platform detection, async UI updates, and operation-state guarding in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtension.java`
-- [ ] T031 [US2] Add cross-platform wording and operation-state translation keys in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/resources/i18n/translation.xml`
-- [ ] T032 [US2] Run the US2 verification gate from `Models/Gemini2.5/dila-ai-markup-plugin/` with `mvn test -Dtest=DiagnosticClassifierPlatformParityTest,AiMarkupDiagnosticSessionTest,DAMAWorkspaceAccessPluginExtensionAsyncDiagnosticsTest`
+- [X] T028 [P] [US2] Implement diagnostic session lifecycle and concurrent-operation rules in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/model/AiMarkupDiagnosticSession.java`
+- [X] T029 [P] [US2] Extend failure classification to support platform-specific wording with equivalent meaning in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/service/DiagnosticClassifier.java`
+- [X] T030 [US2] Integrate platform detection, async UI updates, and operation-state guarding in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtension.java`
+- [X] T031 [US2] Add cross-platform wording and operation-state translation keys in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/resources/i18n/translation.xml`
+- [X] T032 [US2] Run the US2 verification gate from `Models/Gemini2.5/dila-ai-markup-plugin/` with `mvn test -Dtest=DiagnosticClassifierPlatformParityTest,AiMarkupDiagnosticSessionTest,DAMAWorkspaceAccessPluginExtensionAsyncDiagnosticsTest`
 
 **Checkpoint**: User Stories 1 and 2 should both work independently, with parity and async safety verified.
 
@@ -118,22 +118,22 @@ description: "Task list for implementing cross-platform AI Markup diagnostics"
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T033-T-SPEC [P] [US3] Write specification acceptance matrix for troubleshooting-record and export scenarios, including support-usable sanitized exports, in `specs/002-ai-api-diagnostics/acceptance/us3-troubleshooting-export-matrix.md`
-- [ ] T034-T-UNIT [P] [US3] Add unit tests for secret redaction rules in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/domain/service/SecretRedactorTest.java`
-- [ ] T035-T-UNIT [P] [US3] Add unit tests for export package assembly and required support-triage fields in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/application/query/BuildDiagnosticExportQueryTest.java`
-- [ ] T036-T-INTEGRATION [P] [US3] Add infrastructure tests for export serialization, schema compliance, and repeated redaction guarantees in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/infrastructure/export/DiagnosticExportWriterTest.java`
-- [ ] T037-T-INTEGRATION [P] [US3] Add workspace integration tests for manual export flow and redacted UI/logging separation in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtensionExportDiagnosticsTest.java`
+- [X] T033-T-SPEC [P] [US3] Write specification acceptance matrix for troubleshooting-record and export scenarios, including support-usable sanitized exports, in `specs/002-ai-api-diagnostics/acceptance/us3-troubleshooting-export-matrix.md`
+- [X] T034-T-UNIT [P] [US3] Add unit tests for secret redaction rules in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/domain/service/SecretRedactorTest.java`
+- [X] T035-T-UNIT [P] [US3] Add unit tests for export package assembly and required support-triage fields in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/application/query/BuildDiagnosticExportQueryTest.java`
+- [X] T036-T-INTEGRATION [P] [US3] Add infrastructure tests for export serialization, schema compliance, and repeated redaction guarantees in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/infrastructure/export/DiagnosticExportWriterTest.java`
+- [X] T037-T-INTEGRATION [P] [US3] Add workspace integration tests for manual export flow and redacted UI/logging separation in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtensionExportDiagnosticsTest.java`
 
 ### Implementation for User Story 3
 
-- [ ] T038 [P] [US3] Implement secret masking and sanitization rules in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/service/SecretRedactor.java`
-- [ ] T039 [P] [US3] Implement sanitized troubleshooting record creation in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/model/SanitizedTroubleshootingRecord.java`
-- [ ] T040 [P] [US3] Implement export package assembly with schema-required support-triage fields in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/application/query/BuildDiagnosticExportQuery.java`
-- [ ] T041 [P] [US3] Implement sanitized logging adapter in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/logging/SanitizedDiagnosticLogger.java`
-- [ ] T042 [P] [US3] Implement manual export serialization in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/export/DiagnosticExportWriter.java`
-- [ ] T043 [US3] Wire troubleshooting capture, concise-vs-full detail separation, and manual export action into `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtension.java`
-- [ ] T044 [US3] Add export-specific user-facing translations in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/resources/i18n/translation.xml`
-- [ ] T045 [US3] Run the US3 verification gate from `Models/Gemini2.5/dila-ai-markup-plugin/` with `mvn test -Dtest=SecretRedactorTest,BuildDiagnosticExportQueryTest,DiagnosticExportWriterTest,DAMAWorkspaceAccessPluginExtensionExportDiagnosticsTest`
+- [X] T038 [P] [US3] Implement secret masking and sanitization rules in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/service/SecretRedactor.java`
+- [X] T039 [P] [US3] Implement sanitized troubleshooting record creation in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/model/SanitizedTroubleshootingRecord.java`
+- [X] T040 [P] [US3] Implement export package assembly with schema-required support-triage fields in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/application/query/BuildDiagnosticExportQuery.java`
+- [X] T041 [P] [US3] Implement sanitized logging adapter in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/logging/SanitizedDiagnosticLogger.java`
+- [X] T042 [P] [US3] Implement manual export serialization in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/export/DiagnosticExportWriter.java`
+- [X] T043 [US3] Wire troubleshooting capture, concise-vs-full detail separation, and manual export action into `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtension.java`
+- [X] T044 [US3] Add export-specific user-facing translations in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/resources/i18n/translation.xml`
+- [X] T045 [US3] Run the US3 verification gate from `Models/Gemini2.5/dila-ai-markup-plugin/` with `mvn test -Dtest=SecretRedactorTest,BuildDiagnosticExportQueryTest,DiagnosticExportWriterTest,DAMAWorkspaceAccessPluginExtensionExportDiagnosticsTest`
 
 **Checkpoint**: All user stories should now be independently functional and safe to support-share.
 
@@ -143,10 +143,10 @@ description: "Task list for implementing cross-platform AI Markup diagnostics"
 
 **Purpose**: Finalize contracts, documentation, and verification across the full feature.
 
-- [ ] T046 Add automated i18n completeness verification for all supported languages in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/infrastructure/i18n/TranslationBundleCompletenessTest.java`
-- [ ] T047 [P] Update feature contracts to match implementation decisions in `specs/002-ai-api-diagnostics/contracts/openai-compatible-chat-completions.yaml` and `specs/002-ai-api-diagnostics/contracts/diagnostic-export.schema.json`
-- [ ] T048 [P] Document final diagnostic workflow and developer verification steps in `specs/002-ai-api-diagnostics/quickstart.md`
-- [ ] T049 Run full plugin regression suite from `Models/Gemini2.5/dila-ai-markup-plugin/` with `mvn test` and record verification results in `specs/002-ai-api-diagnostics/quickstart.md`
+- [X] T046 Add automated i18n completeness verification for all supported languages in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/infrastructure/i18n/TranslationBundleCompletenessTest.java`
+- [X] T047 [P] Update feature contracts to match implementation decisions in `specs/002-ai-api-diagnostics/contracts/openai-compatible-chat-completions.yaml` and `specs/002-ai-api-diagnostics/contracts/diagnostic-export.schema.json`
+- [X] T048 [P] Document final diagnostic workflow and developer verification steps in `specs/002-ai-api-diagnostics/quickstart.md`
+- [X] T049 Run full plugin regression suite from `Models/Gemini2.5/dila-ai-markup-plugin/` with `mvn test` and record verification results in `specs/002-ai-api-diagnostics/quickstart.md`
 
 ---
 

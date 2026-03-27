@@ -136,6 +136,50 @@ Target test layers:
 
 ---
 
+## Verification Results
+
+Verification was completed from `d:\project\OCR2Markup\Models\Gemini2.5\dila-ai-markup-plugin`.
+
+### Story Gates
+
+1. US1 verification gate passed:
+
+   ```powershell
+   mvn test "-Dtest=RequestValidationServiceTest,DiagnosticClassifierTest,OpenAiCompatibleChatClientTest,DAMAWorkspaceAccessPluginExtensionAiMarkupDiagnosticsTest,DAMAWorkspaceAccessPluginExtensionTest"
+   ```
+
+   Result: `BUILD SUCCESS` with 26 tests passing.
+
+2. US2 verification gate passed:
+
+   ```powershell
+   mvn test "-Dtest=DiagnosticClassifierPlatformParityTest,AiMarkupDiagnosticSessionTest,DAMAWorkspaceAccessPluginExtensionAsyncDiagnosticsTest"
+   ```
+
+   Result: `BUILD SUCCESS` with 6 tests passing.
+
+3. US3 verification gate passed:
+
+   ```powershell
+   mvn test "-Dtest=SecretRedactorTest,BuildDiagnosticExportQueryTest,DiagnosticExportWriterTest,DAMAWorkspaceAccessPluginExtensionExportDiagnosticsTest"
+   ```
+
+   Result: `BUILD SUCCESS` with 6 tests passing.
+
+### Full Regression
+
+```powershell
+mvn test
+```
+
+Result: `BUILD SUCCESS` with 135 tests passing.
+
+Notes:
+- `TranslationConsistencyTest` still reports pre-existing unused translation keys as informational output, but it does not fail the build.
+- The module build temporarily moves `extension.xml` during packaging-related steps; the tracked file was restored after verification so the worktree retains the expected source layout.
+
+---
+
 ## Implementation Notes
 
 - Do not add automatic repair logic in this feature.
