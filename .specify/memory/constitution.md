@@ -125,14 +125,30 @@ Code changes MUST be validated immediately through automated testing:
 ## Technology Standards
 
 **Pure Java Architecture** (NO JavaScript/Java bridges):
-- Language: Java 25 (may downgrade to Java 21 for compatibility)
+- Host Runtime Platform: Oxygen XML Editor / SDK 27.1.0.3+ running on Java 17
+- Plugin Language Baseline: Java 8 source and bytecode compatibility unless a feature plan explicitly approves a higher baseline
 - Build: Maven 3.x
 - Platform: Oxygen XML SDK 27.1.0.3+
 - UI: Java Swing (native desktop)
-- HTTP: `HttpURLConnection` or `HttpClient` (Java 11+)
+- HTTP: `HttpURLConnection` for Java 8 compatibility; `HttpClient` may be used only if the feature plan raises the plugin baseline
 - Testing: JUnit 4, Mockito 4.11.0, AssertJ 3.24.2
 - i18n: Java ResourceBundle with TEI XML files
 - Encoding: UTF-8 everywhere
+
+**Java Version Policy**:
+- Distinguish between the Java version required by the Oxygen host application and the Java version used to compile the plugin
+- The Oxygen host runtime requirement does NOT by itself permit raising the plugin compilation target
+- Default rule: plugin code MUST compile with `source=1.8`, `target=1.8`, and `release=8`
+- A feature MAY raise the plugin baseline only when the implementation plan documents:
+  - the required Java feature or library
+  - the compatibility impact on supported Oxygen deployments
+  - the migration and verification strategy
+  - explicit approval in the plan's Complexity Tracking section
+
+**Compatibility Rule**:
+- Prefer the lowest practical plugin Java baseline that remains compatible with supported Oxygen deployments
+- New code MUST NOT introduce Java language features, standard-library APIs, or dependencies that break the approved plugin baseline
+- If a higher Java baseline is adopted, all affected documentation, build configuration, CI validation, and feature plans MUST be updated in the same change
 
 **Project Structure**:
 - `src/main/java/.../domain/` - Domain Layer (pure logic)
