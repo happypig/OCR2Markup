@@ -1,9 +1,9 @@
-# Feature Specification: Cross-Platform API Diagnostics
+# Feature Specification: Cross-Platform API Diagnostics and Support Visibility
 
 **Feature Branch**: `002-ai-api-diagnostics`  
 **Created**: 2026-03-27  
 **Status**: Draft  
-**Input**: User description: "Add a cross-platform API diagnostics and request-hardening feature for the DILA AI Markup plugin so AI Markup behaves consistently on Windows and macOS. The feature must detect and clearly report OpenAI API failures, especially 400 vs 401 errors, invalid or inaccessible model names, endpoint/model mismatches, missing or malformed API keys, proxy-related configuration issues, and malformed request payloads. The plugin must log the sanitized request metadata and full error response body without exposing secrets, and display actionable user-facing guidance in the DAMA UI. The feature must preserve non-blocking UI behavior, use the existing Java plugin architecture, and support Oxygen XML Editor on both Windows and macOS. Include acceptance criteria for consistent behavior across operating systems, diagnostic quality, and safe redaction of API credentials."
+**Input**: User description: "Add a cross-platform API diagnostics, request-hardening, and support-visibility feature for the DILA AI Markup plugin so AI Markup behaves consistently on Windows and macOS. The feature must detect and clearly report OpenAI API failures, especially 400 vs 401 errors, invalid or inaccessible model names, endpoint/model mismatches, missing or malformed API keys, proxy-related configuration issues, and malformed request payloads. The plugin must log the sanitized request metadata and full error response body without exposing secrets, display actionable user-facing guidance in the DAMA UI, and extend the existing gear icon menu so its order is `Preferences...`, `User Manual`, `About`. `User Manual` must open `https://docs.google.com/document/d/1JHWAu4KJ6eb-UZhh-uYW8HbzsKc6fD5i_lVKTQWj9HQ/edit?usp=sharing`, and `About` must show the installed plugin version and the full current release notes from one packaged source of truth. The feature must preserve non-blocking UI behavior, use the existing Java plugin architecture, and support Oxygen XML Editor on both Windows and macOS. Include acceptance criteria for consistent behavior across operating systems, diagnostic quality, safe redaction of API credentials, and release metadata visibility."
 
 ## Clarifications
 
@@ -14,6 +14,7 @@
 - Q: Should cross-platform consistency require identical wording, or equivalent meaning with platform-specific wording when needed? → A: Require equivalent diagnostic meaning and next-step guidance, while allowing platform-specific wording for OS-specific troubleshooting.
 - Q: Should the DAMA panel show the full sanitized service error body or a concise actionable summary? → A: Show a concise actionable summary in the DAMA panel and keep the fuller sanitized error body in the troubleshooting record.
 - Q: Should troubleshooting records remain local-only, or should users be able to export them manually for support? → A: Users can export troubleshooting records manually for support sharing.
+- Q: How should the existing gear icon support menu expose documentation and release metadata without creating duplicate release-note maintenance? → A: Reuse the existing gear icon menu already created in `DAMAWorkspaceAccessPluginExtension#createMenuBar()` / `createOptionsMenu()`, preserve `Preferences...` first, add `User Manual` second and `About` third, keep the user-manual URL explicit in the feature specification, and use `pom.xml` as the version source plus a single packaged release-notes resource as the content source for the About dialog and extension descriptor metadata.
 
 ## Event Storming
 
@@ -137,6 +138,23 @@ A maintainer or support engineer needs enough diagnostic information to investig
 
 ---
 
+### User Story 4 - Extend Existing Gear Menu with Preferences, User Manual, and About (Priority: P3)
+
+A markup editor or support maintainer needs the existing gear icon menu to keep `Preferences...` first and contain `User Manual` and `About` after it, so they can open plugin settings, the published user manual, and installed-version information without leaving Oxygen.
+
+**Why this priority**: This improves support handoff and release transparency, but it depends on the diagnostic support surface, external documentation link, and release metadata being available in a stable packaged form.
+
+**Independent Test**: Open the existing gear icon menu in a built plugin package and verify it lists `Preferences...`, `User Manual`, and `About` in that order, opens the configured user-manual URL, and shows the installed plugin version plus current release notes in the About dialog with a safe fallback message when release-note metadata is unavailable.
+
+**Acceptance Scenarios**:
+
+1. **Given** the plugin is installed, **When** the user opens the existing gear icon menu, **Then** it lists `Preferences...`, `User Manual`, and `About` in that order.
+2. **Given** the user chooses `User Manual` from the existing gear icon menu, **When** Oxygen opens the external target, **Then** it navigates to `https://docs.google.com/document/d/1JHWAu4KJ6eb-UZhh-uYW8HbzsKc6fD5i_lVKTQWj9HQ/edit?usp=sharing`.
+3. **Given** the user chooses `About` from the existing gear icon menu, **When** the dialog appears, **Then** it shows the installed plugin version from the packaged build metadata rather than a separately maintained hardcoded string and includes the full current release notes from the shared packaged content source.
+4. **Given** the packaged release-note content is missing or malformed in a development build, **When** the user opens `About`, **Then** the dialog still shows the installed version and an explicit fallback message instead of crashing or showing stale release notes.
+
+---
+
 ### Edge Cases
 
 - The configured credential is present but malformed, expired, or associated with a different account than the configured model.
@@ -148,6 +166,10 @@ A maintainer or support engineer needs enough diagnostic information to investig
 - The user retries the action multiple times while a previous request is still in progress.
 - The system detects a likely fixable misconfiguration but, by design, only reports corrective guidance and does not change settings or rewrite the request automatically.
 - A user exports troubleshooting details for support review and expects the export to remain sanitized.
+- The existing gear icon menu order or support-action placement drifts from the documented `Preferences...`, `User Manual`, `About` contract.
+- The `User Manual` action points to an outdated or malformed external URL.
+- The `About` dialog and published extension descriptor drift because release notes are maintained in different files.
+- The packaged release-notes resource is missing, malformed, or out of date in a local development build.
 
 ## Requirements *(mandatory)*
 
@@ -169,6 +191,13 @@ A maintainer or support engineer needs enough diagnostic information to investig
 - **FR-014**: Users MUST be able to tell from the DAMA panel whether a failure is most likely caused by credentials, model access, request compatibility, service availability, or local configuration.
 - **FR-015**: System MUST remain diagnostics-only for this feature and MUST NOT automatically modify DAMA settings, credentials, selected models, endpoint selections, or request shapes as part of failure handling.
 - **FR-016**: System MUST allow users to export troubleshooting records manually for support sharing, and exported records MUST preserve the same redaction rules as on-screen diagnostics.
+- **FR-017**: System MUST reuse the existing gear icon menu for plugin support actions.
+- **FR-018**: The existing gear icon menu MUST list `Preferences...`, `User Manual`, and `About` in that order.
+- **FR-019**: The `User Manual` action MUST open `https://docs.google.com/document/d/1JHWAu4KJ6eb-UZhh-uYW8HbzsKc6fD5i_lVKTQWj9HQ/edit?usp=sharing`.
+- **FR-020**: The `About` dialog MUST display the installed plugin version from packaged build metadata rather than from a separately maintained hardcoded UI string.
+- **FR-021**: System MUST load the full current release notes in the `About` dialog from a single packaged content source that is also used to generate published extension release metadata.
+- **FR-022**: When the shared release-note content is unavailable or invalid, the `About` dialog MUST display a localized fallback message while still showing the installed plugin version.
+- **FR-023**: System MUST implement the new support actions by extending the existing options-menu wiring in `DAMAWorkspaceAccessPluginExtension#createMenuBar()` and `DAMAWorkspaceAccessPluginExtension#createOptionsMenu()` rather than introducing a second support menu entry point.
 
 ### Functional Requirement Acceptance Criteria
 
@@ -188,6 +217,13 @@ A maintainer or support engineer needs enough diagnostic information to investig
 - **FR-014**: Given any supported failure category, when the user reads the DAMA panel summary, then they can tell whether the most likely cause is credentials, model access, request compatibility, service availability, or local configuration.
 - **FR-015**: Given a likely misconfiguration is detected, when diagnostics complete, then the plugin provides corrective guidance without changing settings, credentials, model selection, endpoint selection, or request shape automatically.
 - **FR-016**: Given a user manually exports diagnostics, when the export is created, then the file remains sanitized and contains enough support-triage context to identify the failure category without unsanitized local logs.
+- **FR-017**: Given the plugin is installed, when the user opens the existing gear icon menu, then the plugin support actions are available there.
+- **FR-018**: Given the existing gear icon menu opens, when the user reads the entries, then `Preferences...`, `User Manual`, and `About` appear in that order.
+- **FR-019**: Given the user activates `User Manual`, when Oxygen opens the target, then it navigates to `https://docs.google.com/document/d/1JHWAu4KJ6eb-UZhh-uYW8HbzsKc6fD5i_lVKTQWj9HQ/edit?usp=sharing`.
+- **FR-020**: Given the `About` dialog opens, when packaged build metadata is available, then the dialog shows the installed plugin version without requiring a second maintained version string in UI code.
+- **FR-021**: Given a packaged build with current release notes, when the `About` dialog is shown, then the release-note content matches the same source used to publish extension release metadata for that build.
+- **FR-022**: Given the shared release-note content is missing or malformed, when the `About` dialog is shown, then the dialog presents a localized fallback message and remains usable.
+- **FR-023**: Given the support menu is shown in the plugin panel, when the user accesses support actions, then they are exposed through the existing options-menu path instead of a duplicate menu location.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -195,6 +231,8 @@ A maintainer or support engineer needs enough diagnostic information to investig
 - **Sanitized Troubleshooting Record**: A support-oriented record of request metadata and returned error content with secrets removed or masked.
 - **Exported Diagnostic Package**: A user-initiated shareable form of the troubleshooting record that preserves sanitized failure context for support analysis.
 - **Markup Service Configuration**: The collection of values that determine how AI Markup reaches the configured OpenAI-compatible service, including credentials, model identifier, endpoint base URL, and proxy-related connection path details.
+- **Release Notes Manifest**: The packaged release metadata content source that contains the current release notes used by both the extension descriptor generation path and the About dialog.
+- **Support Menu Contract**: The ordered set of `Preferences...`, `User Manual`, and `About` actions plus external/manual targets exposed through the existing gear icon menu in the plugin UI.
 
 ## Success Criteria *(mandatory)*
 
@@ -206,6 +244,9 @@ A maintainer or support engineer needs enough diagnostic information to investig
 - **SC-004**: Users receive visible feedback that an AI Markup request is processing or has failed within 3 seconds of invoking the action, without the editor becoming unresponsive.
 - **SC-005**: In at least 90% of sampled known AI Markup request failures, a maintainer can identify the most likely root-cause category from the sanitized diagnostic output within 5 minutes and without access to unsanitized local logs.
 - **SC-006**: In 100% of sampled manual diagnostic exports, the exported package matches the documented schema, remains sanitized, and gives support enough information to identify the failure category without requiring unsanitized local logs.
+- **SC-007**: In 100% of sampled release builds, the existing gear icon menu presents `Preferences...`, `User Manual`, and `About` in that order.
+- **SC-008**: In 100% of sampled release builds, the plugin version shown in `About` matches the packaged build version and the extension descriptor version.
+- **SC-009**: In at least 95% of sampled support checks, a user or maintainer can open the published user manual or confirm the installed plugin version and current release notes from the existing gear icon menu within 1 minute and without consulting local source files.
 
 ## Assumptions
 
@@ -218,3 +259,5 @@ A maintainer or support engineer needs enough diagnostic information to investig
 - Users may choose to export sanitized troubleshooting details manually when seeking support.
 - Existing DAMA workflows already provide a place to present user-facing messages about request progress and failure.
 - UI responsiveness means the editor remains interactive, processing/failure status appears within the stated time target, and diagnostic capture continues asynchronously without blocking the Event Dispatch Thread.
+
+

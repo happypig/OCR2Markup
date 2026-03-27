@@ -1,9 +1,9 @@
 ---
 
-description: "Task list for implementing cross-platform AI Markup diagnostics"
+description: "Task list for implementing cross-platform AI Markup diagnostics and About/help-menu release visibility"
 ---
 
-# Tasks: Cross-Platform API Diagnostics
+# Tasks: Cross-Platform API Diagnostics and Support Visibility
 
 **Input**: Design documents from `/specs/002-ai-api-diagnostics/`
 **Prerequisites**: `plan.md`, `spec.md`, `research.md`, `data-model.md`, `contracts/`, `quickstart.md`
@@ -31,8 +31,8 @@ description: "Task list for implementing cross-platform AI Markup diagnostics"
 **Purpose**: Prepare feature-specific documentation scaffolding and test placeholders needed for strict test-first execution.
 
 - [X] T001 Create acceptance-matrix directory and placeholder spec test files in `specs/002-ai-api-diagnostics/acceptance/`
-- [X] T002 Create feature package directories under `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/model/`, `domain/service/`, `application/command/`, `application/query/`, `infrastructure/api/`, `infrastructure/export/`, and `infrastructure/logging/`
-- [X] T003 [P] Create feature test package directories under `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/domain/model/`, `domain/service/`, `application/command/`, `application/query/`, `infrastructure/api/`, `infrastructure/export/`, and `workspace/`
+- [X] T002 Create feature package directories under `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/domain/model/`, `domain/service/`, `application/command/`, `application/query/`, `infrastructure/api/`, `infrastructure/export/`, `infrastructure/logging/`, and `infrastructure/release/`
+- [X] T003 [P] Create feature test package directories under `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/domain/model/`, `domain/service/`, `application/command/`, `application/query/`, `infrastructure/api/`, `infrastructure/export/`, `infrastructure/i18n/`, `infrastructure/release/`, and `workspace/`
 
 ---
 
@@ -135,18 +135,43 @@ description: "Task list for implementing cross-platform AI Markup diagnostics"
 - [X] T044 [US3] Add export-specific user-facing translations in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/resources/i18n/translation.xml`
 - [X] T045 [US3] Run the US3 verification gate from `Models/Gemini2.5/dila-ai-markup-plugin/` with `mvn test -Dtest=SecretRedactorTest,BuildDiagnosticExportQueryTest,DiagnosticExportWriterTest,DAMAWorkspaceAccessPluginExtensionExportDiagnosticsTest`
 
-**Checkpoint**: All user stories should now be independently functional and safe to support-share.
+**Checkpoint**: User Stories 1 through 3 should now be independently functional and safe to support-share.
 
 ---
 
-## Phase 6: Polish & Cross-Cutting Concerns
+## Phase 6: User Story 4 - Extend Existing Gear Menu with Preferences, User Manual, and About (Priority: P3)
+
+**Goal**: Extend the existing gear icon menu so it keeps `Preferences...` first and adds `User Manual` then `About`, where `User Manual` opens the published documentation URL and `About` shows the installed plugin version plus the full current release notes from one packaged source of truth.
+
+**Independent Test**: Open the existing gear icon menu in a built plugin package and verify it lists `Preferences...`, `User Manual`, and `About` in that order, opens `https://docs.google.com/document/d/1JHWAu4KJ6eb-UZhh-uYW8HbzsKc6fD5i_lVKTQWj9HQ/edit?usp=sharing`, and shows the installed plugin version plus the current release notes in `About` with a fallback message when the shared release-notes resource is unavailable.
+
+### Tests for User Story 4 ⚠️
+
+- [ ] T046-T-SPEC [P] [US4] Write specification acceptance matrix for existing gear-menu order (`Preferences...`, `User Manual`, `About`), `User Manual` URL navigation, and `About` release-note scenarios in `specs/002-ai-api-diagnostics/acceptance/us4-gear-menu-support-matrix.md`
+- [ ] T047-T-UNIT [P] [US4] Add unit tests for shared release-notes loading and fallback behavior in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/application/query/LoadReleaseNotesQueryTest.java`
+- [ ] T047a-T-UNIT [P] [US4] Add unit tests for the configured `User Manual` target and existing gear-menu order contract metadata in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtensionAboutDialogTest.java`
+- [ ] T048-T-INTEGRATION [P] [US4] Add workspace integration tests for existing gear-menu order, `User Manual` navigation, `Preferences...` preservation, and `About` dialog content through `DAMAWorkspaceAccessPluginExtension#createMenuBar()` / `createOptionsMenu()` in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtensionAboutDialogTest.java`
+
+### Implementation for User Story 4
+
+- [ ] T049 [P] [US4] Introduce a single packaged release-notes source in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/resources/release-notes.xhtml` and update `Models/Gemini2.5/dila-ai-markup-plugin/src/main/resources/extension.xml` plus `Models/Gemini2.5/dila-ai-markup-plugin/pom.xml` so the extension descriptor consumes that shared source during generation
+- [ ] T050 [P] [US4] Implement release-notes loading/query logic in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/application/query/LoadReleaseNotesQuery.java` and `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/infrastructure/release/ReleaseNotesResourceLoader.java`
+- [ ] T050a [P] [US4] Define the `User Manual` target constant and the existing gear-menu order metadata in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtension.java`
+- [ ] T051 [US4] Extend `DAMAWorkspaceAccessPluginExtension#createMenuBar()` / `createOptionsMenu()` so the existing gear menu preserves `Preferences...` and adds `User Manual` navigation to `https://docs.google.com/document/d/1JHWAu4KJ6eb-UZhh-uYW8HbzsKc6fD5i_lVKTQWj9HQ/edit?usp=sharing` plus `About` dialog behavior in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtension.java`
+- [ ] T052 [US4] Add `User Manual`, `About`, and release-note fallback translations in `Models/Gemini2.5/dila-ai-markup-plugin/src/main/resources/i18n/translation.xml`, explicitly reusing the existing `menuItem.preferences` key for `Preferences...`
+- [ ] T053 [US4] Run the US4 verification gate from `Models/Gemini2.5/dila-ai-markup-plugin/` with `mvn test -Dtest=LoadReleaseNotesQueryTest,DAMAWorkspaceAccessPluginExtensionAboutDialogTest,TranslationBundleCompletenessTest`
+
+**Checkpoint**: User Story 4 should expose the existing gear-menu support actions in the documented order, the published user-manual link, and installed-version/release-note visibility without creating duplicate release-note maintenance paths.
+
+---
+
+## Phase 7: Polish & Cross-Cutting Concerns
 
 **Purpose**: Finalize contracts, documentation, and verification across the full feature.
 
-- [X] T046 Add automated i18n completeness verification for all supported languages in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/infrastructure/i18n/TranslationBundleCompletenessTest.java`
-- [X] T047 [P] Update feature contracts to match implementation decisions in `specs/002-ai-api-diagnostics/contracts/openai-compatible-chat-completions.yaml` and `specs/002-ai-api-diagnostics/contracts/diagnostic-export.schema.json`
-- [X] T048 [P] Document final diagnostic workflow and developer verification steps in `specs/002-ai-api-diagnostics/quickstart.md`
-- [X] T049 Run full plugin regression suite from `Models/Gemini2.5/dila-ai-markup-plugin/` with `mvn test` and record verification results in `specs/002-ai-api-diagnostics/quickstart.md`
+- [ ] T054 Add automated i18n completeness verification for all supported languages, including the new About/help-menu keys, in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/infrastructure/i18n/TranslationBundleCompletenessTest.java`
+- [ ] T055 [P] Update feature contracts plus the shared release-note generation and developer verification workflow documentation in `specs/002-ai-api-diagnostics/contracts/openai-compatible-chat-completions.yaml`, `specs/002-ai-api-diagnostics/contracts/diagnostic-export.schema.json`, and `specs/002-ai-api-diagnostics/quickstart.md`
+- [ ] T056 Run full plugin regression suite from `Models/Gemini2.5/dila-ai-markup-plugin/` with `mvn test` and record verification results in `specs/002-ai-api-diagnostics/quickstart.md`
 
 ---
 
@@ -159,13 +184,15 @@ description: "Task list for implementing cross-platform AI Markup diagnostics"
 - **Phase 3: US1**: Depends on Foundational and is the MVP.
 - **Phase 4: US2**: Depends on Foundational and on the US1 verification gate plus diagnostic classification/orchestration seam.
 - **Phase 5: US3**: Depends on Foundational and on the US1 verification gate plus troubleshooting-record creation path.
-- **Phase 6: Polish**: Depends on completion of all desired user stories.
+- **Phase 6: US4**: Depends on Foundational and on the US3 export path plus shared build metadata decisions being stable.
+- **Phase 7: Polish**: Depends on completion of all desired user stories.
 
 ### User Story Dependencies
 
 - **US1 (P1)**: No dependency on other stories once Foundational is complete.
 - **US2 (P2)**: Builds on US1 diagnostic command and UI summary behavior, and should start only after `T023` passes.
 - **US3 (P3)**: Builds on US1 classification/troubleshooting capture, and should start only after `T023` passes.
+- **US4 (P3)**: Builds on the packaged release metadata conventions established in the feature and should start after US3 is stable enough that the combined release notes can be defined once and the existing gear-menu order contract is agreed.
 
 ### Within Each User Story
 
@@ -183,7 +210,8 @@ description: "Task list for implementing cross-platform AI Markup diagnostics"
 - In US1, `T010-T-SPEC` to `T014-T-INTEGRATION` can run in parallel, and `T015` to `T017` can run in parallel after tests exist.
 - In US2, `T024-T-SPEC` to `T027-T-INTEGRATION` can run in parallel, and `T028` plus `T029` can run in parallel before workspace wiring.
 - In US3, `T033-T-SPEC` to `T037-T-INTEGRATION` can run in parallel, and `T038` to `T042` can run in parallel before workspace wiring.
-- `T047` and `T048` can run in parallel after implementation stabilizes.
+- In US4, `T046-T-SPEC` to `T048-T-INTEGRATION` can run in parallel, and `T049` plus `T050` can run in parallel before workspace wiring.
+- `T054` and `T055` can run in parallel after implementation stabilizes.
 
 ---
 
@@ -231,7 +259,8 @@ Task: "T036-T-INTEGRATION [P] [US3] Add infrastructure tests for export serializ
 1. Add US1 for diagnostic correctness and regression protection
 2. Add US2 for cross-platform parity and async/concurrency hardening
 3. Add US3 for sanitized troubleshooting capture and manual export
-4. Finish with contracts, quickstart, and full-suite verification
+4. Add US4 for the existing gear-menu support actions in the order `Preferences...`, `User Manual`, `About`, plus published user manual and `About` installed-version/release-note visibility from one packaged source
+5. Finish with contracts, quickstart, and full-suite verification
 
 ### Team Strategy
 
@@ -240,6 +269,7 @@ Task: "T036-T-INTEGRATION [P] [US3] Add infrastructure tests for export serializ
    - Developer A can drive US1
    - Developer B can prepare US2 tests in parallel after US1 seams are visible
    - Developer C can prepare US3 tests and export scaffolding in parallel after US1 troubleshooting models exist
+   - Developer D can prepare US4 release-note resource/query work plus the existing gear-menu order contract once the combined release metadata is stable
 
 ---
 
@@ -248,5 +278,8 @@ Task: "T036-T-INTEGRATION [P] [US3] Add infrastructure tests for export serializ
 - All tasks use the required checkbox / ID / marker / file-path format.
 - Story phases include explicit specification, unit, and integration coverage before implementation.
 - Suggested MVP scope is **User Story 1** only.
-- `T023`, `T032`, and `T045` are story verification gates and should not be skipped.
-- `T049` is the final full-regression gate and should not be skipped.
+- `T023`, `T032`, `T045`, and `T053` are story verification gates and should not be skipped.
+- `T056` is the final full-regression gate and should not be skipped.
+
+
+

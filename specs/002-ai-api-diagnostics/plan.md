@@ -1,4 +1,4 @@
-# Implementation Plan: Cross-Platform API Diagnostics
+# Implementation Plan: Cross-Platform API Diagnostics and Support Visibility
 
 **Branch**: `002-ai-api-diagnostics` | **Date**: 2026-03-27 | **Spec**: [spec.md](spec.md)
 **Input**: Feature specification from `/specs/002-ai-api-diagnostics/spec.md`
@@ -7,7 +7,7 @@
 
 ## Summary
 
-Add cross-platform AI Markup diagnostics and request hardening to the DAMA plugin so request failures are validated, classified, redacted, and surfaced consistently on Windows and macOS. The feature will move AI Markup failure handling away from the current workspace-level HTTP/string parsing path into a layered design: domain models for diagnostic state and classification, application command/query orchestration, infrastructure adapters for configured OpenAI-compatible chat completions, sanitized troubleshooting capture, and UI integration through the existing DAMA panel and preferences surface.
+Add cross-platform AI Markup diagnostics and request hardening to the DAMA plugin so request failures are validated, classified, redacted, and surfaced consistently on Windows and macOS. The feature will move AI Markup failure handling away from the current workspace-level HTTP/string parsing path into a layered design: domain models for diagnostic state and classification, application command/query orchestration, infrastructure adapters for configured OpenAI-compatible chat completions, sanitized troubleshooting capture, and UI integration through the existing DAMA panel, the existing gear icon menu, and preferences surface. The same release will also extend the existing gear icon menu implemented in `DAMAWorkspaceAccessPluginExtension#createMenuBar()` and `createOptionsMenu()` so its order is `Preferences...`, `User Manual`, `About`, where `User Manual` opens `https://docs.google.com/document/d/1JHWAu4KJ6eb-UZhh-uYW8HbzsKc6fD5i_lVKTQWj9HQ/edit?usp=sharing` and `About` shows the installed version plus full release notes from a single packaged release-notes source shared with extension descriptor generation.
 
 ## Technical Context
 
@@ -23,6 +23,7 @@ Add cross-platform AI Markup diagnostics and request hardening to the DAMA plugi
 - Oxygen `WSOptionsStorage` and `secretOption` for endpoint/model/key preferences
 - In-memory diagnostic session state during DAMA workflow
 - User-initiated exported diagnostic package written to local file on demand
+- Packaged release-notes resource stored under `src/main/resources/` as the canonical content source for both the existing gear menu's `About` action and extension descriptor generation
 
 **Testing**:
 - JUnit 4
@@ -43,7 +44,11 @@ Add cross-platform AI Markup diagnostics and request hardening to the DAMA plugi
 **Constraints**:
 - Must preserve Java 8 compilation compatibility
 - Must use asynchronous execution with UI updates on `SwingUtilities.invokeLater()`
-- Must preserve diagnostics-only scope: no automatic endpoint/model/request mutation
+- Must preserve diagnostics-only scope for request handling: no automatic endpoint/model/request mutation
+- Must keep plugin version in Maven project metadata and release-note content in one packaged resource reused by the existing gear-menu `About` action and extension descriptor generation
+- Must reuse the existing gear icon menu and keep `Preferences...`, `User Manual`, and `About` in that order
+- Must extend the existing options-menu code path in `DAMAWorkspaceAccessPluginExtension#createMenuBar()` / `createOptionsMenu()` instead of introducing a second support menu location
+- Must route the `User Manual` action to `https://docs.google.com/document/d/1JHWAu4KJ6eb-UZhh-uYW8HbzsKc6fD5i_lVKTQWj9HQ/edit?usp=sharing`
 - Must support OpenAI-hosted and OpenAI-compatible endpoints configured in DAMA
 - Must validate credential presence/shape, model identifier, endpoint base URL, and proxy-related connection settings before network execution when possible
 - Must redact secrets in UI, logs, in-memory troubleshooting records, and exported diagnostic packages
@@ -52,10 +57,10 @@ Add cross-platform AI Markup diagnostics and request hardening to the DAMA plugi
 **Scale/Scope**:
 - 1 existing DAMA AI Markup workflow refactor in touched areas
 - 1 new diagnostic aggregate and supporting value objects
-- 1 command + 1 query orchestration path for AI Markup diagnostics
+- 1 command path for AI Markup diagnostics plus 2 query paths for export assembly and packaged release-note loading
 - 2 external contract artifacts (chat completions subset + diagnostic export schema)
-- Estimated 12-18 production files touched/added
-- Estimated 20-30 unit/integration/specification tests
+- Estimated 15-22 production files touched/added
+- Estimated 24-34 unit/integration/specification tests
 
 ## Constitution Check
 
@@ -168,7 +173,8 @@ Models/Gemini2.5/dila-ai-markup-plugin/
 │   │   │   │   ├── command/
 │   │   │   │   │   └── RunAiMarkupDiagnosticsCommand.java
 │   │   │   │   └── query/
-│   │   │   │       └── BuildDiagnosticExportQuery.java
+│   │   │   │       ├── BuildDiagnosticExportQuery.java
+│   │   │   │       └── LoadReleaseNotesQuery.java
 │   │   │   ├── infrastructure/
 │   │   │   │   ├── api/
 │   │   │   │   │   ├── OpenAiCompatibleChatClient.java
@@ -176,8 +182,10 @@ Models/Gemini2.5/dila-ai-markup-plugin/
 │   │   │   │   │   └── RequestTraceSnapshot.java
 │   │   │   │   ├── export/
 │   │   │   │   │   └── DiagnosticExportWriter.java
-│   │   │   │   └── logging/
-│   │   │   │       └── SanitizedDiagnosticLogger.java
+│   │   │   │   ├── logging/
+│   │   │   │   │   └── SanitizedDiagnosticLogger.java
+│   │   │   │   └── release/
+│   │   │   │       └── ReleaseNotesResourceLoader.java
 │   │   │   ├── preferences/
 │   │   │   │   └── DAMAOptionPagePluginExtension.java
 │   │   │   ├── workspace/
@@ -185,7 +193,8 @@ Models/Gemini2.5/dila-ai-markup-plugin/
 │   │   │   └── util/
 │   │   │       └── PluginLogger.java
 │   │   └── resources/
-│   │       └── i18n/translation.xml
+│   │       ├── i18n/translation.xml
+│   │       └── release-notes.xhtml
 │   └── test/java/com/dila/dama/plugin/
 │       ├── domain/
 │       │   ├── model/
@@ -197,18 +206,23 @@ Models/Gemini2.5/dila-ai-markup-plugin/
 │           ├── api/
 │           ├── export/
 │           ├── i18n/
+│           ├── release/
 │           └── workspace/
 ```
 
-**Structure Decision**: Reuse the existing Maven plugin module under `Models/Gemini2.5/dila-ai-markup-plugin/` and keep new feature logic in domain/application/infrastructure packages, while limiting `workspace/` and `preferences/` changes to wiring and UI integration.
+**Structure Decision**: Reuse the existing Maven plugin module under `Models/Gemini2.5/dila-ai-markup-plugin/` and keep new feature logic in domain/application/infrastructure packages, while limiting `workspace/` and `preferences/` changes to wiring and UI integration for diagnostics plus the existing gear-menu support actions implemented in `DAMAWorkspaceAccessPluginExtension#createMenuBar()` / `createOptionsMenu()`.
 
 ## Verification Strategy
 
 - Write and fail specification, unit, and integration tests before implementation in each user story.
-- Run story-scoped `mvn test` verification immediately after completing US1, US2, and US3 before advancing to the next story.
+- Run story-scoped `mvn test` verification immediately after completing US1, US2, US3, and US4 before advancing to the next story.
 - Add an automated translation-bundle completeness test covering all supported languages whenever new `translation.xml` keys are introduced.
-- Finish with a full-module `mvn test` regression run after contracts and quickstart documentation are aligned with the implemented behavior.
+- Finish with a full-module `mvn test` regression run after contracts, quickstart documentation, and release-note generation workflow are aligned with the implemented behavior.
 
 ## Complexity Tracking
 
 No constitution violations require a justified exception for this feature.
+
+
+
+
