@@ -5,7 +5,7 @@
 <plugin 
        id="com.dila.ai.markup" 
        name="DILA AI Markup Assistant"
-       version="0.4.2" 
+       version="${project.version}" 
        vendor="DILA"
        classLoaderType="preferReferencedResources">
 
@@ -67,7 +67,7 @@
        </description>
 
        <runtime>
-              <library name="lib/dila-ai-markup-plugin-0.4.2.jar" />
+              <library name="lib/dila-ai-markup-plugin-${project.version}.jar" />
        </runtime>
 
        <extension 
