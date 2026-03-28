@@ -176,7 +176,8 @@ Result: `BUILD SUCCESS` with 135 tests passing.
 
 Notes:
 - `TranslationConsistencyTest` still reports pre-existing unused translation keys as informational output, but it does not fail the build.
-- The module build temporarily moves `extension.xml` during packaging-related steps; the tracked file was restored after verification so the worktree retains the expected source layout.
+- The canonical release-notes authoring file is `src/main/resources/release-notes.xhtml`.
+- Plugin-root `release-notes.xhtml` and `dilaAIMarkupPlugin.xml` are generated only during `mvn install`; they are not intended to be edited by hand or kept in sync manually.
 
 ---
 

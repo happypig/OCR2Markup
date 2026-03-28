@@ -4,7 +4,7 @@
 
   <groupId>dila</groupId>
   <artifactId>dila-ai-markup-plugin</artifactId>
-    <version>0.4.2</version>
+    <version>0.4.3</version>
   <name>DILA AI Markup Plugin</name>
   <description>AI markup assistant for detecting and working with DILA references.</description>
 
@@ -196,52 +196,29 @@
         </executions>
       </plugin>
       
-      <!-- Copy and rename extension.xml to dilaAIMarkupPlugin.xml -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>3.3.1</version>
-        <executions>
-          <execution>
-            <id>copy-extension-xml</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>src/main/resources</directory>
-                  <includes>
-                    <include>extension.xml</include>
-                  </includes>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      
-      <!-- Rename the copied extension.xml to dilaAIMarkupPlugin.xml -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <version>3.1.0</version>
         <executions>
           <execution>
-            <id>rename-extension-xml</id>
-            <phase>process-resources</phase>
+            <id>generate-plugin-descriptor</id>
+            <phase>install</phase>
             <goals>
               <goal>run</goal>
             </goals>
             <configuration>
               <target>
-                <move file="${basedir}/extension.xml" 
-                      tofile="${basedir}/dilaAIMarkupPlugin.xml" 
-                      overwrite="true" 
-                      failonerror="false"/>
-                <echo message="Renamed extension.xml to dilaAIMarkupPlugin.xml in root directory"/>
+                <loadfile property="release.notes.xhtml"
+                          srcFile="${basedir}/src/main/resources/release-notes.xhtml"/>
+                <copy file="${project.build.outputDirectory}/extension.xml"
+                      tofile="${basedir}/dilaAIMarkupPlugin.xml"
+                      overwrite="true">
+                  <filterset begintoken="@@" endtoken="@@">
+                    <filter token="RELEASE_NOTES_XHTML" value="${release.notes.xhtml}"/>
+                  </filterset>
+                </copy>
+                <echo message="Generated self-contained dilaAIMarkupPlugin.xml in root directory"/>
               </target>
             </configuration>
           </execution>

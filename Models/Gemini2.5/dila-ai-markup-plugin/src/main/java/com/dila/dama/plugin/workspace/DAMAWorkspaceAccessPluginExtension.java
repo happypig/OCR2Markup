@@ -16,6 +16,7 @@ import com.dila.dama.plugin.application.command.RunAiMarkupDiagnosticsCommand;
 import com.dila.dama.plugin.application.command.ConvertReferenceCommand;
 import com.dila.dama.plugin.application.command.ConvertReferenceResult;
 import com.dila.dama.plugin.application.query.BuildDiagnosticExportQuery;
+import com.dila.dama.plugin.application.query.LoadReleaseNotesQuery;
 import com.dila.dama.plugin.domain.model.AiMarkupDiagnosticSession;
 import com.dila.dama.plugin.domain.model.InvalidReferenceException;
 import com.dila.dama.plugin.domain.model.MarkupServiceConfiguration;
@@ -34,6 +35,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
@@ -51,6 +53,12 @@ import org.w3c.dom.Element;
 public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPluginExtension {
     
     private static final String OPTIONS_PAGE_KEY = "dila_ai_markup_options_page_key";
+    static final String USER_MANUAL_URL = "https://docs.google.com/document/d/1JHWAu4KJ6eb-UZhh-uYW8HbzsKc6fD5i_lVKTQWj9HQ/edit?usp=sharing";
+    static final List<String> OPTIONS_MENU_ITEM_KEYS = Collections.unmodifiableList(Arrays.asList(
+        "menuItem.preferences",
+        "menuItem.user.manual",
+        "menuItem.about"
+    ));
     private StandalonePluginWorkspace pluginWorkspaceAccess;
     private Object resources; // PluginResourceBundle - using Object to avoid type issues
     private WSOptionsStorage optionStorage;
@@ -77,7 +85,11 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
 
     private RunAiMarkupDiagnosticsCommand aiMarkupDiagnosticsCommand = new RunAiMarkupDiagnosticsCommand();
     private BuildDiagnosticExportQuery diagnosticExportQuery = new BuildDiagnosticExportQuery();
+    private LoadReleaseNotesQuery loadReleaseNotesQuery = new LoadReleaseNotesQuery();
     private DiagnosticExportWriter diagnosticExportWriter = new DiagnosticExportWriter();
+    private ExternalUrlOpener externalUrlOpener = new DesktopExternalUrlOpener();
+    private AboutDialogPresenter aboutDialogPresenter = new SwingAboutDialogPresenter();
+    private String pluginVersionOverrideForTests;
     // private int currentTotalFilesScanned = 0;
     
     // Thread pool for background operations
@@ -97,6 +109,36 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     
     // Current operation context
     private OperationType currentOperation = OperationType.NONE;
+
+    interface ExternalUrlOpener {
+        void open(String url) throws Exception;
+    }
+
+    interface AboutDialogPresenter {
+        void show(String title, String html);
+    }
+
+    private static class DesktopExternalUrlOpener implements ExternalUrlOpener {
+        @Override
+        public void open(String url) throws Exception {
+            if (!Desktop.isDesktopSupported()) {
+                throw new UnsupportedOperationException("Desktop browsing is not supported");
+            }
+            Desktop.getDesktop().browse(new URI(url));
+        }
+    }
+
+    private static class SwingAboutDialogPresenter implements AboutDialogPresenter {
+        @Override
+        public void show(String title, String html) {
+            JEditorPane editorPane = new JEditorPane("text/html", html);
+            editorPane.setEditable(false);
+            editorPane.setCaretPosition(0);
+            JScrollPane scrollPane = new JScrollPane(editorPane);
+            scrollPane.setPreferredSize(new Dimension(520, 420));
+            JOptionPane.showMessageDialog(null, scrollPane, title, JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
     
     /**
      * Result class for UTF-8 check operation
@@ -247,7 +289,11 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         // Options Menu with icon
         JMenu menuOptions = createOptionsMenu();
         JMenuItem menuItemOption = new JMenuItem(i18n("menuItem.preferences")); // "Preferences..."
+        JMenuItem menuItemUserManual = new JMenuItem(i18n("menuItem.user.manual"));
+        JMenuItem menuItemAbout = new JMenuItem(i18n("menuItem.about"));
         menuOptions.add(menuItemOption);
+        menuOptions.add(menuItemUserManual);
+        menuOptions.add(menuItemAbout);
         menuBar.add(menuOptions);
         
         // Add action listeners
@@ -256,6 +302,8 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         menuItemRefToLink.addActionListener(new RefToLinkActionListener());
         menuItemUtf8Check.addActionListener(new UTF8CheckActionListener());
         menuItemOption.addActionListener(new OptionsActionListener());
+        menuItemUserManual.addActionListener(new UserManualActionListener());
+        menuItemAbout.addActionListener(new AboutActionListener());
         
         return menuBar;
     }
@@ -651,6 +699,26 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             }
         }
     }
+
+    private class UserManualActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            PluginLogger.info("[UserManualActionListener]User manual action triggered");
+            try {
+                externalUrlOpener.open(USER_MANUAL_URL);
+            } catch (Exception ex) {
+                PluginLogger.error("[UserManualActionListener]Error opening user manual: " + ex.getMessage(), ex);
+            }
+        }
+    }
+
+    private class AboutActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            PluginLogger.info("[AboutActionListener]About action triggered");
+            aboutDialogPresenter.show(i18n("dialog.about.title"), buildAboutDialogHtml());
+        }
+    }
     
     /**
      * Replace button action listener(i18n)
@@ -854,6 +922,71 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             PluginLogger.error("[i18n]Error formatting i18n message for key " + key + ": " + e.getMessage());
             return key;
         }
+    }
+
+    private String buildAboutDialogHtml() {
+        LoadReleaseNotesQuery.Result releaseNotes = loadReleaseNotesQuery.execute(
+            resolvePluginVersion(),
+            i18n("about.release.notes.unavailable")
+        );
+
+        StringBuilder html = new StringBuilder();
+        html.append("<html><body style='font-family:sans-serif; padding:8px;'>");
+        html.append("<h2>").append(escapeHtml(i18n("dialog.about.title"))).append("</h2>");
+        html.append("<p><strong>")
+            .append(escapeHtml(i18n("about.version.label")))
+            .append("</strong> ")
+            .append(escapeHtml(releaseNotes.getPluginVersion()))
+            .append("</p>");
+        if (releaseNotes.isFallbackUsed()) {
+            html.append("<h3>").append(escapeHtml(i18n("about.release.notes.heading"))).append("</h3>");
+            html.append("<p>").append(escapeHtml(releaseNotes.getReleaseNotesMarkup())).append("</p>");
+        } else {
+            html.append(releaseNotes.getReleaseNotesMarkup());
+        }
+        html.append("</body></html>");
+        return html.toString();
+    }
+
+    private String resolvePluginVersion() {
+        if (pluginVersionOverrideForTests != null && !pluginVersionOverrideForTests.trim().isEmpty()) {
+            return pluginVersionOverrideForTests.trim();
+        }
+
+        Package pluginPackage = getClass().getPackage();
+        if (pluginPackage != null) {
+            String implementationVersion = pluginPackage.getImplementationVersion();
+            if (implementationVersion != null && !implementationVersion.trim().isEmpty()) {
+                return implementationVersion.trim();
+            }
+        }
+
+        InputStream stream = getClass().getClassLoader()
+            .getResourceAsStream("META-INF/maven/dila/dila-ai-markup-plugin/pom.properties");
+        if (stream != null) {
+            Properties properties = new Properties();
+            try {
+                properties.load(stream);
+                String version = properties.getProperty("version");
+                if (version != null && !version.trim().isEmpty()) {
+                    return version.trim();
+                }
+            } catch (Exception e) {
+                PluginLogger.warn("[resolvePluginVersion]Failed to load pom.properties: " + e.getMessage());
+            }
+        }
+
+        return "unknown";
+    }
+
+    private String escapeHtml(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;");
     }
     
     /**
@@ -1435,8 +1568,36 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         this.diagnosticExportWriter = writer;
     }
 
+    void setLoadReleaseNotesQueryForTests(LoadReleaseNotesQuery query) {
+        this.loadReleaseNotesQuery = query;
+    }
+
+    void setExternalUrlOpenerForTests(ExternalUrlOpener opener) {
+        this.externalUrlOpener = opener;
+    }
+
+    void setAboutDialogPresenterForTests(AboutDialogPresenter presenter) {
+        this.aboutDialogPresenter = presenter;
+    }
+
+    void setPluginVersionForTests(String pluginVersion) {
+        this.pluginVersionOverrideForTests = pluginVersion;
+    }
+
     void setOptionStorageForTests(WSOptionsStorage storage) {
         this.optionStorage = storage;
+    }
+
+    JMenuBar createMenuBarForTests() {
+        return createMenuBar();
+    }
+
+    String getUserManualUrlForTests() {
+        return USER_MANUAL_URL;
+    }
+
+    List<String> getOptionsMenuItemKeysForTests() {
+        return OPTIONS_MENU_ITEM_KEYS;
     }
 
     JTextArea getResultAreaForTests() {

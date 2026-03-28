@@ -47,11 +47,47 @@
     <val lang="zh_CN">偏好設定...</val>
     <val lang="zh_TW">偏好設定...</val>
   </key>
+  <key value="menuItem.user.manual">
+    <comment>JMenuItem()@createMenuBar()</comment>
+    <val lang="en_US">User Manual</val>
+    <val lang="zh_CN">使用手冊</val>
+    <val lang="zh_TW">使用手冊</val>
+  </key>
+  <key value="menuItem.about">
+    <comment>JMenuItem()@createMenuBar()</comment>
+    <val lang="en_US">About</val>
+    <val lang="zh_CN">關於</val>
+    <val lang="zh_TW">關於</val>
+  </key>
   <key value="menu.options">
     <comment>menuOptions.setText()@createOptionsMenu(),menuOptions.setToolTipText()@createOptionsMenu()</comment>
     <val lang="en_US">Options</val>
     <val lang="zh_CN">選項</val>
     <val lang="zh_TW">選項</val>
+  </key>
+  <key value="dialog.about.title">
+    <comment>About dialog title</comment>
+    <val lang="en_US">About DILA AI Markup Assistant</val>
+    <val lang="zh_CN">關於 DILA AI 標記助手</val>
+    <val lang="zh_TW">關於 DILA AI 標記助手</val>
+  </key>
+  <key value="about.version.label">
+    <comment>About dialog version label</comment>
+    <val lang="en_US">Installed version:</val>
+    <val lang="zh_CN">已安裝版本：</val>
+    <val lang="zh_TW">已安裝版本：</val>
+  </key>
+  <key value="about.release.notes.heading">
+    <comment>About dialog release notes heading</comment>
+    <val lang="en_US">Release notes</val>
+    <val lang="zh_CN">版本說明</val>
+    <val lang="zh_TW">版本說明</val>
+  </key>
+  <key value="about.release.notes.unavailable">
+    <comment>Fallback shown when release notes cannot be loaded</comment>
+    <val lang="en_US">Release notes are unavailable in this build.</val>
+    <val lang="zh_CN">此建置目前無法提供版本說明。</val>
+    <val lang="zh_TW">此建置目前無法提供版本說明。</val>
   </key>
   <key value="initial.info">
     <comment>JTextArea()@createTextAreas()</comment>

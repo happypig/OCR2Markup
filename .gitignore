@@ -18,3 +18,5 @@ Thumbs.db
 .tools/
 Models/Gemini2.5/dila-ai-markup-plugin/dilaAIMarkupPlugin.xml
 Models/Gemini2.5/dila-ai-markup-plugin/dilaAIMarkupPlugin.zip
+Models/Gemini2.5/dila-ai-markup-plugin/extension.xml
+Models/Gemini2.5/dila-ai-markup-plugin/release-notes.xhtml
