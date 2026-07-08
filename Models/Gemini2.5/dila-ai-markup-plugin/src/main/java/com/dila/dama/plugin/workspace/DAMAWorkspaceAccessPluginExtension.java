@@ -1623,6 +1623,14 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     boolean isAiMarkupInProgressForTests() {
         return aiMarkupInProgress;
     }
+
+    void setAiMarkupOperationContextForTests() {
+        currentOperation = OperationType.AI_MARKUP;
+    }
+
+    boolean isExecutorShutdownForTests() {
+        return executor.isShutdown();
+    }
     
     /**
      * Process AI markup with LLM API integration(i18n)

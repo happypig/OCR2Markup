@@ -65,12 +65,24 @@ public class DAMAWorkspaceAccessPluginExtensionTest {
         // Setup plugin first
         when(mockWorkspace.getOptionsStorage()).thenReturn(mockOptionsStorage);
         plugin.applicationStarted(mockWorkspace);
-        
+
         // Test closing - should not throw exception
         plugin.applicationClosing();
-        
+
         // Should complete successfully
         assertTrue("Application closing should complete", true);
+    }
+
+    @Test
+    public void testApplicationClosingShutsDownBackgroundExecutor() {
+        when(mockWorkspace.getOptionsStorage()).thenReturn(mockOptionsStorage);
+        plugin.applicationStarted(mockWorkspace);
+
+        assertFalse("Executor should be running before applicationClosing", plugin.isExecutorShutdownForTests());
+
+        plugin.applicationClosing();
+
+        assertTrue("Executor should be shut down after applicationClosing", plugin.isExecutorShutdownForTests());
     }
 
     // ========================================

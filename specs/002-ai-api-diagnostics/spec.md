@@ -2,7 +2,7 @@
 
 **Feature Branch**: `002-ai-api-diagnostics`  
 **Created**: 2026-03-27  
-**Status**: Draft  
+**Status**: Delivered (documentation remediated 2026-04-07)  
 **Input**: User description: "Add a cross-platform API diagnostics, request-hardening, and support-visibility feature for the DILA AI Markup plugin so AI Markup behaves consistently on Windows and macOS. The feature must detect and clearly report OpenAI API failures, especially 400 vs 401 errors, invalid or inaccessible model names, endpoint/model mismatches, missing or malformed API keys, proxy-related configuration issues, and malformed request payloads. The plugin must log the sanitized request metadata and full error response body without exposing secrets, display actionable user-facing guidance in the DAMA UI, and extend the existing gear icon menu so its order is `Preferences...`, `User Manual`, `About`. `User Manual` must open `https://docs.google.com/document/d/1JHWAu4KJ6eb-UZhh-uYW8HbzsKc6fD5i_lVKTQWj9HQ/edit?usp=sharing`, and `About` must show the installed plugin version and the full current release notes from one packaged source of truth. The feature must preserve non-blocking UI behavior, use the existing Java plugin architecture, and support Oxygen XML Editor on both Windows and macOS. Include acceptance criteria for consistent behavior across operating systems, diagnostic quality, safe redaction of API credentials, and release metadata visibility."
 
 ## Clarifications
@@ -15,6 +15,10 @@
 - Q: Should the DAMA panel show the full sanitized service error body or a concise actionable summary? → A: Show a concise actionable summary in the DAMA panel and keep the fuller sanitized error body in the troubleshooting record.
 - Q: Should troubleshooting records remain local-only, or should users be able to export them manually for support? → A: Users can export troubleshooting records manually for support sharing.
 - Q: How should the existing gear icon support menu expose documentation and release metadata without creating duplicate release-note maintenance? → A: Reuse the existing gear icon menu already created in `DAMAWorkspaceAccessPluginExtension#createMenuBar()` / `createOptionsMenu()`, preserve `Preferences...` first, add `User Manual` second and `About` third, keep the user-manual URL explicit in the feature specification, and use `pom.xml` as the version source plus a single packaged release-notes resource as the content source for the About dialog and extension descriptor metadata.
+
+### Session 2026-04-07
+
+- Q: For Windows/macOS parity, what must remain equivalent? → A: Equivalent means the same diagnostic classification, the same recommended next-action class, and the same visible workflow state transition for the same input; wording may differ only for OS-specific nouns, paths, or troubleshooting labels.
 
 ## Event Storming
 
@@ -111,7 +115,7 @@ A markup editor working on either Windows or macOS needs the same AI Markup requ
 
 **Why this priority**: The current user pain is platform inconsistency. Resolving that inconsistency is necessary to make support and troubleshooting credible.
 
-**Independent Test**: Execute the same AI Markup request and the same failure conditions on Windows and macOS and verify that the resulting classifications, user guidance, and visible workflow behavior remain equivalent.
+**Independent Test**: Execute the same AI Markup request and the same failure conditions on Windows and macOS and verify that the resulting classifications, next-action guidance, and visible workflow state transitions remain equivalent.
 
 **Acceptance Scenarios**:
 
@@ -178,17 +182,17 @@ A markup editor or support maintainer needs the existing gear icon menu to keep 
 - **FR-001**: System MUST classify AI Markup request failures into user-meaningful categories, including authentication problems, invalid or inaccessible model configuration, malformed request problems, incompatible request path problems, connectivity/proxy problems, and unknown service failures.
 - **FR-002**: System MUST display user-facing guidance for each failure category that explains the likely cause and the next action the user should take.
 - **FR-003**: System MUST distinguish unauthorized failures from malformed-request failures so that users are not told to replace credentials when the real problem is request compatibility.
-- **FR-004**: System MUST detect when required configuration values for AI Markup are missing or malformed before attempting the request, and those required values MUST include at minimum credential presence and shape, model identifier, endpoint base URL, and any configured proxy-related connection settings used by the plugin runtime.
+- **FR-004**: System MUST detect when required configuration values for AI Markup are missing or malformed before attempting the request, and those required values MUST include at minimum a non-blank non-placeholder credential, a non-blank model identifier, an absolute HTTP(S) endpoint base URL, and any configured proxy host/port/authentication settings actually used by the plugin runtime.
 - **FR-005**: System MUST surface when the configured model appears invalid, inaccessible, or incompatible with the selected request path.
 - **FR-006**: System MUST apply diagnostics consistently for OpenAI-hosted and other OpenAI-compatible endpoints configured in DAMA.
 - **FR-007**: System MUST capture troubleshooting records for AI Markup failures that include sanitized request metadata and the returned service error body.
 - **FR-008**: System MUST redact API keys, secret tokens, and equivalent sensitive values from troubleshooting records and user-facing messages.
 - **FR-009**: System MUST present a concise actionable summary in the DAMA panel and reserve the fuller sanitized service error body for troubleshooting records.
-- **FR-010**: System MUST preserve equivalent diagnostic behavior on Windows and macOS for the same request conditions, while allowing platform-specific wording only when it clarifies OS-specific troubleshooting steps.
+- **FR-010**: System MUST preserve equivalent diagnostic behavior on Windows and macOS for the same request conditions, where equivalent means the same diagnostic classification, the same recommended next-action class, and the same visible operation-state transition, while allowing platform-specific wording only when it clarifies OS-specific troubleshooting steps.
 - **FR-011**: System MUST keep the DAMA user interface responsive while requests are in progress and while diagnostics are captured.
 - **FR-012**: System MUST prevent overlapping AI Markup operations from producing ambiguous or conflicting diagnostic output for the same user action.
 - **FR-013**: System MUST provide a generic fallback diagnostic message when the failure cannot be classified confidently, while still preserving sanitized troubleshooting context.
-- **FR-014**: Users MUST be able to tell from the DAMA panel whether a failure is most likely caused by credentials, model access, request compatibility, service availability, or local configuration.
+- **FR-014**: System MUST encode DAMA panel failure summaries using a bounded cause vocabulary so users can tell whether the most likely cause is credentials, model access, request compatibility, service availability, or local configuration.
 - **FR-015**: System MUST remain diagnostics-only for this feature and MUST NOT automatically modify DAMA settings, credentials, selected models, endpoint selections, or request shapes as part of failure handling.
 - **FR-016**: System MUST allow users to export troubleshooting records manually for support sharing, and exported records MUST preserve the same redaction rules as on-screen diagnostics.
 - **FR-017**: System MUST reuse the existing gear icon menu for plugin support actions.
@@ -197,24 +201,33 @@ A markup editor or support maintainer needs the existing gear icon menu to keep 
 - **FR-020**: The `About` dialog MUST display the installed plugin version from packaged build metadata rather than from a separately maintained hardcoded UI string.
 - **FR-021**: System MUST load the full current release notes in the `About` dialog from a single packaged content source that is also used to generate published extension release metadata.
 - **FR-022**: When the shared release-note content is unavailable or invalid, the `About` dialog MUST display a localized fallback message while still showing the installed plugin version.
-- **FR-023**: System MUST implement the new support actions by extending the existing options-menu wiring in `DAMAWorkspaceAccessPluginExtension#createMenuBar()` and `DAMAWorkspaceAccessPluginExtension#createOptionsMenu()` rather than introducing a second support menu entry point.
+- **FR-023**: System MUST expose support actions through a single gear-menu entry point and MUST NOT introduce a duplicate support menu location elsewhere in the plugin UI.
+- **FR-024**: System MUST preserve equivalent successful AI Markup workflow behavior on Windows and macOS for the same request conditions, without platform-specific warning drift or unexplained deviations.
+
+### Non-Functional Requirements
+
+- **NFR-001**: The DAMA panel MUST show visible processing or failure feedback within 3 seconds for local validation failures and representative service-request failures covered by this feature.
+- **NFR-002**: Validation, network execution, diagnostic capture, and export preparation MUST run off the Swing EDT, and all Swing UI updates MUST be marshaled back to the EDT.
+- **NFR-003**: All new user-facing text, fallback messages, and support-menu labels introduced by this feature MUST ship in `en_US`, `zh_CN`, and `zh_TW`.
+- **NFR-004**: Any executor used for diagnostics or export work MUST be shut down during plugin `applicationClosing()` to avoid background-thread leaks between Oxygen sessions.
+- **NFR-005**: For Windows/macOS parity, wording may differ only for OS-specific nouns, paths, or troubleshooting labels; classification, recommended action class, and visible workflow state transition MUST remain the same for equivalent inputs.
 
 ### Functional Requirement Acceptance Criteria
 
 - **FR-001**: Given representative authentication, model-access, malformed-payload, endpoint-mismatch, proxy/connectivity, and unknown-service failures, when AI Markup diagnostics run, then each failure is assigned to the expected user-meaningful category.
 - **FR-002**: Given a classified failure, when the DAMA panel displays guidance, then the message states the likely cause and the next user action without exposing secrets.
 - **FR-003**: Given one unauthorized failure and one malformed-request failure, when both are diagnosed, then the credential guidance and request-compatibility guidance remain distinct.
-- **FR-004**: Given missing or malformed credentials, model identifier, endpoint base URL, or proxy-related settings, when AI Markup is invoked, then the plugin rejects the request locally and tells the user exactly which configuration area to correct.
+- **FR-004**: Given a blank or placeholder credential, a blank model identifier, a malformed or non-HTTP(S) endpoint base URL, or incomplete proxy settings for the active runtime path, when AI Markup is invoked, then the plugin rejects the request locally and tells the user exactly which configuration area to correct.
 - **FR-005**: Given a configured model that is invalid, inaccessible, or incompatible with the selected request path, when diagnostics run, then the user is told to verify model access or model-to-endpoint compatibility.
 - **FR-006**: Given equivalent failures from an OpenAI-hosted endpoint and another configured OpenAI-compatible endpoint, when diagnostics run, then both are classified and reported through the same diagnostic model.
 - **FR-007**: Given an AI Markup failure, when the troubleshooting record is captured, then it contains sanitized request metadata and the sanitized service error body needed for support analysis.
 - **FR-008**: Given secrets in configuration values, headers, request bodies, or returned error content, when diagnostics are shown, logged, or exported, then all secrets are masked or removed.
 - **FR-009**: Given a failed request, when the DAMA panel is updated, then it shows only a concise actionable summary and omits the fuller sanitized error body reserved for troubleshooting records.
-- **FR-010**: Given equivalent request conditions on Windows and macOS, when the same failure occurs, then both platforms show the same diagnostic classification and materially equivalent guidance, allowing only OS-specific troubleshooting wording to differ.
+- **FR-010**: Given equivalent request conditions on Windows and macOS, when the same failure occurs, then both platforms show the same diagnostic classification, the same next-action intent, and the same visible operation-state outcome, allowing only OS-specific troubleshooting wording to differ.
 - **FR-011**: Given AI Markup validation, network execution, or diagnostic capture is in progress, when the user continues interacting with the editor, then the editor remains responsive and visible status or failure feedback appears within the stated time target.
 - **FR-012**: Given an AI Markup operation is already running, when the user invokes the action again, then the plugin prevents overlapping diagnostics from producing conflicting output for the same action.
 - **FR-013**: Given a failure cannot be classified confidently, when diagnostics complete, then the DAMA panel shows a generic fallback message and the troubleshooting record preserves the sanitized uncertainty context.
-- **FR-014**: Given any supported failure category, when the user reads the DAMA panel summary, then they can tell whether the most likely cause is credentials, model access, request compatibility, service availability, or local configuration.
+- **FR-014**: Given any supported failure category, when the user reads the DAMA panel summary, then the summary uses the bounded cause vocabulary so the user can tell whether the most likely cause is credentials, model access, request compatibility, service availability, or local configuration.
 - **FR-015**: Given a likely misconfiguration is detected, when diagnostics complete, then the plugin provides corrective guidance without changing settings, credentials, model selection, endpoint selection, or request shape automatically.
 - **FR-016**: Given a user manually exports diagnostics, when the export is created, then the file remains sanitized and contains enough support-triage context to identify the failure category without unsanitized local logs.
 - **FR-017**: Given the plugin is installed, when the user opens the existing gear icon menu, then the plugin support actions are available there.
@@ -223,7 +236,8 @@ A markup editor or support maintainer needs the existing gear icon menu to keep 
 - **FR-020**: Given the `About` dialog opens, when packaged build metadata is available, then the dialog shows the installed plugin version without requiring a second maintained version string in UI code.
 - **FR-021**: Given a packaged build with current release notes, when the `About` dialog is shown, then the release-note content matches the same source used to publish extension release metadata for that build.
 - **FR-022**: Given the shared release-note content is missing or malformed, when the `About` dialog is shown, then the dialog presents a localized fallback message and remains usable.
-- **FR-023**: Given the support menu is shown in the plugin panel, when the user accesses support actions, then they are exposed through the existing options-menu path instead of a duplicate menu location.
+- **FR-023**: Given the support menu is shown in the plugin panel, when the user accesses support actions, then they are exposed only through the existing gear icon menu and no duplicate support menu entry point is present elsewhere in the plugin UI.
+- **FR-024**: Given the same AI Markup configuration and selected text on Windows and macOS, when both environments succeed, then the visible workflow completes with the same success-state behavior and without platform-specific warning drift or unexplained deviations.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -239,7 +253,7 @@ A markup editor or support maintainer needs the existing gear icon menu to keep 
 ### Measurable Outcomes
 
 - **SC-001**: In at least 95% of sampled AI Markup failures from the defined failure categories, users can identify the likely corrective action from the DAMA panel without needing to inspect raw logs.
-- **SC-002**: Equivalent AI Markup request conditions on Windows and macOS produce the same diagnostic classification and materially equivalent corrective guidance in 100% of validation scenarios.
+- **SC-002**: Equivalent AI Markup request conditions on Windows and macOS produce the same diagnostic classification, materially equivalent corrective guidance, and the same success-state behavior in 100% of validation scenarios.
 - **SC-003**: In 100% of sampled troubleshooting records generated for this feature, secrets remain redacted while the remaining metadata is sufficient to distinguish the major failure categories.
 - **SC-004**: Users receive visible feedback that an AI Markup request is processing or has failed within 3 seconds of invoking the action, without the editor becoming unresponsive.
 - **SC-005**: In at least 90% of sampled known AI Markup request failures, a maintainer can identify the most likely root-cause category from the sanitized diagnostic output within 5 minutes and without access to unsanitized local logs.
@@ -247,6 +261,8 @@ A markup editor or support maintainer needs the existing gear icon menu to keep 
 - **SC-007**: In 100% of sampled release builds, the existing gear icon menu presents `Preferences...`, `User Manual`, and `About` in that order.
 - **SC-008**: In 100% of sampled release builds, the plugin version shown in `About` matches the packaged build version and the extension descriptor version.
 - **SC-009**: In at least 95% of sampled support checks, a user or maintainer can open the published user manual or confirm the installed plugin version and current release notes from the existing gear icon menu within 1 minute and without consulting local source files.
+
+Sampling baseline for `SC-001` through `SC-009`: the feature acceptance matrices under `specs/002-ai-api-diagnostics/acceptance/` plus the regression evidence recorded in `quickstart.md`.
 
 ## Assumptions
 

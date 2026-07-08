@@ -11,6 +11,7 @@ description: "Task list for implementing cross-platform AI Markup diagnostics an
 **Tests**: Explicit test-first coverage is required for this feature. Each user story includes specification, unit, and integration coverage tasks that must be written before implementation tasks.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
+**Post-Delivery Note**: `T001` through `T056` record the delivered branch work. `T057+` are explicit follow-up tasks added after delivery to close constitution traceability and measurement gaps without changing the accepted feature scope.
 
 ## Format: `[ID] [P?] [Story] Description`
 
@@ -169,9 +170,24 @@ description: "Task list for implementing cross-platform AI Markup diagnostics an
 
 **Purpose**: Finalize contracts, documentation, and verification across the full feature.
 
-- [ ] T054 Add automated i18n completeness verification for all supported languages, including the new About/help-menu keys, in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/infrastructure/i18n/TranslationBundleCompletenessTest.java`
-- [ ] T055 [P] Update feature contracts plus the shared release-note generation and developer verification workflow documentation in `specs/002-ai-api-diagnostics/contracts/openai-compatible-chat-completions.yaml`, `specs/002-ai-api-diagnostics/contracts/diagnostic-export.schema.json`, and `specs/002-ai-api-diagnostics/quickstart.md`
-- [ ] T056 Run full plugin regression suite from `Models/Gemini2.5/dila-ai-markup-plugin/` with `mvn test` and record verification results in `specs/002-ai-api-diagnostics/quickstart.md`
+- [X] T054 Extend automated i18n completeness verification for all supported languages, including the new About/help-menu keys, in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/infrastructure/i18n/TranslationBundleCompletenessTest.java`
+- [X] T055 [P] Update feature contracts plus the shared release-note generation and developer verification workflow documentation in `specs/002-ai-api-diagnostics/contracts/openai-compatible-chat-completions.yaml`, `specs/002-ai-api-diagnostics/contracts/diagnostic-export.schema.json`, and `specs/002-ai-api-diagnostics/quickstart.md`
+- [X] T056 Run full plugin regression suite from `Models/Gemini2.5/dila-ai-markup-plugin/` with `mvn test` and record verification results in `specs/002-ai-api-diagnostics/quickstart.md`
+
+---
+
+## Phase 8: Post-Delivery Constitution & Traceability Follow-Up
+
+**Purpose**: Close explicit traceability and measurement gaps discovered after delivery without changing the accepted feature scope.
+
+- [X] T057-T-SPEC [P] [US1] Add a diagnostics-only acceptance matrix covering non-mutation of settings, credentials, selected model, endpoint selection, and request shape in `specs/002-ai-api-diagnostics/acceptance/us1-diagnostics-only-matrix.md`
+- [X] T058-T-INTEGRATION [US1] Add workspace integration coverage proving AI Markup diagnostics never auto-modify settings, credentials, selected model, endpoint selection, or request shape in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtensionAiMarkupDiagnosticsTest.java`
+- [X] T059-T-SPEC [P] [US2] Add a successful-workflow parity acceptance matrix for Windows and macOS in `specs/002-ai-api-diagnostics/acceptance/us2-success-path-parity-matrix.md`
+- [X] T060-T-INTEGRATION [US2] Add workspace integration coverage for successful AI Markup completion parity and absence of warning drift on Windows and macOS in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtensionAsyncDiagnosticsTest.java`
+- [X] T061-T-UNIT [P] [US2] Add explicit lifecycle assertions that `applicationClosing()` shuts down the background executor in `Models/Gemini2.5/dila-ai-markup-plugin/src/test/java/com/dila/dama/plugin/workspace/DAMAWorkspaceAccessPluginExtensionTest.java`
+- [X] T062 [P] [US2] Record timed responsiveness and cross-platform parity measurement evidence for `SC-002` and `SC-004` in `specs/002-ai-api-diagnostics/quickstart.md`
+- [X] T063 [P] [US3] Record sampled redaction and export evidence for `SC-003`, `SC-005`, and `SC-006` in `specs/002-ai-api-diagnostics/quickstart.md`
+- [X] T064 [US4] Run a post-delivery regression gate from `Models/Gemini2.5/dila-ai-markup-plugin/` with `mvn test` after completing Phase 8 follow-up tasks and record the results in `specs/002-ai-api-diagnostics/quickstart.md`
 
 ---
 
@@ -186,6 +202,7 @@ description: "Task list for implementing cross-platform AI Markup diagnostics an
 - **Phase 5: US3**: Depends on Foundational and on the US1 verification gate plus troubleshooting-record creation path.
 - **Phase 6: US4**: Depends on Foundational and on the US3 export path plus shared build metadata decisions being stable.
 - **Phase 7: Polish**: Depends on completion of all desired user stories.
+- **Phase 8: Post-Delivery Follow-Up**: Depends on the delivered branch artifacts and may run independently as compliance/test hardening after Phase 7.
 
 ### User Story Dependencies
 
@@ -193,6 +210,7 @@ description: "Task list for implementing cross-platform AI Markup diagnostics an
 - **US2 (P2)**: Builds on US1 diagnostic command and UI summary behavior, and should start only after `T023` passes.
 - **US3 (P3)**: Builds on US1 classification/troubleshooting capture, and should start only after `T023` passes.
 - **US4 (P3)**: Builds on the packaged release metadata conventions established in the feature and should start after US3 is stable enough that the combined release notes can be defined once and the existing gear-menu order contract is agreed.
+- **Phase 8 Follow-Up**: `T057`-`T064` build on the delivered branch and can be scheduled independently by story area (`US1` diagnostics-only, `US2` parity/lifecycle, `US3` sampled evidence, `US4` regression gate).
 
 ### Within Each User Story
 
@@ -212,6 +230,7 @@ description: "Task list for implementing cross-platform AI Markup diagnostics an
 - In US3, `T033-T-SPEC` to `T037-T-INTEGRATION` can run in parallel, and `T038` to `T042` can run in parallel before workspace wiring.
 - In US4, `T046-T-SPEC` to `T048-T-INTEGRATION` can run in parallel, and `T049` plus `T050` can run in parallel before workspace wiring.
 - `T054` and `T055` can run in parallel after implementation stabilizes.
+- In Phase 8, `T057`, `T059`, `T061`, `T062`, and `T063` can run in parallel; `T058` depends on `T057`, `T060` depends on `T059`, and `T064` remains the final follow-up verification gate.
 
 ---
 
@@ -261,6 +280,7 @@ Task: "T036-T-INTEGRATION [P] [US3] Add infrastructure tests for export serializ
 3. Add US3 for sanitized troubleshooting capture and manual export
 4. Add US4 for the existing gear-menu support actions in the order `Preferences...`, `User Manual`, `About`, plus published user manual and `About` installed-version/release-note visibility from one packaged source
 5. Finish with contracts, quickstart, and full-suite verification
+6. If post-delivery hardening is scheduled, complete Phase 8 follow-up tasks and rerun regression
 
 ### Team Strategy
 
@@ -279,7 +299,9 @@ Task: "T036-T-INTEGRATION [P] [US3] Add infrastructure tests for export serializ
 - Story phases include explicit specification, unit, and integration coverage before implementation.
 - Suggested MVP scope is **User Story 1** only.
 - `T023`, `T032`, `T045`, and `T053` are story verification gates and should not be skipped.
-- `T056` is the final full-regression gate and should not be skipped.
+- `T056` is the delivered-branch full-regression gate and should not be skipped.
+- `T064` is the post-delivery follow-up regression gate for any Phase 8 hardening work.
+- `T057` through `T064` are post-delivery follow-up tasks added during artifact remediation; they do not invalidate the delivered branch, but they do capture the remaining constitution traceability work explicitly.
 
 
 
