@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dila.edu.tw/schemas/diagnostic-export.schema.json",
+  "title": "Exported Diagnostic Package",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "generatedAt",
+    "sessionId",
+    "record"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "exportReason": {
+      "type": "string",
+      "description": "User-supplied reason for exporting the sanitized troubleshooting package"
+    },
+    "record": {
+      "type": "object",
+      "required": [
+        "requestId",
+        "platform",
+        "endpointSummary",
+        "requestSnapshot",
+        "failureCategory",
+        "guidanceMessageKey",
+        "capturedAtEpochMs",
+        "redactionApplied"
+      ],
+      "properties": {
+        "requestId": {
+          "type": "string"
+        },
+        "platform": {
+          "type": "string",
+          "enum": ["windows", "macos"]
+        },
+        "endpointSummary": {
+          "type": "string",
+          "description": "Redacted endpoint summary without embedded credentials or query secrets"
+        },
+        "requestSnapshot": {
+          "type": "string",
+          "description": "Sanitized request metadata suitable for support triage"
+        },
+        "httpStatus": {
+          "type": "integer"
+        },
+        "serviceErrorBody": {
+          "type": "string",
+          "description": "Sanitized error response body captured from the remote service"
+        },
+        "failureCategory": {
+          "type": "string",
+          "enum": [
+            "CREDENTIALS",
+            "MODEL_ACCESS",
+            "MALFORMED_REQUEST",
+            "ENDPOINT_COMPATIBILITY",
+            "CONNECTIVITY_OR_PROXY",
+            "RATE_LIMIT_OR_CAPACITY",
+            "UNKNOWN_SERVICE_FAILURE"
+          ]
+        },
+        "guidanceMessageKey": {
+          "type": "string",
+          "description": "Canonical translation key used for the concise DAMA panel guidance"
+        },
+        "capturedAtEpochMs": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "redactionApplied": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

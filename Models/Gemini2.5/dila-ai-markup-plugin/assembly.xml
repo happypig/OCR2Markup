@@ -19,10 +19,13 @@
 
     <fileSets>
         <fileSet>
-            <directory>src/main/resources</directory>
+            <directory>target/classes</directory>
             <outputDirectory>/</outputDirectory>
             <includes>
-                <include>**/*</include>
+                <include>plugin.xml</include>
+                <include>release-notes.xhtml</include>
+                <include>i18n/**</include>
+                <include>images/**</include>
             </includes>
             <excludes>
                 <exclude>extension.xml</exclude>

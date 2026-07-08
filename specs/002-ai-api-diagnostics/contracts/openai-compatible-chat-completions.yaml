@@ -1,0 +1,167 @@
+openapi: 3.0.3
+info:
+  title: OpenAI-Compatible Chat Completions Contract
+  version: 1.0.0
+  description: |
+    External contract subset for the DAMA AI Markup diagnostics feature.
+    The plugin uses this contract to validate request construction and classify
+    success/error responses from OpenAI-hosted or OpenAI-compatible chat completions endpoints.
+    The current implementation sends `model`, `messages`, and `max_tokens`, and
+    treats 400 responses as malformed-request or endpoint-compatibility candidates
+    based on the returned error envelope.
+
+servers:
+  - url: https://api.openai.com
+    description: OpenAI-hosted example
+  - url: https://example-compatible-host.invalid
+    description: OpenAI-compatible gateway example
+
+paths:
+  /v1/chat/completions:
+    post:
+      summary: Submit AI Markup chat completions request
+      operationId: submitAiMarkupRequest
+      tags:
+        - AI Markup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCompletionsRequest'
+      responses:
+        '200':
+          description: Successful completion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatCompletionsSuccess'
+        '400':
+          description: Malformed request or endpoint incompatibility
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '401':
+          description: Credential/authentication problem
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '403':
+          description: Forbidden or inaccessible model/project scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Unknown path or unavailable endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          description: Rate limit or capacity issue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '500':
+          description: Unknown service failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+components:
+  schemas:
+    ChatCompletionsRequest:
+      type: object
+      required:
+        - model
+        - messages
+      properties:
+        model:
+          type: string
+          description: Model identifier configured in DAMA
+        messages:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+        max_tokens:
+          type: integer
+          minimum: 1
+          description: Maximum completion tokens requested by the DAMA AI Markup action
+        temperature:
+          type: number
+          minimum: 0
+          maximum: 2
+          description: Optional compatibility field; not currently sent by the plugin
+      additionalProperties: true
+
+    ChatMessage:
+      type: object
+      required:
+        - role
+        - content
+      properties:
+        role:
+          type: string
+          enum: [system, user, assistant]
+        content:
+          type: string
+
+    ChatCompletionsSuccess:
+      type: object
+      required:
+        - choices
+      properties:
+        id:
+          type: string
+        object:
+          type: string
+        choices:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Choice'
+
+    Choice:
+      type: object
+      required:
+        - message
+      properties:
+        index:
+          type: integer
+        message:
+          type: object
+          required:
+            - role
+            - content
+          properties:
+            role:
+              type: string
+            content:
+              type: string
+
+    ErrorEnvelope:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorObject'
+
+    ErrorObject:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Service-provided error text captured for sanitized diagnostics
+        type:
+          type: string
+        code:
+          oneOf:
+            - type: string
+            - type: integer
+        param:
+          type: string
