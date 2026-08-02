@@ -18,13 +18,16 @@ import com.dila.dama.plugin.application.command.ConvertReferenceResult;
 import com.dila.dama.plugin.application.query.BuildDiagnosticExportQuery;
 import com.dila.dama.plugin.application.query.LoadReleaseNotesQuery;
 import com.dila.dama.plugin.domain.model.AiMarkupDiagnosticSession;
+import com.dila.dama.plugin.domain.model.CbrdParseConfiguration;
 import com.dila.dama.plugin.domain.model.InvalidReferenceException;
-import com.dila.dama.plugin.domain.model.MarkupServiceConfiguration;
 import com.dila.dama.plugin.domain.model.SanitizedTroubleshootingRecord;
 import com.dila.dama.plugin.infrastructure.export.DiagnosticExportWriter;
+import com.dila.dama.plugin.domain.service.DocumentLanguageResolver;
 import com.dila.dama.plugin.domain.service.RefElementRewriter;
 import com.dila.dama.plugin.domain.service.ReferenceParser;
+import com.dila.dama.plugin.domain.service.RequestValidationService;
 import com.dila.dama.plugin.infrastructure.api.CBRDAPIClient;
+import com.dila.dama.plugin.infrastructure.api.CbrdParseRequest;
 import com.dila.dama.plugin.infrastructure.api.HttpUrlConnectionFactory;
 import com.dila.dama.plugin.preferences.DAMAOptionPagePluginExtension;
 import com.dila.dama.plugin.util.PluginLogger;
@@ -80,8 +83,21 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     // UTF-8 workflow state
     private List<Path> currentNonUtf8Files = null;
     private volatile boolean aiMarkupInProgress = false;
+
+    /** The selection the in-flight operation is processing, shown when a second one is refused (FR-015). */
+    private volatile String inFlightAiMarkupSelection = "";
+
+    /** Cancel handle for the in-flight parse request (FR-020). */
+    private volatile CompletableFuture<?> inFlightAiMarkupFuture;
+
+    /** Set when an in-flight operation was abandoned, so a late result is discarded silently (FR-020). */
+    private volatile boolean aiMarkupCancelled = false;
+
     private AiMarkupDiagnosticSession lastDiagnosticSession;
     private SanitizedTroubleshootingRecord lastTroubleshootingRecord;
+
+    private final RequestValidationService requestValidationService = new RequestValidationService();
+    private final DocumentLanguageResolver documentLanguageResolver = new DocumentLanguageResolver();
 
     private RunAiMarkupDiagnosticsCommand aiMarkupDiagnosticsCommand = new RunAiMarkupDiagnosticsCommand();
     private BuildDiagnosticExportQuery diagnosticExportQuery = new BuildDiagnosticExportQuery();
@@ -432,42 +448,64 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         public void actionPerformed(ActionEvent e) {
             PluginLogger.info("[AIMarkupActionListener]AI Markup action triggered");
 
-            if (!tryStartAiMarkupOperation()) {
-                resultArea.setText(i18n("ai.markup.diagnostic.in.progress"));
-                hideAllButtons();
+            // A second invocation is ignored, and the editor is told which selection is still
+            // being processed (FR-015). Checked before anything is cleared so the in-flight
+            // result area is not wiped by the ignored click.
+            if (aiMarkupInProgress) {
+                showAiMarkupAlreadyInProgress();
                 return;
             }
-            
+
             // Set operation context
             currentOperation = OperationType.AI_MARKUP;
             lastDiagnosticSession = null;
             lastTroubleshootingRecord = null;
-            
+
             // Clear previous results
             infoArea.setText(i18n("action.ai.markup.selected") + "\n\n"); // "Action selected: AI Markup (Use AI for reference tagging)"
             resultArea.setText("");
             hideAllButtons();
-            
+
             // Get selected text from current editor
             String selectedText = fetchSelectedText(resultArea);
             if (selectedText.isEmpty()) {
-                // infoArea.append(i18n("no.text.selected")); // "No text selected in the editor."
+                // fetchSelectedText already reported "no text selected".
                 return;
             }
-            
+
+            // Pre-flight: missing token (FR-010), unusable endpoint URL (FR-021), empty or
+            // over-long selection (FR-019). Each names its own cause and sends no request.
+            String preflightGuidance = aiMarkupPreflightGuidance(selectedText);
+            if (preflightGuidance != null) {
+                PluginLogger.warn("[AIMarkupActionListener]Pre-flight refused the request");
+                resultArea.setText(preflightGuidance);
+                hideAllButtons();
+                return;
+            }
+
+            if (!tryStartAiMarkupOperation(selectedText)) {
+                showAiMarkupAlreadyInProgress();
+                return;
+            }
+
             infoArea.append(i18n("selected.text", selectedText) + "\n" // "Selected text: "
                             + i18n("text.with.length", selectedText.length()) + "\n\n"); // "Text length: {0} characters"
             resultArea.setText(i18n("ai.markup.diagnostic.processing"));
-            
+
             // Process AI markup in background
-            CompletableFuture.supplyAsync(() -> runAiMarkup(selectedText), executor)
+            CompletableFuture<RunAiMarkupDiagnosticsCommand.Result> inFlight =
+                CompletableFuture.supplyAsync(() -> runAiMarkup(selectedText), executor);
+            inFlightAiMarkupFuture = inFlight;
+            inFlight
                 .thenAccept(result -> SwingUtilities.invokeLater(() -> {
                     completeAiMarkupOperation(result);
                 }))
                 .exceptionally(throwable -> {
                     SwingUtilities.invokeLater(() -> {
-                        resultArea.setText(i18n("error.processing.ai.markup", throwable.getMessage()));
-                        hideAllButtons();
+                        if (!aiMarkupCancelled) {
+                            resultArea.setText(i18n("error.processing.ai.markup", throwable.getMessage()));
+                            hideAllButtons();
+                        }
                         finishAiMarkupOperation();
                     });
                     return null;
@@ -1292,9 +1330,21 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
             "error.processing.ai.markup",
             "error.checking.utf8", 
             "error.converting.files",
-            "error.no.APIKey",
-            "error.no.parse.model",
-            "llm.error",
+            // CBRD Parse guidance (004-cbrd-parse-endpoint) - these must be recognised as
+            // errors so a failure message never gets offered for replacement.
+            "ai.markup.error.text_is_required",
+            "ai.markup.error.text_is_too_long",
+            "ai.markup.error.unsupported_language",
+            "ai.markup.error.unauthorized",
+            "ai.markup.error.parse_api_not_configured",
+            "ai.markup.error.openai_credentials_unavailable",
+            "ai.markup.error.openai_rate_limited",
+            "ai.markup.error.openai_unavailable",
+            "ai.markup.error.invalid_model_output",
+            "ai.markup.error.unexpected",
+            "ai.markup.error.connectivity",
+            "ai.markup.error.token_not_configured",
+            "ai.markup.error.endpoint_url_invalid",
             "error.replacing.text",
             "error.accessing.editor",
 
@@ -1325,7 +1375,6 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         // Fallback: Check for common English error patterns only if i18n failed to load
         String lowerResult = result.toLowerCase();
         if (lowerResult.startsWith("error") || 
-            lowerResult.startsWith("http error") || 
             lowerResult.contains("exception") ||
             lowerResult.contains("failed")) {
             return true;
@@ -1375,23 +1424,85 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     // ========================================
 
     private synchronized boolean tryStartAiMarkupOperation() {
+        return tryStartAiMarkupOperation("");
+    }
+
+    /**
+     * Single-flight guard. Records the selection being processed so a refused second invocation
+     * can show the editor which one is in flight (FR-015).
+     */
+    private synchronized boolean tryStartAiMarkupOperation(String selectedText) {
         if (aiMarkupInProgress) {
             return false;
         }
         aiMarkupInProgress = true;
+        aiMarkupCancelled = false;
+        inFlightAiMarkupSelection = selectedText == null ? "" : selectedText;
         return true;
     }
 
     private synchronized void finishAiMarkupOperation() {
         aiMarkupInProgress = false;
+        inFlightAiMarkupFuture = null;
+    }
+
+    /**
+     * Reports that AI Markup is already running, together with the selection being processed,
+     * so the editor can tell which one it is (FR-015).
+     */
+    void showAiMarkupAlreadyInProgress() {
+        String message = i18n("ai.markup.diagnostic.in.progress");
+        String inFlight = inFlightAiMarkupSelection;
+        resultArea.setText(inFlight == null || inFlight.isEmpty() ? message : message + "\n\n" + inFlight);
+        hideAllButtons();
+    }
+
+    /**
+     * Cancels the in-flight parse request and marks its result for silent discard, so nothing is
+     * written into a document the editor has closed (FR-020).
+     */
+    void cancelInFlightAiMarkup() {
+        CompletableFuture<?> inFlight = inFlightAiMarkupFuture;
+        if (inFlight != null && !inFlight.isDone()) {
+            PluginLogger.info("[cancelInFlightAiMarkup]Cancelling in-flight AI Markup request");
+            inFlight.cancel(true);
+        }
+        if (aiMarkupInProgress) {
+            aiMarkupCancelled = true;
+        }
+        finishAiMarkupOperation();
     }
 
     RunAiMarkupDiagnosticsCommand.Result runAiMarkup(String text) {
-        MarkupServiceConfiguration configuration = buildAiMarkupConfiguration();
-        return aiMarkupDiagnosticsCommand.execute(text, configuration, i18n("system.prompt.ai.markup"), determinePlatform());
+        CbrdParseConfiguration configuration = buildAiMarkupConfiguration();
+        CbrdParseRequest request = new CbrdParseRequest(text, resolveAiMarkupLanguage());
+        return aiMarkupDiagnosticsCommand.execute(request, configuration, determinePlatform());
+    }
+
+    /**
+     * Returns the guidance to show instead of sending a request, or null when the request may
+     * proceed (FR-010, FR-019, FR-021).
+     */
+    String aiMarkupPreflightGuidance(String selectedText) {
+        RequestValidationService.ValidationResult result =
+            requestValidationService.validate(buildAiMarkupConfiguration(), selectedText);
+        if (result.isValid()) {
+            return null;
+        }
+        return resolveGuidanceMessage(result.getGuidanceMessageKey());
     }
 
     void completeAiMarkupOperation(RunAiMarkupDiagnosticsCommand.Result result) {
+        if (aiMarkupCancelled) {
+            // The document or the editor closed while this was in flight: discard silently.
+            PluginLogger.info("[completeAiMarkupOperation]Discarding result for a cancelled operation");
+            aiMarkupCancelled = false;
+            // Withdraw any offered action too: a Replace button left over from the abandoned
+            // operation would apply stale markup.
+            hideAllButtons();
+            finishAiMarkupOperation();
+            return;
+        }
         try {
             lastDiagnosticSession = result == null ? null : result.getSession();
             lastTroubleshootingRecord = result == null ? null : result.getTroubleshootingRecord();
@@ -1455,30 +1566,55 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         }
     }
 
-    private MarkupServiceConfiguration buildAiMarkupConfiguration() {
-        String apiKey = optionValueSecret(DAMAOptionPagePluginExtension.KEY_DILA_DAMA_API_KEY, "");
-        String parseModel = optionValue(DAMAOptionPagePluginExtension.KEY_DILA_DAMA_FT_PARSE_MODEL, "");
-        String baseUrl = optionValue(DAMAOptionPagePluginExtension.KEY_DILA_DAMA_API_BASE_URL, "https://api.openai.com");
-        String chatPath = optionValue(DAMAOptionPagePluginExtension.KEY_DILA_DAMA_CHAT_COMPLETIONS_PATH, "/v1/chat/completions");
-        String timeoutValue = optionValue(DAMAOptionPagePluginExtension.KEY_DILA_DAMA_API_TIMEOUT_MS, "30000");
-        int timeoutMs = 30000;
+    /**
+     * Builds the AI Markup configuration from the CBRD Parse preferences (FR-002, FR-003, FR-016).
+     *
+     * The obsolete {@code dila.dama.*} OpenAI keys are never read: values left over from a
+     * previous version are ignored, never migrated (FR-004, FR-005).
+     */
+    CbrdParseConfiguration buildAiMarkupConfiguration() {
+        String endpointUrl = CbrdParseConfiguration.resolveEndpointUrl(
+            optionValue(DAMAOptionPagePluginExtension.KEY_CBRD_PARSE_API_URL, CbrdParseConfiguration.DEFAULT_ENDPOINT_URL));
+        int timeoutMs = CbrdParseConfiguration.resolveTimeoutMs(
+            optionValue(DAMAOptionPagePluginExtension.KEY_CBRD_PARSE_TIMEOUT_MS, ""));
+        String sharedToken = optionValueSecret(DAMAOptionPagePluginExtension.KEY_CBRD_PARSE_TOKEN, "");
+        return new CbrdParseConfiguration(endpointUrl, timeoutMs, sharedToken);
+    }
+
+    /**
+     * Resolves the request language from the document root element's {@code xml:lang} (FR-007).
+     * Anything unavailable or unusable yields the Chinese default rather than blocking the call.
+     */
+    String resolveAiMarkupLanguage() {
+        return documentLanguageResolver.resolveFromXml(fetchCurrentDocumentXml());
+    }
+
+    /**
+     * Returns the current editor's full document text, or null when there is no text-mode
+     * editor to read (headless tests, Author mode, no open file).
+     */
+    String fetchCurrentDocumentXml() {
         try {
-            timeoutMs = Integer.parseInt(timeoutValue);
+            if (pluginWorkspaceAccess == null) {
+                return null;
+            }
+            WSEditor editorAccess = pluginWorkspaceAccess.getCurrentEditorAccess(PluginWorkspace.MAIN_EDITING_AREA);
+            if (editorAccess == null) {
+                return null;
+            }
+            WSEditorPage pageAccess = editorAccess.getCurrentPage();
+            if (!(pageAccess instanceof WSTextEditorPage)) {
+                return null;
+            }
+            javax.swing.text.Document document = ((WSTextEditorPage) pageAccess).getDocument();
+            if (document == null) {
+                return null;
+            }
+            return document.getText(0, document.getLength());
         } catch (Exception e) {
-            timeoutMs = 30000;
+            PluginLogger.warn("[fetchCurrentDocumentXml]Could not read the document: " + e.getMessage());
+            return null;
         }
-        String endpointKind = baseUrl != null && baseUrl.toLowerCase().contains("api.openai.com")
-            ? MarkupServiceConfiguration.ENDPOINT_KIND_OPENAI_HOSTED
-            : MarkupServiceConfiguration.ENDPOINT_KIND_OPENAI_COMPATIBLE;
-        return new MarkupServiceConfiguration(
-            baseUrl,
-            chatPath,
-            parseModel,
-            apiKey,
-            timeoutMs,
-            endpointKind,
-            true
-        );
     }
 
     private String optionValue(String key, String defaultValue) {
@@ -1612,8 +1748,28 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
         return replaceButton;
     }
 
+    /**
+     * The button panel is the real "are any actions offered" signal: {@code hideAllButtons}
+     * hides the panel, and individual buttons keep their own flags.
+     */
+    boolean isButtonPanelVisibleForTests() {
+        return buttonPanel.isVisible();
+    }
+
     JButton getExportButtonForTests() {
         return exportButton;
+    }
+
+    boolean tryStartAiMarkupOperationForTests(String selectedText) {
+        return tryStartAiMarkupOperation(selectedText);
+    }
+
+    void finishAiMarkupOperationForTests() {
+        finishAiMarkupOperation();
+    }
+
+    void setInFlightAiMarkupFutureForTests(CompletableFuture<?> future) {
+        this.inFlightAiMarkupFuture = future;
     }
 
     boolean tryStartAiMarkupOperationForTests() {
@@ -1630,186 +1786,6 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
 
     boolean isExecutorShutdownForTests() {
         return executor.isShutdown();
-    }
-    
-    /**
-     * Process AI markup with LLM API integration(i18n)
-     */
-    private String processAIMarkup(String text) {
-        try {
-            // Get API configuration from options storage
-            String apiKey = optionStorage.getSecretOption("dila.dama.api.key", "");
-            String parseModel = optionStorage.getOption("dila.dama.ft.parse.model", "");
-            
-
-            StringBuilder errors = new StringBuilder();
-            
-            if (apiKey == null || apiKey.trim().isEmpty()) {
-                PluginLogger.warn("[processAIMarkup]API key not configured");
-                errors.append(i18n("error.no.APIKey")); // "Error: API key not configured. Please set up your API key in Preferences."
-            }
-            
-            if (parseModel == null || parseModel.trim().isEmpty()) {
-                PluginLogger.warn("[processAIMarkup]Parse model not configured");
-                if (errors.length() > 0) {
-                    errors.append("\n");
-                }
-                errors.append(i18n("error.no.parse.model")); // "Error: Parse model not configured. Please set up your model in Preferences."
-            }
-            
-            if (errors.length() > 0) {
-                return errors.toString();
-            }
-            
-            PluginLogger.info("[processAIMarkup]Making AI Markup API call with model: " + parseModel);
-            
-            // Create HTTP connection
-            URL url = new URL("https://api.openai.com/v1/chat/completions");
-            java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
-            
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Authorization", "Bearer " + apiKey);
-            connection.setDoOutput(true);
-            
-            // Get system prompt from i18n
-            String systemPrompt = i18n("system.prompt.ai.markup"); // "Please add XML tags for all sutra, volume, page, column, and line references related to "sutra references" in the selected text."
-            
-            // Create request body
-            String requestBody = createJSONRequest(parseModel, systemPrompt, text);
-            
-            // Send request
-            try (java.io.OutputStreamWriter writer = new java.io.OutputStreamWriter(
-                    connection.getOutputStream(), "UTF-8")) {
-                writer.write(requestBody);
-                writer.flush();
-            }
-            
-            // Handle response
-            int responseCode = connection.getResponseCode();
-            if (responseCode >= 200 && responseCode < 300) {
-                // Success response
-                StringBuilder response = new StringBuilder();
-                try (java.io.BufferedReader reader = new java.io.BufferedReader(
-                        new java.io.InputStreamReader(connection.getInputStream(), "UTF-8"))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        response.append(line);
-                    }
-                }
-                
-                // Parse JSON response
-                String llmResponse = parseOpenAIResponse(response.toString());
-                return "<ref>" + llmResponse + "</ref>";
-                
-            } else {
-                // Error response
-                StringBuilder errorResponse = new StringBuilder();
-                try (java.io.BufferedReader errorReader = new java.io.BufferedReader(
-                        new java.io.InputStreamReader(connection.getErrorStream(), "UTF-8"))) {
-                    String errorLine;
-                    while ((errorLine = errorReader.readLine()) != null) {
-                        errorResponse.append(errorLine);
-                    }
-                }
-                PluginLogger.error("[processAIMarkup]AI Markup HTTP error response: " + errorResponse.toString());
-                // return "HTTP Error " + responseCode + ": " + errorResponse.toString();
-                return i18n("http.error", responseCode, errorResponse.toString()); // "HTTP Error {0}: {1}"
-            }
-            
-        } catch (Exception e) {
-            PluginLogger.error("[processAIMarkup]AI Markup error: " + e.getMessage());
-            return i18n("llm.error", e.getMessage()); // "\nError calling language model: \n{0}"
-        }
-    }
-    
-    /**
-     * Create JSON request for OpenAI API
-     */
-    private String createJSONRequest(String model, String systemPrompt, String userContent) {
-        // Simple JSON creation without external dependencies
-        StringBuilder json = new StringBuilder();
-        json.append("{");
-        json.append("\"model\":\"").append(escapeJSON(model)).append("\",");
-        json.append("\"messages\":[");
-        json.append("{\"role\":\"system\",\"content\":\"").append(escapeJSON(systemPrompt)).append("\"},");
-        json.append("{\"role\":\"user\",\"content\":\"").append(escapeJSON(userContent)).append("\"}");
-        json.append("],");
-        json.append("\"max_tokens\":1000");
-        json.append("}");
-        return json.toString();
-    }
-    
-    /**
-     * Escape JSON string values
-     */
-    private String escapeJSON(String text) {
-        if (text == null) return "";
-        return text.replace("\\", "\\\\")
-                  .replace("\"", "\\\"")
-                  .replace("\n", "\\n")
-                  .replace("\r", "\\r")
-                  .replace("\t", "\\t");
-    }
-    
-    /**
-     * Parse OpenAI API response
-     */
-    private String parseOpenAIResponse(String jsonResponse) {
-        try {
-            // Simple JSON parsing for OpenAI response format
-            // Looking for: {"choices":[{"message":{"content":"response text"}}]}
-            
-            int choicesIndex = jsonResponse.indexOf("\"choices\":");
-            if (choicesIndex == -1) {
-                return "Error parsing response: no choices found";
-            }
-            
-            int contentIndex = jsonResponse.indexOf("\"content\":", choicesIndex);
-            if (contentIndex == -1) {
-                return "Error parsing response: no content found";
-            }
-            
-            // Find the start and end of the content string
-            int contentStart = jsonResponse.indexOf("\"", contentIndex + 10) + 1;
-            int contentEnd = findJSONStringEnd(jsonResponse, contentStart);
-            
-            if (contentStart > 0 && contentEnd > contentStart) {
-                String content = jsonResponse.substring(contentStart, contentEnd);
-                return unescapeJSON(content);
-            } else {
-                return "Error parsing response: could not extract content";
-            }
-            
-        } catch (Exception e) {
-            PluginLogger.error("[processAIMarkup]Error parsing OpenAI response: " + e.getMessage());
-            return "Error parsing response: " + e.getMessage();
-        }
-    }
-    
-    /**
-     * Find the end of a JSON string value
-     */
-    private int findJSONStringEnd(String json, int start) {
-        for (int i = start; i < json.length(); i++) {
-            char c = json.charAt(i);
-            if (c == '\"' && (i == 0 || json.charAt(i - 1) != '\\')) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    
-    /**
-     * Unescape JSON string values
-     */
-    private String unescapeJSON(String text) {
-        if (text == null) return "";
-        return text.replace("\\\"", "\"")
-                  .replace("\\\\", "\\")
-                  .replace("\\n", "\n")
-                  .replace("\\r", "\r")
-                  .replace("\\t", "\t");
     }
     
     /**
@@ -1995,6 +1971,9 @@ public class DAMAWorkspaceAccessPluginExtension implements WorkspaceAccessPlugin
     @Override
     public boolean applicationClosing() {
         PluginLogger.info("[applicationClosing]Closing DILA AI Markup plugin (Pure Java Implementation)");
+        // Interrupt any in-flight parse request first so its result is discarded rather than
+        // written into a document that is going away (FR-020).
+        cancelInFlightAiMarkup();
         if (executor != null && !executor.isShutdown()) {
             executor.shutdown();
         }

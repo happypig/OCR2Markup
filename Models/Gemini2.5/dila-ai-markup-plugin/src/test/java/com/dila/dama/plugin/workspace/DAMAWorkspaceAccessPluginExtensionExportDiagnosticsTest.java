@@ -3,7 +3,7 @@ package com.dila.dama.plugin.workspace;
 import com.dila.dama.plugin.application.command.RunAiMarkupDiagnosticsCommand;
 import com.dila.dama.plugin.domain.model.AiMarkupDiagnosticSession;
 import com.dila.dama.plugin.domain.model.DiagnosticFailureCategory;
-import com.dila.dama.plugin.domain.model.MarkupServiceConfiguration;
+import com.dila.dama.plugin.domain.model.CbrdParseConfiguration;
 import com.dila.dama.plugin.domain.model.SanitizedTroubleshootingRecord;
 import org.json.JSONObject;
 import org.junit.Rule;
@@ -60,15 +60,7 @@ public class DAMAWorkspaceAccessPluginExtensionExportDiagnosticsTest {
         );
     }
 
-    private MarkupServiceConfiguration configuration() {
-        return new MarkupServiceConfiguration(
-            "https://api.openai.com",
-            "/v1/chat/completions",
-            "gpt-test",
-            "sk-secret",
-            30000,
-            MarkupServiceConfiguration.ENDPOINT_KIND_OPENAI_HOSTED,
-            true
-        );
+    private CbrdParseConfiguration configuration() {
+        return new CbrdParseConfiguration("https://cbss.dila.edu.tw/cbrd/parse", 30000, "shared-token-9876");
     }
 }

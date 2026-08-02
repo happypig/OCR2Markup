@@ -4,12 +4,14 @@ import com.dila.dama.plugin.application.command.RunAiMarkupDiagnosticsCommand;
 import com.dila.dama.plugin.domain.model.AiMarkupDiagnosticSession;
 import com.dila.dama.plugin.domain.model.DiagnosticFailureCategory;
 import com.dila.dama.plugin.domain.model.DiagnosticStatus;
-import com.dila.dama.plugin.domain.model.MarkupServiceConfiguration;
+import com.dila.dama.plugin.domain.model.CbrdParseConfiguration;
 import com.dila.dama.plugin.domain.model.SanitizedTroubleshootingRecord;
 import com.dila.dama.plugin.domain.service.DiagnosticClassifier;
 import com.dila.dama.plugin.domain.service.RequestValidationService;
 import com.dila.dama.plugin.domain.service.SecretRedactor;
-import com.dila.dama.plugin.infrastructure.api.OpenAiCompatibleChatClient;
+import com.dila.dama.plugin.infrastructure.api.CapturingConnectionFactory;
+import com.dila.dama.plugin.infrastructure.api.CbrdParseApiClient;
+import com.dila.dama.plugin.infrastructure.api.CbrdParseRequest;
 import com.dila.dama.plugin.infrastructure.logging.SanitizedDiagnosticLogger;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,19 +35,17 @@ public class DAMAWorkspaceAccessPluginExtensionAsyncDiagnosticsTest {
 
     @Test
     public void successfulCompletionIsIdenticalAcrossWindowsAndMacos() {
-        OpenAiCompatibleChatClient client = mock(OpenAiCompatibleChatClient.class);
-        when(client.execute(any(MarkupServiceConfiguration.class), anyString(), anyString()))
-            .thenReturn(OpenAiCompatibleChatClient.Response.success("markup content", 200, null));
         RunAiMarkupDiagnosticsCommand command = new RunAiMarkupDiagnosticsCommand(
             new RequestValidationService(),
             new DiagnosticClassifier(),
-            client,
+            new CbrdParseApiClient(CapturingConnectionFactory.respondingWith(200, "<ref>markup content</ref>")),
             new SecretRedactor(),
             new SanitizedDiagnosticLogger()
         );
 
-        RunAiMarkupDiagnosticsCommand.Result windowsResult = command.execute("selected text", successConfiguration(), "system prompt", "windows");
-        RunAiMarkupDiagnosticsCommand.Result macosResult = command.execute("selected text", successConfiguration(), "system prompt", "macos");
+        CbrdParseRequest request = new CbrdParseRequest("selected text", "zh");
+        RunAiMarkupDiagnosticsCommand.Result windowsResult = command.execute(request, successConfiguration(), "windows");
+        RunAiMarkupDiagnosticsCommand.Result macosResult = command.execute(request, successConfiguration(), "macos");
 
         assertThat(windowsResult.isSuccess()).isTrue();
         assertThat(macosResult.isSuccess()).isTrue();
@@ -114,16 +114,8 @@ public class DAMAWorkspaceAccessPluginExtensionAsyncDiagnosticsTest {
         assertThat(extension.getReplaceButtonForTests().isVisible()).isFalse();
     }
 
-    private MarkupServiceConfiguration successConfiguration() {
-        return new MarkupServiceConfiguration(
-            "https://api.openai.com",
-            "/v1/chat/completions",
-            "gpt-test",
-            "sk-example-key",
-            30000,
-            MarkupServiceConfiguration.ENDPOINT_KIND_OPENAI_HOSTED,
-            false
-        );
+    private CbrdParseConfiguration successConfiguration() {
+        return new CbrdParseConfiguration("https://cbss.dila.edu.tw/cbrd/parse", 30000, "shared-token-9876");
     }
 
     private AiMarkupDiagnosticSession session() {
@@ -145,15 +137,7 @@ public class DAMAWorkspaceAccessPluginExtensionAsyncDiagnosticsTest {
         );
     }
 
-    private MarkupServiceConfiguration configuration() {
-        return new MarkupServiceConfiguration(
-            "https://api.openai.com",
-            "/v1/chat/completions",
-            "gpt-test",
-            "sk-example-key",
-            30000,
-            MarkupServiceConfiguration.ENDPOINT_KIND_OPENAI_HOSTED,
-            true
-        );
+    private CbrdParseConfiguration configuration() {
+        return new CbrdParseConfiguration("https://cbss.dila.edu.tw/cbrd/parse", 30000, "shared-token-9876");
     }
 }

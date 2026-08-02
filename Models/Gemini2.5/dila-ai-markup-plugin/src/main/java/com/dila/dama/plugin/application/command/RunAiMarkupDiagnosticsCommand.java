@@ -1,13 +1,15 @@
 package com.dila.dama.plugin.application.command;
 
 import com.dila.dama.plugin.domain.model.AiMarkupDiagnosticSession;
+import com.dila.dama.plugin.domain.model.CbrdParseConfiguration;
 import com.dila.dama.plugin.domain.model.DiagnosticFailureCategory;
-import com.dila.dama.plugin.domain.model.MarkupServiceConfiguration;
 import com.dila.dama.plugin.domain.model.SanitizedTroubleshootingRecord;
 import com.dila.dama.plugin.domain.service.DiagnosticClassifier;
 import com.dila.dama.plugin.domain.service.RequestValidationService;
 import com.dila.dama.plugin.domain.service.SecretRedactor;
-import com.dila.dama.plugin.infrastructure.api.OpenAiCompatibleChatClient;
+import com.dila.dama.plugin.infrastructure.api.CbrdParseApiClient;
+import com.dila.dama.plugin.infrastructure.api.CbrdParseRequest;
+import com.dila.dama.plugin.infrastructure.api.CbrdParseResponse;
 import com.dila.dama.plugin.infrastructure.api.RequestTraceSnapshot;
 import com.dila.dama.plugin.infrastructure.logging.SanitizedDiagnosticLogger;
 
@@ -72,35 +74,45 @@ public class RunAiMarkupDiagnosticsCommand {
 
     private final RequestValidationService validationService;
     private final DiagnosticClassifier classifier;
-    private final OpenAiCompatibleChatClient client;
+    private final CbrdParseApiClient parseClient;
     private final SecretRedactor redactor;
     private final SanitizedDiagnosticLogger logger;
 
     public RunAiMarkupDiagnosticsCommand() {
-        this(new RequestValidationService(), new DiagnosticClassifier(), new OpenAiCompatibleChatClient(), new SecretRedactor(), new SanitizedDiagnosticLogger());
+        this(new RequestValidationService(), new DiagnosticClassifier(), new CbrdParseApiClient(),
+            new SecretRedactor(), new SanitizedDiagnosticLogger());
     }
 
     public RunAiMarkupDiagnosticsCommand(
         RequestValidationService validationService,
         DiagnosticClassifier classifier,
-        OpenAiCompatibleChatClient client,
+        CbrdParseApiClient parseClient,
         SecretRedactor redactor,
         SanitizedDiagnosticLogger logger
     ) {
         this.validationService = validationService;
         this.classifier = classifier;
-        this.client = client;
+        this.parseClient = parseClient;
         this.redactor = redactor;
         this.logger = logger;
     }
 
-    public Result execute(String selectedText, MarkupServiceConfiguration configuration, String systemPrompt, String platform) {
-        AiMarkupDiagnosticSession session = new AiMarkupDiagnosticSession(selectedText == null ? 0 : selectedText.length(), configuration);
+    /**
+     * Runs one AI Markup transformation through the DILA CBRD Parse endpoint (FR-001, FR-006).
+     *
+     * Takes no system prompt: the transformation instruction lives on the DILA server with the
+     * pretrained model, and the request contract forbids extra fields (research.md R11).
+     */
+    public Result execute(CbrdParseRequest request, CbrdParseConfiguration configuration, String platform) {
+        String selectedText = request == null ? "" : request.getText();
+        AiMarkupDiagnosticSession session = new AiMarkupDiagnosticSession(selectedText.length(), configuration);
         session.startOperation();
         try {
             session.validatingConfiguration();
-            RequestValidationService.ValidationResult validationResult = validationService.validate(configuration, selectedText);
+            RequestValidationService.ValidationResult validationResult =
+                validationService.validate(configuration, selectedText);
             if (!validationResult.isValid()) {
+                // Caught before anything is sent: missing token, broken endpoint, unusable selection.
                 DiagnosticClassifier.Classification classification = classifier.classifyValidationFailure(validationResult);
                 SanitizedTroubleshootingRecord record = createRecord(
                     session,
@@ -119,32 +131,23 @@ public class RunAiMarkupDiagnosticsCommand {
 
             session.buildingRequest();
             session.callingEndpoint();
-            OpenAiCompatibleChatClient.Response response = client.execute(configuration, systemPrompt, selectedText);
+            CbrdParseResponse response = parseClient.execute(configuration, request);
             if (response.isSuccess()) {
                 session.completedSuccess();
-                return Result.success("<ref>" + response.getContent() + "</ref>", session);
+                // The service returns the complete <ref> element - do not wrap it again.
+                return Result.success(response.getMarkupXml(), session);
             }
 
             session.parsingResponse();
-            DiagnosticClassifier.Classification classification;
-            if (response.getException() != null) {
-                classification = classifier.classifyException(response.getException(), platform);
-            } else {
-                classification = classifier.classifyHttpFailure(
-                    response.getHttpStatus() == null ? 0 : response.getHttpStatus().intValue(),
-                    response.getErrorResponse(),
-                    configuration,
-                    platform
-                );
-            }
+            DiagnosticClassifier.Classification classification = classifier.classifyParseError(response.getError());
             SanitizedTroubleshootingRecord record = createRecord(
                 session,
                 platform,
                 response.getHttpStatus(),
-                response.getErrorResponse() == null ? "" : response.getErrorResponse().getSanitizedBody(),
+                response.getErrorBody(),
                 classification.getCategory(),
                 classification.getGuidanceMessageKey(),
-                response.getTraceSnapshot()
+                response.getTrace()
             );
             session.classifiedFailure(classification.getCategory(), classification.getGuidanceMessageKey(), record);
             session.exportReady();
@@ -165,9 +168,9 @@ public class RunAiMarkupDiagnosticsCommand {
         RequestTraceSnapshot traceSnapshot
     ) {
         String requestId = traceSnapshot == null ? session.getSessionId() : traceSnapshot.getRequestId();
-        String endpointSummary = traceSnapshot == null ? session.getConfiguration().getEndpointSummary() : traceSnapshot.getEndpointSummary();
+        String endpointSummary = traceSnapshot == null ? session.getEndpointSummary() : traceSnapshot.getEndpointSummary();
         String requestSnapshot = traceSnapshot == null
-            ? "validation=" + redactor.redact(session.getConfiguration().getEndpointSummary())
+            ? "validation=" + redactor.redact(session.getEndpointSummary())
             : redactor.redact(traceSnapshot.getRequestMetadataSummary());
         return new SanitizedTroubleshootingRecord(
             requestId,

@@ -1,67 +1,79 @@
 package com.dila.dama.plugin.domain.service;
 
 import com.dila.dama.plugin.domain.model.DiagnosticFailureCategory;
-import com.dila.dama.plugin.domain.model.MarkupServiceConfiguration;
-import com.dila.dama.plugin.infrastructure.api.OpenAiErrorResponse;
+import com.dila.dama.plugin.domain.model.ParseError;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.net.SocketTimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Retargeted to the CBRD Parse path (004-cbrd-parse-endpoint). The OpenAI HTTP-shape heuristics
+ * are gone: the DILA service enumerates its own causes, so classification is a lookup rather
+ * than message sniffing.
+ */
 public class DiagnosticClassifierTest {
 
     private final DiagnosticClassifier classifier = new DiagnosticClassifier();
-    private final SecretRedactor redactor = new SecretRedactor();
 
     @Test
-    public void classifiesUnauthorizedAsCredentials() {
-        DiagnosticClassifier.Classification classification = classifier.classifyHttpFailure(401, OpenAiErrorResponse.parse("{\"error\":{\"message\":\"bad key\"}}", redactor), configuration(), "windows");
+    public void classifiesRejectedTokenAsCredentials() {
+        DiagnosticClassifier.Classification classification = classifier.classifyParseError(ParseError.UNAUTHORIZED);
 
         assertThat(classification.getCategory()).isEqualTo(DiagnosticFailureCategory.CREDENTIALS);
-        assertThat(classification.getGuidanceMessageKey()).endsWith(".windows");
+        assertThat(classification.getGuidanceMessageKey()).isEqualTo("ai.markup.error.unauthorized");
     }
 
     @Test
-    public void classifiesModelMissingAsModelAccess() {
-        DiagnosticClassifier.Classification classification = classifier.classifyHttpFailure(
-            400,
-            OpenAiErrorResponse.parse("{\"error\":{\"message\":\"The model gpt-x does not exist\"}}", redactor),
-            configuration(),
-            "generic"
-        );
-
-        assertThat(classification.getCategory()).isEqualTo(DiagnosticFailureCategory.MODEL_ACCESS);
+    public void classifiesRateLimitingAsCapacity() {
+        assertThat(classifier.classifyParseError(ParseError.OPENAI_RATE_LIMITED).getCategory())
+            .isEqualTo(DiagnosticFailureCategory.RATE_LIMIT_OR_CAPACITY);
     }
 
     @Test
-    public void classifiesEndpointMismatchSeparatelyFromMalformedRequest() {
-        DiagnosticClassifier.Classification classification = classifier.classifyHttpFailure(
-            400,
-            OpenAiErrorResponse.parse("{\"error\":{\"message\":\"This endpoint does not support chat/completions. Use the Responses API.\"}}", redactor),
-            configuration(),
-            "generic"
-        );
-
-        assertThat(classification.getCategory()).isEqualTo(DiagnosticFailureCategory.ENDPOINT_COMPATIBILITY);
+    public void classifiesUpstreamOutageAsAServiceFailureNotACredentialProblem() {
+        assertThat(classifier.classifyParseError(ParseError.OPENAI_UNAVAILABLE).getCategory())
+            .isEqualTo(DiagnosticFailureCategory.UNKNOWN_SERVICE_FAILURE);
+        assertThat(classifier.classifyParseError(ParseError.OPENAI_CREDENTIALS_UNAVAILABLE).getCategory())
+            .isEqualTo(DiagnosticFailureCategory.UNKNOWN_SERVICE_FAILURE);
     }
 
     @Test
-    public void classifiesRateLimitAndServerFailures() {
-        DiagnosticClassifier.Classification rateLimit = classifier.classifyHttpFailure(429, OpenAiErrorResponse.parse("{\"error\":{\"message\":\"Too many requests\"}}", redactor), configuration(), "generic");
-        DiagnosticClassifier.Classification serverFailure = classifier.classifyHttpFailure(503, OpenAiErrorResponse.parse("{\"error\":{\"message\":\"Service unavailable\"}}", redactor), configuration(), "generic");
-
-        assertThat(rateLimit.getCategory()).isEqualTo(DiagnosticFailureCategory.RATE_LIMIT_OR_CAPACITY);
-        assertThat(serverFailure.getCategory()).isEqualTo(DiagnosticFailureCategory.UNKNOWN_SERVICE_FAILURE);
+    public void classifiesInputProblemsAsMalformedRequests() {
+        assertThat(classifier.classifyParseError(ParseError.TEXT_IS_TOO_LONG).getCategory())
+            .isEqualTo(DiagnosticFailureCategory.MALFORMED_REQUEST);
+        assertThat(classifier.classifyParseError(ParseError.UNSUPPORTED_LANGUAGE).getCategory())
+            .isEqualTo(DiagnosticFailureCategory.MALFORMED_REQUEST);
     }
 
-    private MarkupServiceConfiguration configuration() {
-        return new MarkupServiceConfiguration(
-            "https://api.openai.com",
-            "/v1/chat/completions",
-            "gpt-test",
-            "sk-example-key",
-            30000,
-            MarkupServiceConfiguration.ENDPOINT_KIND_OPENAI_HOSTED,
-            true
-        );
+    @Test
+    public void parseErrorClassificationCarriesFullConfidence() {
+        assertThat(classifier.classifyParseError(ParseError.INVALID_MODEL_OUTPUT).getConfidence()).isEqualTo(100);
+    }
+
+    @Test
+    public void everyParseErrorIsClassifiable() {
+        for (ParseError error : ParseError.values()) {
+            DiagnosticClassifier.Classification classification = classifier.classifyParseError(error);
+
+            assertThat(classification.getCategory()).isNotNull();
+            assertThat(classification.getGuidanceMessageKey()).isNotEmpty();
+        }
+    }
+
+    @Test
+    public void transportFailuresAreStillClassifiedAsConnectivity() {
+        assertThat(classifier.classifyException(new SocketTimeoutException("timeout"), "generic").getCategory())
+            .isEqualTo(DiagnosticFailureCategory.CONNECTIVITY_OR_PROXY);
+        assertThat(classifier.classifyException(new IOException("refused"), "generic").getCategory())
+            .isEqualTo(DiagnosticFailureCategory.CONNECTIVITY_OR_PROXY);
+    }
+
+    @Test
+    public void platformSuffixingStillAppliesToTheLegacyDiagnosticKeys() {
+        assertThat(classifier.classifyException(new IOException("refused"), "windows").getGuidanceMessageKey())
+            .endsWith(".windows");
     }
 }

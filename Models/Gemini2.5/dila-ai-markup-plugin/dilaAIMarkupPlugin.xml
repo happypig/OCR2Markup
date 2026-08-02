@@ -2,7 +2,7 @@
 <xt:extensions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xt="http://www.oxygenxml.com/ns/extension" xsi:schemaLocation="http://www.oxygenxml.com/ns/extension http://www.oxygenxml.com/ns/extension/extensions.xsd">
     <xt:extension id="com.dila.ai.markup">
         <xt:location href="dilaAIMarkupPlugin.zip"/>
-        <xt:version>0.4.3</xt:version>
+        <xt:version>0.5.0</xt:version>
         <xt:oxy_version>27.0+</xt:oxy_version>
         <xt:type>plugin</xt:type>
         <xt:author>DILA DA</xt:author>
@@ -11,6 +11,18 @@
             <p>This plugin provides an AI-empowered markup assistant for editing TEI XML documents.</p>
             <div xmlns="http://www.w3.org/1999/xhtml">
   <h3>Release Notes</h3>
+  <h4>v0.5.0</h4>
+  <ul>
+    <li><strong>AI Markup now runs on the DILA server:</strong> The AI Markup action calls the DILA CBRD Parse endpoint (<code>https://cbss.dila.edu.tw/cbrd/parse</code>) instead of an OpenAI-compatible endpoint on your machine. The transformation model and its credentials stay on the server.</li>
+    <li><strong>Preferences simplified:</strong> Six OpenAI-era fields are gone (parsing model, detection model, API key, base URL, chat path, AI timeout). Three replace them: <code>CBRD Parse endpoint URL</code>, <code>CBRD Parse token</code>, and <code>CBRD Parse timeout (ms)</code>. Enter the shared DILA parse token once to resume work.</li>
+    <li><strong>No migration of old values:</strong> Any OpenAI settings left from a previous version are ignored, never reused, and never sent anywhere.</li>
+    <li><strong>Document language is detected automatically:</strong> The request language comes from <code>xml:lang</code> on the document root element, so there is nothing to choose. Regional tags such as <code>zh-Hant</code> and <code>ja-JP</code> are understood; anything else defaults to Chinese.</li>
+    <li><strong>Clearer failures:</strong> Each cause the DILA service reports now has its own actionable message, and "cannot reach the service", "no token configured", "token rejected", and "endpoint URL is wrong" are four distinct messages rather than one generic failure.</li>
+    <li><strong>Checks before sending:</strong> An empty selection, a selection over 4,000 characters, a missing token, or a malformed endpoint URL are caught locally - no pointless round trip.</li>
+    <li><strong>Timeout:</strong> Defaults to 30 seconds, matching the previous AI Markup timeout, because the server performs a model transformation.</li>
+    <li><strong>Interrupted work is discarded:</strong> Closing the document or Oxygen mid-request cancels it; nothing is written into a closed document.</li>
+    <li><strong>Unchanged:</strong> The review-then-replace workflow, undo history, editor responsiveness, diagnostics export, UTF-8 validation, tag removal, and Ref-to-Link all behave as before.</li>
+  </ul>
   <h4>v0.4.3</h4>
   <ul>
     <li><strong>AI Markup Diagnostics:</strong> Added clearer cross-platform diagnostics for AI Markup request, credential, model, endpoint, and connectivity failures.</li>

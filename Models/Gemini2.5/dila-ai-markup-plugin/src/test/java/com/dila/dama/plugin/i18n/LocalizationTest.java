@@ -46,12 +46,10 @@ public class LocalizationTest {
         // Error messages
         "error.processing.ai.markup", "error.checking.utf8",
         "error.replacing.text", "error.accessing.editor", 
-        "error.converting.files", "error.no.APIKey", "error.no.parse.model",
+        "error.converting.files",
         
         // Other important keys
-        "no.text.selected", "no.editor.open", "no.text.to.replace",
-        "system.prompt.ai.markup", "llm.error"
-    };
+        "no.text.selected", "no.editor.open", "no.text.to.replace"};
 
     private StandalonePluginWorkspace mockWorkspace;
     private PluginResourceBundle mockResourceBundle;

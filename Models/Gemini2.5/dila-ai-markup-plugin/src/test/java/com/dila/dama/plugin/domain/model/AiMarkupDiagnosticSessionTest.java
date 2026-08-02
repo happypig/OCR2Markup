@@ -48,15 +48,7 @@ public class AiMarkupDiagnosticSessionTest {
         assertThat(session.getExportedPackage()).isNotNull();
     }
 
-    private MarkupServiceConfiguration configuration() {
-        return new MarkupServiceConfiguration(
-            "https://api.openai.com",
-            "/v1/chat/completions",
-            "gpt-test",
-            "sk-example-key",
-            30000,
-            MarkupServiceConfiguration.ENDPOINT_KIND_OPENAI_HOSTED,
-            true
-        );
+    private CbrdParseConfiguration configuration() {
+        return new CbrdParseConfiguration("https://cbss.dila.edu.tw/cbrd/parse", 30000, "shared-token-9876");
     }
 }
