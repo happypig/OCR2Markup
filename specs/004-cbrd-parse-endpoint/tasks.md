@@ -29,24 +29,34 @@ the two Ref-to-Link preference labels are renamed to "CBRD Link Endpoint" and
 renamed "CBRD bearer token*:", moved to row 2, and all six preference labels
 ship identical to their English text in zh_CN/zh_TW (display-only, FR-023/US5);
 and the 0.5.0 release notes fold in all changes (version NOT bumped).
-T083 (manual quickstart S10 revalidation in Oxygen — gates T084) and T055 still
-owed before release.
+**2026-08-02 (feature owner): manual validation performed in Oxygen. T055, T083,
+T084 and T057 signed off — 004 is complete at 86/86 tasks.** `mvn test`: 365
+tests, 0 failures.
 
-All of Phases 1-7 are done except the two items below, which cannot be completed in a headless
-environment or with the current build configuration:
+What the sign-off does and does not cover:
 
-- **T055 (unchecked)** — the 10 quickstart scenarios need a running Oxygen XML Editor with a real
-  DILA parse token. No Oxygen installation or display is available here, so this is a genuine
-  manual step still owed before release. Everything it would exercise has automated coverage
-  except the visual layout of the preferences page and a live call to the real endpoint.
-- **T057 (unchecked)** — four of its five conditions hold: `mvn test` is fully green; no
-  `MarkupServiceConfiguration`/`OpenAi*` symbol remains under `src/` (only the DILA service's own
-  `openai_*` wire codes and explanatory comments); every FR-001…FR-022 and NFR-001…NFR-005 is
-  referenced by at least one passing test; plan.md Complexity Tracking is signed. The fifth,
-  **coverage ≥ 80%, could not be measured — `pom.xml` configures no coverage plugin** (no JaCoCo).
-  Adding one changes the build for the whole project, so it is left as an explicit decision rather
-  than assumed. Do not treat T057 as passed until coverage is measured or the criterion is
-  formally dropped.
+- **T055 / T083 — verified manually.** These could only ever be settled by a
+  human at a running Oxygen with a real DILA token, which is what happened. They
+  cover the two things no automated test in this repo can reach: the rendered
+  preference page, and a live call to the real endpoint. T083 in particular
+  re-validated the Phase 8 fix end to end, which matters because the bug it
+  fixes was invisible to the whole suite (the fakes cannot reproduce Oxygen's
+  URL stream handler).
+- **T084 / T057 — signed off, with one condition accepted rather than measured.**
+  Every other condition is objectively verified: `mvn test` green at 365; no
+  `MarkupServiceConfiguration`/`OpenAi*` symbol under `src/` (only the DILA
+  service's own `openai_*` wire codes and explanatory comments); every
+  FR-001…FR-023 and NFR-001…NFR-005 referenced by a passing test or a
+  signed-off manual scenario; `pom.xml` matching the newest release-notes
+  heading via `VersionConsistencyTest`; plan.md Complexity Tracking signed.
+
+  **Coverage ≥ 80% was NOT measured.** `pom.xml` configures no coverage plugin,
+  so no number exists to check; manual testing does not produce one. The
+  criterion was accepted on the feature owner's judgement. Anyone relying on
+  this gate as evidence of coverage should know it is not that. Resolve it
+  properly by adding JaCoCo, or by dropping the criterion from the constitution
+  via `/speckit.constitution` — the current state where a mandated gate cannot
+  be evaluated is the thing worth fixing.
 
 Two files were added beyond the task list, both justified:
 
@@ -273,7 +283,7 @@ _UI and resources_
 - [X] T054 Update `release-notes.xhtml` with the CBRD Parse endpoint change, the six removed preferences, and the new timeout default in `src/main/resources/release-notes.xhtml`
 - [X] T054a Bump `pom.xml` `<version>` to `0.5.0` to match the release-notes heading T054 added. `pom.xml` is the single source: resource filtering substitutes `${project.version}` into `plugin.xml` and `extension.xml`, so no other file needs editing. Add `VersionConsistencyTest` in `src/test/java/com/dila/dama/plugin/infrastructure/release/VersionConsistencyTest.java` asserting the newest `<h4>` matches the declared version, so the two can never ship out of step again. _MINOR bump per project convention: feature-sized changes took MINOR (0.3.0 Java migration, 0.4.0 Ref-to-Link)._
 - [X] T054b Bump the hardcoded `USER_AGENT` in `CbrdParseApiClient` to `0.5.0` — this feature's own new code, so shipping a knowingly-wrong header is not acceptable. `src/main/java` is NOT resource-filtered, so `${project.version}` cannot reach it; a `TODO(005)` marks it for the single-source fix. **`CBRDAPIClient`'s stale `DILA-AI-Markup/0.4.2` is deliberately left alone**: FR-017 requires Ref-to-Link behaviour to be unchanged by this feature, and its header is part of that behaviour. Both literals are fixed together in the follow-up feature.
-- [ ] T055 Run all 10 quickstart.md validation scenarios end-to-end in Oxygen
+- [X] T055 Run all 10 quickstart.md validation scenarios end-to-end in Oxygen — _signed off by the feature owner, 2026-08-02, against a running Oxygen with a real DILA parse token._
 - [X] T056 Remove remaining OpenAI references in imports and comments across `src/main/java/com/dila/dama/plugin/`
 
 ### Retirement (deletion is only safe here — see plan.md Retirement Sequencing)
@@ -292,8 +302,8 @@ Discovered during 2026-08-02 quickstart validation: S10 (wrong bearer token) sur
 - [X] T081 [US4] Implement status-recovery in `CbrdParseApiClient.execute` — extract a side helper `recoverStatusFromException(Throwable, int priorStatus)` that returns `priorStatus` when non-zero, else parses the canonical `Server returned HTTP response code: (\d{3}) for URL:` regex out of `e.getMessage()` (returns `<0` when no status is recoverable). Refactor the `catch (Exception e)` path so that when a recoverable status is present, the response is stamped via a status-known classification (401 → `UNAUTHORIZED`, 5xx → `UNEXPECTED_RESPONSE`, etc.) **with a non-empty `serviceErrorBody`** describing the JDK quirk ("Java-17 getErrorStream threw IOException; status recovered from exception message") rather than `""` — so the export record retains a meaningful cause; only when no status is recoverable (DNS/TLS/timeout) does it remain `CONNECTIVITY_FAILURE`. **Do not** change `ParseError` enum values, `HttpUrlConnectionFactory`, or any FR-011 wire-code mapping. Update the existing 200/400/401/422/502/503/connectivity tests to stay green; the RED test from T080 now turns GREEN. Tags: [US4].
 - [X] **T081a 🎯 GATE** — `mvn test -Dtest=CbrdParseApiClientTest` green (T080 test now GREEN).
 - [X] T082 [US4] Update `CbrdParseApiClientTest` to add at least two companion cases guarding the no-status path is still classified as connectivity: (a) `SocketTimeoutException` from `getResponseCode()` → `CONNECTIVITY_FAILURE` with empty `serviceErrorBody`; (b) `UnknownHostException` from `getResponseCode()` → `CONNECTIVITY_FAILURE`. These pin FR-013 against accidental widening under T081. Tags: [P] [US4] [T-UNIT].
-- [ ] T083 [US4] Manual quickstart revalidation: re-run `quickstart.md` S10 (wrong token) and S6 (`unauthorized` row) in Oxygen on Java 17. Expected: result area shows `ai.markup.error.unauthorized` (zh_TW: "DILA 解析服務拒絕此存取權杖…"), Export Diagnostics control visible, diagnostics export JSON shows `failureCategory: CREDENTIALS`, `guidanceMessageKey: ai.markup.error.unauthorized`, `serviceErrorBody` non-empty, `token=****XXXX` fingerprint, `redactionApplied: true`. Record the signed-off result against S10 in the validation matrix referenced by `quickstart.md`. Tags: [US4] [T-MANUAL].
-- [ ] **T084 🎯 COMPLETION GATE** — `mvn test` fully green with ≥ 356 tests (354 baseline + T080 + T082's additional cases); no `OpenAi*` symbol remains; `plan.md` Phase 8 section matches the shipped code; T083 signed off; Coverage ≥ 80% preserved.
+- [X] T083 [US4] _(signed off by the feature owner, 2026-08-02)_ Manual quickstart revalidation: re-run `quickstart.md` S10 (wrong token) and S6 (`unauthorized` row) in Oxygen on Java 17. Expected: result area shows `ai.markup.error.unauthorized` (zh_TW: "DILA 解析服務拒絕此存取權杖…"), Export Diagnostics control visible, diagnostics export JSON shows `failureCategory: CREDENTIALS`, `guidanceMessageKey: ai.markup.error.unauthorized`, `serviceErrorBody` non-empty, `token=****XXXX` fingerprint, `redactionApplied: true`. Record the signed-off result against S10 in the validation matrix referenced by `quickstart.md`. Tags: [US4] [T-MANUAL].
+- [X] **T084 🎯 COMPLETION GATE** _(signed off 2026-08-02; coverage ≥ 80% accepted on owner judgement, NOT measured — no coverage plugin in the build)_ — `mvn test` fully green with ≥ 356 tests (354 baseline + T080 + T082's additional cases); no `OpenAi*` symbol remains; `plan.md` Phase 8 section matches the shipped code; T083 signed off; Coverage ≥ 80% preserved.
 
 ### Phase 9 — Preference Page Label Renovation
 
@@ -323,7 +333,7 @@ Discovered during the 2026-08-02 review: the three Ref-to-Link rows were left la
 
 - [X] T099a [US5] **🎯 GATE (GREEN)** — In `src/main/resources/i18n/translation.xml`, set the zh_CN/zh_TW values of all six `cbrd.*.label` keys to exactly their en_US text ("CBRD Referer header:", "CBRD bearer token*:", "CBRD Parse endpoint URL:", "CBRD Parse timeout (ms):", "CBRD Link Endpoint:", "CBRD Link timeout (ms):"); update the fallback for `cbrd.parse.token.label` in `DAMAOptionPagePluginExtension` to `"CBRD bearer token*:"`; swap the token row block (label + `JPasswordField`) above the endpoint URL row block in the option page builder so the order is Referer, token, Parse URL, Parse timeout, Link Endpoint, Link timeout. `mvn test -Dtest=PreferencePageLayoutOrderTest,UpgradePreferencesTest,TranslationBundleCompletenessTest,SharedTokenNonDisclosureTest,TranslationXmlValidatorTest` green; full `mvn test` green at 365 tests, 0 failures; `VersionConsistencyTest` green (version stays `0.5.0`); release-notes 0.5.0 entry updated for the token label rename + row swap + English-only labels. Tags: [US5].
 
-- [ ] **T057 🎯 COMPLETION GATE** — `mvn test` fully green; no `MarkupServiceConfiguration` or `OpenAi*` symbol remains under `src/`; every FR-001…FR-023 and NFR-001…NFR-005 traced to a passing test or a signed-off manual quickstart scenario; `pom.xml` `<version>` matches the newest `release-notes.xhtml` heading (enforced by `VersionConsistencyTest`); coverage ≥ 80% (constitution Enforcement); plan.md Complexity Tracking approval recorded.
+- [X] **T057 🎯 COMPLETION GATE** _(signed off 2026-08-02; coverage ≥ 80% accepted on owner judgement, NOT measured — no coverage plugin in the build)_ — `mvn test` fully green; no `MarkupServiceConfiguration` or `OpenAi*` symbol remains under `src/`; every FR-001…FR-023 and NFR-001…NFR-005 traced to a passing test or a signed-off manual quickstart scenario; `pom.xml` `<version>` matches the newest `release-notes.xhtml` heading (enforced by `VersionConsistencyTest`); coverage ≥ 80% (constitution Enforcement); plan.md Complexity Tracking approval recorded.
 
 ---
 
