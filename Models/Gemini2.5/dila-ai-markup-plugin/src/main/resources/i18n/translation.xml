@@ -239,36 +239,6 @@
     <val lang="zh_CN">抓取所選文字時出錯： {0}</val>
     <val lang="zh_TW">抓取所選文字時出錯： {0}</val>
   </key>
-  <key value="error.no.APIKey">
-    <comment>infoArea.append()@processAIMarkup()</comment>
-    <val lang="en_US">Error: API key not configured. Please set up your API key in Preferences.</val>
-    <val lang="zh_CN">錯誤：API 金鑰未配置。請在偏好設定中設置您的 API 金鑰。</val>
-    <val lang="zh_TW">錯誤：API 金鑰未配置。請在偏好設定中設置您的 API 金鑰。</val>
-  </key>
-  <key value="error.no.parse.model">
-    <comment>infoArea.append()@processAIMarkup()</comment>
-    <val lang="en_US">Error: Parse model not configured. Please set up your model in Preferences.</val>
-    <val lang="zh_CN">錯誤：解析模型未配置。請在偏好設定中設置您的模型。</val>
-    <val lang="zh_TW">錯誤：解析模型未配置。請在偏好設定中設置您的模型。</val>
-  </key>
-  <key value="system.prompt.ai.markup">
-    <comment>String systemPrompt = i18n("system.prompt.ai.markup")@processAIMarkup()</comment>
-    <val lang="en_US">Please add XML tags for all sutra, volume, page, column, and line references related to "sutra references" in the selected text.</val>
-    <val lang="zh_CN">請將選取文字中，只要與「藏經參照」相關的藏經、冊、頁、欄、行等均標上 XML 標籤。</val>
-    <val lang="zh_TW">請將選取文字中，只要與「藏經參照」相關的藏經、冊、頁、欄、行等均標上 XML 標籤。</val>
-  </key>
-  <key value="http.error">
-    <comment>return i18n("http.error", responseCode, errorResponse.toString())@processAIMarkup()</comment>
-    <val lang="en_US">HTTP error {0}: {1}</val>
-    <val lang="zh_CN">HTTP 錯誤 {0}: {1}</val>
-    <val lang="zh_TW">HTTP 錯誤 {0}: {1}</val>
-  </key>
-  <key value="llm.error">
-    <comment>return i18n("llm.error", e.getMessage())@processAIMarkup()</comment>
-    <val lang="en_US">Error calling language model: {0}</val>
-    <val lang="zh_CN">呼叫語言模型錯誤: {0}</val>
-    <val lang="zh_TW">呼叫語言模型錯誤: {0}</val>
-  </key>
   <key value="utf8.all.valid">
     <comment>infoArea.append()@displayUtf8CheckResults()</comment>
     <val lang="en_US">All files are valid UTF-8!</val>
@@ -543,22 +513,118 @@
 
   <!-- CBRD preferences -->
   <key value="cbrd.api.url.label">
-    <comment>Preferences label</comment>
-    <val lang="en_US">CBRD API Endpoint:</val>
-    <val lang="zh_CN">CBRD API 接口位址(Endpoint)：</val>
-    <val lang="zh_TW">CBRD API 接口位址(Endpoint)：</val>
+    <comment>Preferences label; zh_CN/zh_TW deliberately identical to English (Session 2026-08-02 Phase 9 follow-up 4)</comment>
+    <val lang="en_US">CBRD Link Endpoint:</val>
+    <val lang="zh_CN">CBRD Link Endpoint:</val>
+    <val lang="zh_TW">CBRD Link Endpoint:</val>
   </key>
   <key value="cbrd.referer.label">
-    <comment>Preferences label</comment>
+    <comment>Preferences label; zh_CN/zh_TW deliberately identical to English (Session 2026-08-02 Phase 9 follow-up 4)</comment>
     <val lang="en_US">CBRD Referer header:</val>
-    <val lang="zh_CN">CBRD Referer 來源標頭：</val>
-    <val lang="zh_TW">CBRD Referer 來源標頭：</val>
+    <val lang="zh_CN">CBRD Referer header:</val>
+    <val lang="zh_TW">CBRD Referer header:</val>
   </key>
   <key value="cbrd.timeout.ms.label">
-    <comment>Preferences label</comment>
-    <val lang="en_US">CBRD timeout (ms):</val>
-    <val lang="zh_CN">CBRD 逾時（毫秒）：</val>
-    <val lang="zh_TW">CBRD 逾時（毫秒）：</val>
+    <comment>Preferences label; zh_CN/zh_TW deliberately identical to English (Session 2026-08-02 Phase 9 follow-up 4)</comment>
+    <val lang="en_US">CBRD Link timeout (ms):</val>
+    <val lang="zh_CN">CBRD Link timeout (ms):</val>
+    <val lang="zh_TW">CBRD Link timeout (ms):</val>
+  </key>
+  <key value="cbrd.parse.api.url.label">
+    <comment>Preferences label (004-cbrd-parse-endpoint); zh_CN/zh_TW deliberately identical to English (Session 2026-08-02 Phase 9 follow-up 4)</comment>
+    <val lang="en_US">CBRD Parse endpoint URL:</val>
+    <val lang="zh_CN">CBRD Parse endpoint URL:</val>
+    <val lang="zh_TW">CBRD Parse endpoint URL:</val>
+  </key>
+  <key value="cbrd.parse.token.label">
+    <comment>Preferences label (004-cbrd-parse-endpoint); zh_CN/zh_TW deliberately identical to English - "Bearer"/"Token" are untranslated protocol terms (RFC 6750)</comment>
+    <val lang="en_US">CBRD bearer token*:</val>
+    <val lang="zh_CN">CBRD bearer token*:</val>
+    <val lang="zh_TW">CBRD bearer token*:</val>
+  </key>
+  <key value="cbrd.parse.timeout.ms.label">
+    <comment>Preferences label (004-cbrd-parse-endpoint); zh_CN/zh_TW deliberately identical to English (Session 2026-08-02 Phase 9 follow-up 4)</comment>
+    <val lang="en_US">CBRD Parse timeout (ms):</val>
+    <val lang="zh_CN">CBRD Parse timeout (ms):</val>
+    <val lang="zh_TW">CBRD Parse timeout (ms):</val>
+  </key>
+  <key value="ai.markup.error.text_is_required">
+    <comment>CBRD Parse failure guidance - service code text_is_required (FR-011/FR-019)</comment>
+    <val lang="en_US">AI Markup needs a selection. Select the CBETA reference text you want marked up, then run AI Markup again.</val>
+    <val lang="zh_CN">AI 標記需要選取內容。請先選取要標記的 CBETA 參考文獻文字，再執行 AI 標記。</val>
+    <val lang="zh_TW">AI 標記需要選取內容。請先選取要標記的 CBETA 參考文獻文字，再執行 AI 標記。</val>
+  </key>
+  <key value="ai.markup.error.text_is_too_long">
+    <comment>CBRD Parse failure guidance - service code text_is_too_long (FR-011/FR-019)</comment>
+    <val lang="en_US">The selection is too long. The DILA parse service accepts up to 4,000 characters - select a shorter passage and try again.</val>
+    <val lang="zh_CN">選取內容過長。DILA 解析服務最多接受 4,000 個字元，請選取較短的段落後再試。</val>
+    <val lang="zh_TW">選取內容過長。DILA 解析服務最多接受 4,000 個字元，請選取較短的段落後再試。</val>
+  </key>
+  <key value="ai.markup.error.unsupported_language">
+    <comment>CBRD Parse failure guidance - service code unsupported_language (FR-011)</comment>
+    <val lang="en_US">The DILA parse service does not support this document's language. Only Chinese and Japanese documents can be marked up.</val>
+    <val lang="zh_CN">DILA 解析服務不支援此文件的語言，僅能標記中文或日文文件。</val>
+    <val lang="zh_TW">DILA 解析服務不支援此文件的語言，僅能標記中文或日文文件。</val>
+  </key>
+  <key value="ai.markup.error.unauthorized">
+    <comment>CBRD Parse failure guidance - service code unauthorized; the token was rejected (FR-011)</comment>
+    <val lang="en_US">The DILA parse service rejected the shared token. Check the CBRD Parse token in Preferences with your administrator, then try again.</val>
+    <val lang="zh_CN">DILA 解析服務拒絕此存取權杖。請與管理者確認「偏好設定」中的 CBRD Parse 存取權杖後再試。</val>
+    <val lang="zh_TW">DILA 解析服務拒絕此存取權杖。請與管理者確認「偏好設定」中的 CBRD Parse 存取權杖後再試。</val>
+  </key>
+  <key value="ai.markup.error.parse_api_not_configured">
+    <comment>CBRD Parse failure guidance - service code parse_api_not_configured (FR-011)</comment>
+    <val lang="en_US">The DILA parse service is not configured on the server. Contact the DILA administrator; no change on your machine will fix this.</val>
+    <val lang="zh_CN">伺服器端尚未設定 DILA 解析服務。請聯絡 DILA 管理者；此問題無法從您的電腦修正。</val>
+    <val lang="zh_TW">伺服器端尚未設定 DILA 解析服務。請聯絡 DILA 管理者；此問題無法從您的電腦修正。</val>
+  </key>
+  <key value="ai.markup.error.openai_credentials_unavailable">
+    <comment>CBRD Parse failure guidance - service code openai_credentials_unavailable; server-side, not the editor's token (FR-011)</comment>
+    <val lang="en_US">The DILA parse service cannot reach its own model credentials. This is a server-side problem - contact the DILA administrator.</val>
+    <val lang="zh_CN">DILA 解析服務無法取得其模型憑證。這是伺服器端問題，請聯絡 DILA 管理者。</val>
+    <val lang="zh_TW">DILA 解析服務無法取得其模型憑證。這是伺服器端問題，請聯絡 DILA 管理者。</val>
+  </key>
+  <key value="ai.markup.error.openai_rate_limited">
+    <comment>CBRD Parse failure guidance - service code openai_rate_limited (FR-011)</comment>
+    <val lang="en_US">The DILA parse service is rate limited right now. Wait a moment and run AI Markup again.</val>
+    <val lang="zh_CN">DILA 解析服務目前流量受限。請稍候再執行 AI 標記。</val>
+    <val lang="zh_TW">DILA 解析服務目前流量受限。請稍候再執行 AI 標記。</val>
+  </key>
+  <key value="ai.markup.error.openai_unavailable">
+    <comment>CBRD Parse failure guidance - service code openai_unavailable (FR-011)</comment>
+    <val lang="en_US">The DILA parse service cannot reach its model provider. The service is temporarily unavailable - retry shortly.</val>
+    <val lang="zh_CN">DILA 解析服務無法連線至其模型供應商，服務暫時無法使用，請稍後再試。</val>
+    <val lang="zh_TW">DILA 解析服務無法連線至其模型供應商，服務暫時無法使用，請稍後再試。</val>
+  </key>
+  <key value="ai.markup.error.invalid_model_output">
+    <comment>CBRD Parse failure guidance - service code invalid_model_output (FR-011)</comment>
+    <val lang="en_US">The DILA parse service produced markup that failed its own validation. Nothing was changed - try a shorter or cleaner selection, or report the passage to DILA.</val>
+    <val lang="zh_CN">DILA 解析服務產生的標記未通過其自身驗證。文件未變更；請改用較短或較單純的選取內容，或將此段落回報 DILA。</val>
+    <val lang="zh_TW">DILA 解析服務產生的標記未通過其自身驗證。文件未變更；請改用較短或較單純的選取內容，或將此段落回報 DILA。</val>
+  </key>
+  <key value="ai.markup.error.unexpected">
+    <comment>CBRD Parse failure guidance - generic fallback for unenumerated responses (FR-012)</comment>
+    <val lang="en_US">AI Markup failed: the DILA parse service returned an unexpected response. Nothing was changed in your document.</val>
+    <val lang="zh_CN">AI 標記失敗：DILA 解析服務傳回非預期的回應。您的文件未做任何變更。</val>
+    <val lang="zh_TW">AI 標記失敗：DILA 解析服務傳回非預期的回應。您的文件未做任何變更。</val>
+  </key>
+  <key value="ai.markup.error.connectivity">
+    <comment>CBRD Parse failure guidance - cannot reach the service at all (FR-013)</comment>
+    <val lang="en_US">Cannot reach the DILA parse service. Check your network connection and the CBRD Parse endpoint URL in Preferences, then try again.</val>
+    <val lang="zh_CN">無法連線至 DILA 解析服務。請檢查網路連線與「偏好設定」中的 CBRD Parse 端點網址後再試。</val>
+    <val lang="zh_TW">無法連線至 DILA 解析服務。請檢查網路連線與「偏好設定」中的 CBRD Parse 端點網址後再試。</val>
+  </key>
+  <key value="ai.markup.error.token_not_configured">
+    <comment>CBRD Parse local guard - no token configured; distinct from unauthorized (FR-010)</comment>
+    <val lang="en_US">No CBRD Parse token is configured. Enter the shared DILA parse token in Preferences and run AI Markup again.</val>
+    <val lang="zh_CN">尚未設定 CBRD Parse 存取權杖。請於「偏好設定」輸入共用的 DILA 解析權杖，再執行 AI 標記。</val>
+    <val lang="zh_TW">尚未設定 CBRD Parse 存取權杖。請於「偏好設定」輸入共用的 DILA 解析權杖，再執行 AI 標記。</val>
+  </key>
+  <key value="ai.markup.error.endpoint_url_invalid">
+    <comment>CBRD Parse local guard - endpoint URL preference unusable (FR-021)</comment>
+    <val lang="en_US">The CBRD Parse endpoint URL in Preferences is missing or malformed. Restore it to https://cbss.dila.edu.tw/cbrd/parse and try again.</val>
+    <val lang="zh_CN">「偏好設定」中的 CBRD Parse 端點網址缺漏或格式錯誤。請還原為 https://cbss.dila.edu.tw/cbrd/parse 後再試。</val>
+    <val lang="zh_TW">「偏好設定」中的 CBRD Parse 端點網址缺漏或格式錯誤。請還原為 https://cbss.dila.edu.tw/cbrd/parse 後再試。</val>
   </key>
   <key value="api.base.url.label">
     <comment>Preferences label</comment>

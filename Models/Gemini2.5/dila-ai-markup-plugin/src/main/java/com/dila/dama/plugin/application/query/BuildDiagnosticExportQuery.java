@@ -10,7 +10,7 @@ import java.util.TimeZone;
 public class BuildDiagnosticExportQuery {
 
     public ExportedDiagnosticPackage build(String sessionId, SanitizedTroubleshootingRecord record, String exportReason) {
-        return new ExportedDiagnosticPackage("1.0.0", isoNow(), sessionId, record, exportReason == null ? "" : exportReason.trim());
+        return new ExportedDiagnosticPackage("1.1.0", isoNow(), sessionId, record, exportReason == null ? "" : exportReason.trim());
     }
 
     private String isoNow() {

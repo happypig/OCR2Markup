@@ -11,7 +11,7 @@ import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 import ro.sync.exml.workspace.api.options.WSOptionsStorage;
 import com.dila.dama.plugin.application.command.RunAiMarkupDiagnosticsCommand;
 import com.dila.dama.plugin.domain.model.AiMarkupDiagnosticSession;
-import com.dila.dama.plugin.domain.model.MarkupServiceConfiguration;
+import com.dila.dama.plugin.domain.model.CbrdParseConfiguration;
 
 /**
  * Test suite for DAMAWorkspaceAccessPluginExtension
@@ -229,15 +229,8 @@ public class DAMAWorkspaceAccessPluginExtensionTest {
 
         plugin.completeAiMarkupOperation(RunAiMarkupDiagnosticsCommand.Result.success(
             "<ref><ptr target='https://example.org'/></ref>",
-            new AiMarkupDiagnosticSession(12, new MarkupServiceConfiguration(
-                "https://api.openai.com",
-                "/v1/chat/completions",
-                "gpt-test",
-                "sk-example-key",
-                30000,
-                MarkupServiceConfiguration.ENDPOINT_KIND_OPENAI_HOSTED,
-                true
-            ))
+            new AiMarkupDiagnosticSession(12, new CbrdParseConfiguration(
+                "https://cbss.dila.edu.tw/cbrd/parse", 30000, "shared-token-9876"))
         ));
 
         assertTrue("Replace button should remain available for successful AI Markup", plugin.getReplaceButtonForTests().isVisible());

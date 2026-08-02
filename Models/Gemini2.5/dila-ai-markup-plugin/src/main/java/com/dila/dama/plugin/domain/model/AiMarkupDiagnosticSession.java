@@ -7,7 +7,10 @@ public final class AiMarkupDiagnosticSession {
 
     private final String sessionId;
     private final int selectedTextLength;
-    private final MarkupServiceConfiguration configuration;
+
+    /** CBRD Parse configuration (004-cbrd-parse-endpoint). */
+    private final CbrdParseConfiguration parseConfiguration;
+
     private final long createdAtEpochMs;
 
     private DiagnosticStatus status;
@@ -17,14 +20,14 @@ public final class AiMarkupDiagnosticSession {
     private ExportedDiagnosticPackage exportedPackage;
     private boolean operationInProgress;
 
-    public AiMarkupDiagnosticSession(int selectedTextLength, MarkupServiceConfiguration configuration) {
-        this(UUID.randomUUID().toString(), selectedTextLength, configuration, System.currentTimeMillis());
+    public AiMarkupDiagnosticSession(int selectedTextLength, CbrdParseConfiguration parseConfiguration) {
+        this(UUID.randomUUID().toString(), selectedTextLength, parseConfiguration, System.currentTimeMillis());
     }
 
-    public AiMarkupDiagnosticSession(String sessionId, int selectedTextLength, MarkupServiceConfiguration configuration, long createdAtEpochMs) {
+    public AiMarkupDiagnosticSession(String sessionId, int selectedTextLength, CbrdParseConfiguration parseConfiguration, long createdAtEpochMs) {
         this.sessionId = sessionId;
         this.selectedTextLength = selectedTextLength;
-        this.configuration = configuration;
+        this.parseConfiguration = parseConfiguration;
         this.createdAtEpochMs = createdAtEpochMs;
         this.status = DiagnosticStatus.INITIALIZED;
     }
@@ -93,8 +96,13 @@ public final class AiMarkupDiagnosticSession {
         return selectedTextLength;
     }
 
-    public MarkupServiceConfiguration getConfiguration() {
-        return configuration;
+    public CbrdParseConfiguration getParseConfiguration() {
+        return parseConfiguration;
+    }
+
+    /** Endpoint description for diagnostics. Never contains a credential. */
+    public String getEndpointSummary() {
+        return parseConfiguration == null ? "" : parseConfiguration.getEndpointSummary();
     }
 
     public synchronized DiagnosticStatus getStatus() {
@@ -129,11 +137,11 @@ public final class AiMarkupDiagnosticSession {
         return selectedTextLength == that.selectedTextLength
             && createdAtEpochMs == that.createdAtEpochMs
             && Objects.equals(sessionId, that.sessionId)
-            && Objects.equals(configuration, that.configuration);
+            && Objects.equals(parseConfiguration, that.parseConfiguration);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sessionId, selectedTextLength, configuration, createdAtEpochMs);
+        return Objects.hash(sessionId, selectedTextLength, parseConfiguration, createdAtEpochMs);
     }
 }

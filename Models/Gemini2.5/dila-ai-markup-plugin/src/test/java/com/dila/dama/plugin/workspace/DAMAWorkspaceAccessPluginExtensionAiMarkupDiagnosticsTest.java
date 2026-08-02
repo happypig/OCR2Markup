@@ -2,9 +2,10 @@ package com.dila.dama.plugin.workspace;
 
 import com.dila.dama.plugin.application.command.RunAiMarkupDiagnosticsCommand;
 import com.dila.dama.plugin.domain.model.AiMarkupDiagnosticSession;
+import com.dila.dama.plugin.domain.model.CbrdParseConfiguration;
 import com.dila.dama.plugin.domain.model.DiagnosticFailureCategory;
-import com.dila.dama.plugin.domain.model.MarkupServiceConfiguration;
 import com.dila.dama.plugin.domain.model.SanitizedTroubleshootingRecord;
+import com.dila.dama.plugin.infrastructure.api.CbrdParseRequest;
 import com.dila.dama.plugin.preferences.DAMAOptionPagePluginExtension;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +22,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Retargeted from the OpenAI path to CBRD Parse (004-cbrd-parse-endpoint). The read-only
+ * guarantee from 002 is unchanged; what the command receives is not.
+ */
 public class DAMAWorkspaceAccessPluginExtensionAiMarkupDiagnosticsTest {
 
     private DAMAWorkspaceAccessPluginExtension extension;
@@ -35,10 +40,7 @@ public class DAMAWorkspaceAccessPluginExtensionAiMarkupDiagnosticsTest {
     public void successfulRunNeverMutatesStoredSettings() {
         WSOptionsStorage optionsStorage = stubbedOptionsStorage();
         extension.setOptionStorageForTests(optionsStorage);
-        RunAiMarkupDiagnosticsCommand command = mock(RunAiMarkupDiagnosticsCommand.class);
-        when(command.execute(anyString(), any(MarkupServiceConfiguration.class), anyString(), anyString()))
-            .thenReturn(RunAiMarkupDiagnosticsCommand.Result.success("<ref><ptr target='x'/></ref>", session()));
-        extension.setAiMarkupDiagnosticsCommandForTests(command);
+        extension.setAiMarkupDiagnosticsCommandForTests(succeedingCommand());
 
         extension.runAiMarkup("selected text");
 
@@ -50,9 +52,9 @@ public class DAMAWorkspaceAccessPluginExtensionAiMarkupDiagnosticsTest {
         WSOptionsStorage optionsStorage = stubbedOptionsStorage();
         extension.setOptionStorageForTests(optionsStorage);
         RunAiMarkupDiagnosticsCommand command = mock(RunAiMarkupDiagnosticsCommand.class);
-        when(command.execute(anyString(), any(MarkupServiceConfiguration.class), anyString(), anyString()))
+        when(command.execute(any(CbrdParseRequest.class), any(CbrdParseConfiguration.class), anyString()))
             .thenReturn(RunAiMarkupDiagnosticsCommand.Result.failure(
-                "ai.markup.diagnostic.credentials.windows",
+                "ai.markup.error.unauthorized",
                 DiagnosticFailureCategory.CREDENTIALS,
                 record(),
                 session()
@@ -68,23 +70,57 @@ public class DAMAWorkspaceAccessPluginExtensionAiMarkupDiagnosticsTest {
     public void requestShapePassedToCommandMatchesStoredReadOnlyConfiguration() {
         WSOptionsStorage optionsStorage = stubbedOptionsStorage();
         extension.setOptionStorageForTests(optionsStorage);
-        RunAiMarkupDiagnosticsCommand command = mock(RunAiMarkupDiagnosticsCommand.class);
-        when(command.execute(anyString(), any(MarkupServiceConfiguration.class), anyString(), anyString()))
-            .thenReturn(RunAiMarkupDiagnosticsCommand.Result.success("<ref><ptr target='x'/></ref>", session()));
+        RunAiMarkupDiagnosticsCommand command = succeedingCommand();
         extension.setAiMarkupDiagnosticsCommandForTests(command);
 
         extension.runAiMarkup("selected text");
         extension.runAiMarkup("selected text again");
 
-        ArgumentCaptor<MarkupServiceConfiguration> configurationCaptor = ArgumentCaptor.forClass(MarkupServiceConfiguration.class);
-        verify(command, Mockito.times(2)).execute(anyString(), configurationCaptor.capture(), anyString(), anyString());
-        for (MarkupServiceConfiguration configuration : configurationCaptor.getAllValues()) {
-            assertThat(configuration.getBaseUrl()).isEqualTo("https://api.openai.com");
-            assertThat(configuration.getChatCompletionsPath()).isEqualTo("/v1/chat/completions");
-            assertThat(configuration.getModelName()).isEqualTo("gpt-test");
-            assertThat(configuration.getApiKey()).isEqualTo("sk-example-key");
+        ArgumentCaptor<CbrdParseConfiguration> configurationCaptor = ArgumentCaptor.forClass(CbrdParseConfiguration.class);
+        verify(command, Mockito.times(2)).execute(any(CbrdParseRequest.class), configurationCaptor.capture(), anyString());
+        for (CbrdParseConfiguration configuration : configurationCaptor.getAllValues()) {
+            assertThat(configuration.getEndpointUrl()).isEqualTo("https://cbss.dila.edu.tw/cbrd/parse");
+            assertThat(configuration.getSharedToken()).isEqualTo("shared-token-9876");
+            assertThat(configuration.getTimeoutMs()).isEqualTo(30000);
         }
         assertNoSettingsMutated(optionsStorage);
+    }
+
+    @Test
+    public void obsoleteOpenAiPreferenceValuesAreNeverSentToTheService() {
+        // FR-004/FR-005: values left in storage by a previous version are ignored, not migrated.
+        extension.setOptionStorageForTests(stubbedOptionsStorage());
+        RunAiMarkupDiagnosticsCommand command = succeedingCommand();
+        extension.setAiMarkupDiagnosticsCommandForTests(command);
+
+        extension.runAiMarkup("selected text");
+
+        ArgumentCaptor<CbrdParseConfiguration> captor = ArgumentCaptor.forClass(CbrdParseConfiguration.class);
+        verify(command).execute(any(CbrdParseRequest.class), captor.capture(), anyString());
+        CbrdParseConfiguration configuration = captor.getValue();
+        assertThat(configuration.getEndpointUrl()).doesNotContain("api.openai.com");
+        assertThat(configuration.getSharedToken()).isNotEqualTo("sk-example-key");
+    }
+
+    @Test
+    public void requestCarriesTheSelectionAndALanguageIndicator() {
+        extension.setOptionStorageForTests(stubbedOptionsStorage());
+        RunAiMarkupDiagnosticsCommand command = succeedingCommand();
+        extension.setAiMarkupDiagnosticsCommandForTests(command);
+
+        extension.runAiMarkup("selected text");
+
+        ArgumentCaptor<CbrdParseRequest> captor = ArgumentCaptor.forClass(CbrdParseRequest.class);
+        verify(command).execute(captor.capture(), any(CbrdParseConfiguration.class), anyString());
+        assertThat(captor.getValue().getText()).isEqualTo("selected text");
+        assertThat(captor.getValue().getLang()).isIn("zh", "jp");
+    }
+
+    private RunAiMarkupDiagnosticsCommand succeedingCommand() {
+        RunAiMarkupDiagnosticsCommand command = mock(RunAiMarkupDiagnosticsCommand.class);
+        when(command.execute(any(CbrdParseRequest.class), any(CbrdParseConfiguration.class), anyString()))
+            .thenReturn(RunAiMarkupDiagnosticsCommand.Result.success("<ref><ptr target='x'/></ref>", session()));
+        return command;
     }
 
     private void assertNoSettingsMutated(WSOptionsStorage optionsStorage) {
@@ -94,10 +130,20 @@ public class DAMAWorkspaceAccessPluginExtensionAiMarkupDiagnosticsTest {
         verify(optionsStorage, never()).setPersistentObjectOption(anyString(), any());
     }
 
+    /**
+     * Deliberately still returns the obsolete OpenAI values as well, so the tests above can
+     * prove they are ignored rather than merely absent.
+     */
     private WSOptionsStorage stubbedOptionsStorage() {
         WSOptionsStorage optionsStorage = mock(WSOptionsStorage.class);
         when(optionsStorage.getOption(anyString(), anyString())).thenAnswer(invocation -> {
             String key = invocation.getArgument(0);
+            if (DAMAOptionPagePluginExtension.KEY_CBRD_PARSE_API_URL.equals(key)) {
+                return "https://cbss.dila.edu.tw/cbrd/parse";
+            }
+            if (DAMAOptionPagePluginExtension.KEY_CBRD_PARSE_TIMEOUT_MS.equals(key)) {
+                return "30000";
+            }
             if (DAMAOptionPagePluginExtension.KEY_DILA_DAMA_API_BASE_URL.equals(key)) {
                 return "https://api.openai.com";
             }
@@ -112,7 +158,16 @@ public class DAMAWorkspaceAccessPluginExtensionAiMarkupDiagnosticsTest {
             }
             return invocation.getArgument(1);
         });
-        when(optionsStorage.getSecretOption(anyString(), anyString())).thenReturn("sk-example-key");
+        when(optionsStorage.getSecretOption(anyString(), anyString())).thenAnswer(invocation -> {
+            String key = invocation.getArgument(0);
+            if (DAMAOptionPagePluginExtension.KEY_CBRD_PARSE_TOKEN.equals(key)) {
+                return "shared-token-9876";
+            }
+            if (DAMAOptionPagePluginExtension.KEY_DILA_DAMA_API_KEY.equals(key)) {
+                return "sk-example-key";
+            }
+            return invocation.getArgument(1);
+        });
         return optionsStorage;
     }
 
@@ -128,13 +183,13 @@ public class DAMAWorkspaceAccessPluginExtensionAiMarkupDiagnosticsTest {
     @Test
     public void showsExportButtonForFailedDiagnosticResult() {
         extension.completeAiMarkupOperation(RunAiMarkupDiagnosticsCommand.Result.failure(
-            "ai.markup.diagnostic.credentials.windows",
+            "ai.markup.error.unauthorized",
             DiagnosticFailureCategory.CREDENTIALS,
             record(),
             session()
         ));
 
-        assertThat(extension.getResultAreaForTests().getText()).contains("ai.markup.diagnostic.credentials");
+        assertThat(extension.getResultAreaForTests().getText()).contains("ai.markup.error.unauthorized");
         assertThat(extension.getReplaceButtonForTests().isVisible()).isFalse();
         assertThat(extension.getExportButtonForTests().isVisible()).isTrue();
     }
@@ -152,21 +207,13 @@ public class DAMAWorkspaceAccessPluginExtensionAiMarkupDiagnosticsTest {
             401,
             "sanitized-body",
             DiagnosticFailureCategory.CREDENTIALS,
-            "ai.markup.diagnostic.credentials.windows",
+            "ai.markup.error.unauthorized",
             10L,
             true
         );
     }
 
-    private MarkupServiceConfiguration configuration() {
-        return new MarkupServiceConfiguration(
-            "https://api.openai.com",
-            "/v1/chat/completions",
-            "gpt-test",
-            "sk-example-key",
-            30000,
-            MarkupServiceConfiguration.ENDPOINT_KIND_OPENAI_HOSTED,
-            true
-        );
+    private CbrdParseConfiguration configuration() {
+        return new CbrdParseConfiguration("https://cbss.dila.edu.tw/cbrd/parse", 30000, "shared-token-9876");
     }
 }

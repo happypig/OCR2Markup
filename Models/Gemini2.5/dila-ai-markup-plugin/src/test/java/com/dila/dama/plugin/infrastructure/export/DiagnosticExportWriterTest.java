@@ -25,7 +25,7 @@ public class DiagnosticExportWriterTest {
     public void serializesSchemaCompliantSanitizedPackage() throws Exception {
         File output = temporaryFolder.newFile("diagnostics.json");
         ExportedDiagnosticPackage diagnosticPackage = new ExportedDiagnosticPackage(
-            "1.0.0",
+            "1.1.0",
             "2026-03-27T00:00:00Z",
             "session-1",
             new SanitizedTroubleshootingRecord(
@@ -47,7 +47,39 @@ public class DiagnosticExportWriterTest {
 
         String content = new String(Files.readAllBytes(output.toPath()), StandardCharsets.UTF_8);
         JSONObject root = new JSONObject(content);
-        assertThat(root.getString("schemaVersion")).isEqualTo("1.0.0");
+        assertThat(root.getString("schemaVersion")).isEqualTo("1.1.0");
         assertThat(root.getJSONObject("record").getBoolean("redactionApplied")).isTrue();
+        assertThat(root.getJSONObject("record").isNull("transportError")).isTrue();
+    }
+
+    @Test
+    public void serializesATransportErrorWhenTheFailureCarriedOne() throws Exception {
+        File output = temporaryFolder.newFile("diagnostics-connectivity.json");
+        ExportedDiagnosticPackage diagnosticPackage = new ExportedDiagnosticPackage(
+            "1.1.0",
+            "2026-03-27T00:00:00Z",
+            "session-1",
+            new SanitizedTroubleshootingRecord(
+                "request-1",
+                "windows",
+                "endpoint",
+                "snapshot",
+                null,
+                "",
+                DiagnosticFailureCategory.CONNECTIVITY_OR_PROXY,
+                "ai.markup.error.connectivity",
+                100L,
+                true,
+                "SocketTimeoutException: connect timed out"
+            ),
+            "manual_support_export"
+        );
+
+        writer.write(diagnosticPackage, output);
+
+        String content = new String(Files.readAllBytes(output.toPath()), StandardCharsets.UTF_8);
+        JSONObject record = new JSONObject(content).getJSONObject("record");
+        assertThat(record.getString("transportError")).isEqualTo("SocketTimeoutException: connect timed out");
+        assertThat(record.isNull("httpStatus")).isTrue();
     }
 }

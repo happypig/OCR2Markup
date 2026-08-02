@@ -1,11 +1,18 @@
 package com.dila.dama.plugin.domain.service;
 
+import com.dila.dama.plugin.domain.model.CbrdParseConfiguration;
 import com.dila.dama.plugin.domain.model.DiagnosticFailureCategory;
-import com.dila.dama.plugin.domain.model.MarkupServiceConfiguration;
 
 import java.net.URI;
 
 public class RequestValidationService {
+
+    /**
+     * The DILA CBRD Parse service caps input at 4,000 characters
+     * ({@code contracts/openapi.yaml}, {@code ParseRequest.text.maxLength}). Checking it here
+     * avoids a round trip and gives the editor immediate feedback (FR-019).
+     */
+    public static final int MAX_SELECTION_LENGTH = 4000;
 
     interface SystemPropertyReader {
         String getProperty(String name, String defaultValue);
@@ -59,49 +66,118 @@ public class RequestValidationService {
         }
     }
 
-    public ValidationResult validate(MarkupServiceConfiguration configuration, String selectedText) {
+    /**
+     * Pre-flight validation for the CBRD Parse path (FR-010, FR-019, FR-021).
+     *
+     * Configuration problems are reported before input problems so the editor fixes the deeper
+     * cause first: a malformed endpoint beats a missing token, and a missing token beats an
+     * unusable selection.
+     */
+    public ValidationResult validate(CbrdParseConfiguration configuration, String selectedText) {
         if (configuration == null) {
-            return ValidationResult.invalid(DiagnosticFailureCategory.UNKNOWN_SERVICE_FAILURE, "ai.markup.diagnostic.unknown", "Missing configuration");
+            return ValidationResult.invalid(
+                DiagnosticFailureCategory.UNKNOWN_SERVICE_FAILURE,
+                "ai.markup.diagnostic.unknown",
+                "Missing configuration"
+            );
         }
+
+        ValidationResult endpointResult = validateEndpointUrl(configuration.getEndpointUrl());
+        if (!endpointResult.isValid()) {
+            return endpointResult;
+        }
+
+        if (configuration.getTimeoutMs() <= 0) {
+            return ValidationResult.invalid(
+                DiagnosticFailureCategory.MALFORMED_REQUEST,
+                "ai.markup.diagnostic.malformed.request",
+                "Timeout must be positive"
+            );
+        }
+
+        if (!configuration.hasSharedToken()) {
+            return ValidationResult.invalid(
+                DiagnosticFailureCategory.CREDENTIALS,
+                CbrdParseErrorClassifier.TOKEN_NOT_CONFIGURED_KEY,
+                "Missing shared parse token"
+            );
+        }
+        if (containsWhitespace(configuration.getSharedToken())) {
+            return ValidationResult.invalid(
+                DiagnosticFailureCategory.CREDENTIALS,
+                CbrdParseErrorClassifier.TOKEN_NOT_CONFIGURED_KEY,
+                "Malformed shared parse token"
+            );
+        }
+
         if (selectedText == null || selectedText.trim().isEmpty()) {
-            return ValidationResult.invalid(DiagnosticFailureCategory.MALFORMED_REQUEST, "ai.markup.diagnostic.selection.required", "No selected text");
+            return ValidationResult.invalid(
+                DiagnosticFailureCategory.MALFORMED_REQUEST,
+                "ai.markup.error.text_is_required",
+                "No selected text"
+            );
         }
-        if (!configuration.hasApiKey()) {
-            return ValidationResult.invalid(DiagnosticFailureCategory.CREDENTIALS, "ai.markup.diagnostic.credentials", "Missing API key");
+        if (selectedText.length() > MAX_SELECTION_LENGTH) {
+            return ValidationResult.invalid(
+                DiagnosticFailureCategory.MALFORMED_REQUEST,
+                "ai.markup.error.text_is_too_long",
+                "Selection exceeds " + MAX_SELECTION_LENGTH + " characters"
+            );
         }
-        if (configuration.getApiKey().contains(" ")) {
-            return ValidationResult.invalid(DiagnosticFailureCategory.CREDENTIALS, "ai.markup.diagnostic.credentials", "Malformed API key");
-        }
-        if (configuration.getModelName() == null || configuration.getModelName().trim().isEmpty()) {
-            return ValidationResult.invalid(DiagnosticFailureCategory.MODEL_ACCESS, "ai.markup.diagnostic.model.access", "Missing model identifier");
-        }
-        if (configuration.getBaseUrl() == null || configuration.getBaseUrl().trim().isEmpty()) {
-            return ValidationResult.invalid(DiagnosticFailureCategory.ENDPOINT_COMPATIBILITY, "ai.markup.diagnostic.endpoint.compatibility", "Missing endpoint base URL");
+
+        return ValidationResult.valid();
+    }
+
+    private ValidationResult validateEndpointUrl(String endpointUrl) {
+        if (endpointUrl == null || endpointUrl.trim().isEmpty()) {
+            return ValidationResult.invalid(
+                DiagnosticFailureCategory.ENDPOINT_COMPATIBILITY,
+                CbrdParseErrorClassifier.ENDPOINT_URL_INVALID_KEY,
+                "Missing CBRD Parse endpoint URL"
+            );
         }
         try {
-            URI uri = new URI(configuration.getBaseUrl());
-            if (!"https".equalsIgnoreCase(uri.getScheme()) || uri.getHost() == null || uri.getHost().trim().isEmpty()) {
-                return ValidationResult.invalid(DiagnosticFailureCategory.ENDPOINT_COMPATIBILITY, "ai.markup.diagnostic.endpoint.compatibility", "Endpoint base URL must be absolute HTTPS");
+            URI uri = new URI(endpointUrl);
+            String scheme = uri.getScheme();
+            boolean supportedScheme = "https".equalsIgnoreCase(scheme) || "http".equalsIgnoreCase(scheme);
+            if (!supportedScheme) {
+                return ValidationResult.invalid(
+                    DiagnosticFailureCategory.ENDPOINT_COMPATIBILITY,
+                    CbrdParseErrorClassifier.ENDPOINT_URL_INVALID_KEY,
+                    "CBRD Parse endpoint URL must use http or https"
+                );
+            }
+            if (uri.getHost() == null || uri.getHost().trim().isEmpty()) {
+                return ValidationResult.invalid(
+                    DiagnosticFailureCategory.ENDPOINT_COMPATIBILITY,
+                    CbrdParseErrorClassifier.ENDPOINT_URL_INVALID_KEY,
+                    "CBRD Parse endpoint URL has no host"
+                );
             }
             if (uri.getUserInfo() != null) {
-                return ValidationResult.invalid(DiagnosticFailureCategory.CREDENTIALS, "ai.markup.diagnostic.credentials", "Endpoint URL must not contain embedded credentials");
+                return ValidationResult.invalid(
+                    DiagnosticFailureCategory.ENDPOINT_COMPATIBILITY,
+                    CbrdParseErrorClassifier.ENDPOINT_URL_INVALID_KEY,
+                    "CBRD Parse endpoint URL must not contain embedded credentials"
+                );
             }
         } catch (Exception e) {
-            return ValidationResult.invalid(DiagnosticFailureCategory.ENDPOINT_COMPATIBILITY, "ai.markup.diagnostic.endpoint.compatibility", "Invalid endpoint base URL");
-        }
-        if (configuration.getChatCompletionsPath() == null || configuration.getChatCompletionsPath().trim().isEmpty()) {
-            return ValidationResult.invalid(DiagnosticFailureCategory.ENDPOINT_COMPATIBILITY, "ai.markup.diagnostic.endpoint.compatibility", "Missing chat completions path");
-        }
-        if (!configuration.getChatCompletionsPath().startsWith("/")) {
-            return ValidationResult.invalid(DiagnosticFailureCategory.ENDPOINT_COMPATIBILITY, "ai.markup.diagnostic.endpoint.compatibility", "Chat completions path must start with /");
-        }
-        if (configuration.getTimeoutMs() <= 0) {
-            return ValidationResult.invalid(DiagnosticFailureCategory.MALFORMED_REQUEST, "ai.markup.diagnostic.malformed.request", "Timeout must be positive");
-        }
-        if (configuration.isProxyExpected()
-            && !"true".equalsIgnoreCase(systemPropertyReader.getProperty("java.net.useSystemProxies", "false"))) {
-            return ValidationResult.invalid(DiagnosticFailureCategory.CONNECTIVITY_OR_PROXY, "ai.markup.diagnostic.connectivity.proxy", "System proxy discovery is disabled");
+            return ValidationResult.invalid(
+                DiagnosticFailureCategory.ENDPOINT_COMPATIBILITY,
+                CbrdParseErrorClassifier.ENDPOINT_URL_INVALID_KEY,
+                "Invalid CBRD Parse endpoint URL"
+            );
         }
         return ValidationResult.valid();
     }
+
+    private static boolean containsWhitespace(String value) {
+        for (int i = 0; i < value.length(); i++) {
+            if (Character.isWhitespace(value.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

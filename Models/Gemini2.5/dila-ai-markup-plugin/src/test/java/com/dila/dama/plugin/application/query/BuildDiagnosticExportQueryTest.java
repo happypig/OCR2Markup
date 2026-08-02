@@ -28,7 +28,7 @@ public class BuildDiagnosticExportQueryTest {
 
         ExportedDiagnosticPackage diagnosticPackage = query.build("session-1", record, "manual_support_export");
 
-        assertThat(diagnosticPackage.getSchemaVersion()).isEqualTo("1.0.0");
+        assertThat(diagnosticPackage.getSchemaVersion()).isEqualTo("1.1.0");
         assertThat(diagnosticPackage.getSessionId()).isEqualTo("session-1");
         assertThat(diagnosticPackage.getExportReason()).isEqualTo("manual_support_export");
         assertThat(diagnosticPackage.getRecord()).isEqualTo(record);

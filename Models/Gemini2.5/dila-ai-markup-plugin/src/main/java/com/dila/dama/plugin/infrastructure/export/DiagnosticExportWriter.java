@@ -35,6 +35,7 @@ public class DiagnosticExportWriter {
         json.put("guidanceMessageKey", record.getGuidanceMessageKey());
         json.put("capturedAtEpochMs", record.getCapturedAtEpochMs());
         json.put("redactionApplied", record.isRedactionApplied());
+        json.put("transportError", record.getTransportError() == null ? JSONObject.NULL : record.getTransportError());
         return json;
     }
 }

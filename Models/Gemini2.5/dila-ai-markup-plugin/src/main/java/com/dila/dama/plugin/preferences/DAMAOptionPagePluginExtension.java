@@ -15,7 +15,6 @@ import javax.swing.JPasswordField;
 import ro.sync.exml.plugin.option.OptionPagePluginExtension;
 import ro.sync.exml.workspace.api.PluginResourceBundle;
 import ro.sync.exml.workspace.api.PluginWorkspace;
-import ro.sync.exml.workspace.api.PluginWorkspaceProvider;
 import ro.sync.exml.workspace.api.standalone.StandalonePluginWorkspace;
 
 /**
@@ -34,19 +33,14 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
    */
   public static final String DILA_DAMA_OPTIONS_PAGE_KEY = "dila_ai_markup_options_page_key";
 
-    /**
-   * The option key describing the ft parse model.
+  /**
+   * Obsolete OpenAI-era option keys (FR-004). No UI row reads or writes these any more; the
+   * constants remain only so the retirement tasks (T056a-T056c) can prove nothing still reads
+   * them. Values left in a user's storage from a previous version are ignored, never migrated
+   * (FR-005).
    */
   public static final String KEY_DILA_DAMA_FT_PARSE_MODEL = "dila.dama.ft.parse.model";
-
-  /**
-   * The option key describing the ft detect model.
-   */
   public static final String KEY_DILA_DAMA_FT_DETECT_MODEL = "dila.dama.ft.detect.model";
-
-  /**
-   * The option key describing the API key.
-   */
   public static final String KEY_DILA_DAMA_API_KEY = "dila.dama.api.key";
   public static final String KEY_DILA_DAMA_API_BASE_URL = "dila.dama.api.base.url";
   public static final String KEY_DILA_DAMA_CHAT_COMPLETIONS_PATH = "dila.dama.api.chat.path";
@@ -58,37 +52,31 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
   public static final String KEY_CBRD_API_URL = "cbrd.api.url";
   public static final String KEY_CBRD_REFERER_HEADER = "cbrd.referer.header";
   public static final String KEY_CBRD_TIMEOUT_MS = "cbrd.timeout";
-  
+
+  /**
+   * CBRD Parse API options for the AI Markup action (004-cbrd-parse-endpoint).
+   * The token is stored via the secure option storage; the URL and timeout are plain options.
+   */
+  public static final String KEY_CBRD_PARSE_API_URL = "cbrd.parse.api.url";
+  public static final String KEY_CBRD_PARSE_TOKEN = "cbrd.parse.token";
+  public static final String KEY_CBRD_PARSE_TIMEOUT_MS = "cbrd.parse.timeout";
+
+  public static final String DEFAULT_CBRD_PARSE_API_URL = "https://cbss.dila.edu.tw/cbrd/parse";
+  /**
+   * The parse endpoint runs a model transformation server-side, so it inherits the previous
+   * AI Markup timeout rather than the shorter Ref-to-Link lookup timeout (FR-016).
+   */
+  public static final String DEFAULT_CBRD_PARSE_TIMEOUT_MS = "30000";
+
   private static final String DEFAULT_CBRD_API_URL = "https://cbss.dila.edu.tw/cbrd/link";
   private static final String DEFAULT_CBRD_REFERER_HEADER = "CBRD@dila.edu.tw";
   private static final String DEFAULT_CBRD_TIMEOUT_MS = "10000";
-  private static final String DEFAULT_AI_API_BASE_URL = "https://api.openai.com";
-  private static final String DEFAULT_AI_CHAT_COMPLETIONS_PATH = "/v1/chat/completions";
-  private static final String DEFAULT_AI_TIMEOUT_MS = "30000";
-  
+
   /**
    * Safe fallback values to prevent null pointer exceptions in Oxygen's options system.
    */
   private static final String SAFE_KEY_FALLBACK = "dila_safe_fallback";
   private static final String SAFE_VALUE_FALLBACK = "";
-  
-  /**
-   * The text field for the ft parse model.
-   */
-  private JTextField parseModelTextField;
-
-  /**
-   * The text field for the ft detect model.
-   */
-  private JTextField detectModelTextField;
-
-  /**
-   * The text field for the API key.
-   */
-  private JTextField apiKeyTextField;
-  private JTextField apiBaseUrlTextField;
-  private JTextField chatCompletionsPathTextField;
-  private JTextField apiTimeoutTextField;
 
   /**
    * The text field for the CBRD API URL.
@@ -106,6 +94,22 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
   private JTextField cbrdTimeoutTextField;
 
   /**
+   * The text field for the CBRD Parse endpoint URL.
+   */
+  private JTextField cbrdParseApiUrlTextField;
+
+  /**
+   * The masked field for the shared DILA parse token. Masked and stored via the secure option
+   * storage so the token is never displayed (FR-003, NFR-004).
+   */
+  private JPasswordField cbrdParseTokenTextField;
+
+  /**
+   * The text field for the CBRD Parse request timeout (ms).
+   */
+  private JTextField cbrdParseTimeoutTextField;
+
+  /**
    * Resource bundle for i18n support.
    */
   private PluginResourceBundle resources;
@@ -115,29 +119,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
    */
   public DAMAOptionPagePluginExtension() {
     super();
-    // Try to initialize resource bundle immediately using PluginWorkspaceProvider
-    // initializeResourceBundleEarly();
   }
-
-  // /**
-  //  * Early initialization of resource bundle using PluginWorkspaceProvider.
-  //  * This ensures the resource bundle is available when getTitle() is called.
-  //  */
-  // private void initializeResourceBundleEarly() {
-  //   try {
-  //     // Use PluginWorkspaceProvider to get the current workspace instance
-  //     PluginWorkspace workspace = PluginWorkspaceProvider.getPluginWorkspace();
-  //     if (workspace != null) {
-  //       PluginLogger.info(DAMAOptionPagePluginExtension.class, "Early resource bundle initialization via PluginWorkspaceProvider");
-  //       initializeResourceBundle(workspace);
-  //     } else {
-  //       PluginLogger.warn(DAMAOptionPagePluginExtension.class, "PluginWorkspaceProvider returned null - resource bundle will be initialized later");
-  //     }
-  //   } catch (Exception e) {
-  //     PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed early resource bundle initialization: " + e.getMessage());
-  //     // Resource bundle will be initialized later in init() method
-  //   }
-  // }
 
   /**
    * @see ro.sync.exml.plugin.option.OptionPagePluginExtension#apply(ro.sync.exml.workspace.api.PluginWorkspace)
@@ -146,96 +128,22 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
   public void apply(PluginWorkspace pluginWorkspace) {
     try {
       PluginLogger.info(DAMAOptionPagePluginExtension.class, "Applying option page settings...");
-      
+
       // Ultra-defensive checks for system-wide preferences saving
       if (pluginWorkspace == null) {
         PluginLogger.info(DAMAOptionPagePluginExtension.class, "PluginWorkspace is null in apply()");
         return; // Silently return without error
       }
-      
+
       if (pluginWorkspace.getOptionsStorage() == null) {
         PluginLogger.info(DAMAOptionPagePluginExtension.class, "OptionsStorage is null in apply()");
         return; // Silently return without error
       }
-      
+
       // Additional check: ensure text fields were initialized
-      if (parseModelTextField == null || detectModelTextField == null || apiKeyTextField == null) {
+      if (cbrdParseApiUrlTextField == null || cbrdParseTokenTextField == null || cbrdParseTimeoutTextField == null) {
         PluginLogger.info(DAMAOptionPagePluginExtension.class, "Text fields not initialized in apply()");
         return; // Silently return without error
-      }
-      
-      // Save the new locations in the option storage.
-      // Extra null safety checks to prevent NullPointerException in Oxygen's options system
-      // Ensure text fields are not null before accessing them
-      String parseModelText = (parseModelTextField != null && parseModelTextField.getText() != null) 
-          ? parseModelTextField.getText().trim() : "";
-      String detectModelText = (detectModelTextField != null && detectModelTextField.getText() != null) 
-          ? detectModelTextField.getText().trim() : "";
-      String apiKeyText = (apiKeyTextField != null && apiKeyTextField.getText() != null) 
-          ? apiKeyTextField.getText().trim() : "";
-      String apiBaseUrlText = (apiBaseUrlTextField != null && apiBaseUrlTextField.getText() != null)
-          ? apiBaseUrlTextField.getText().trim() : DEFAULT_AI_API_BASE_URL;
-      String chatPathText = (chatCompletionsPathTextField != null && chatCompletionsPathTextField.getText() != null)
-          ? chatCompletionsPathTextField.getText().trim() : DEFAULT_AI_CHAT_COMPLETIONS_PATH;
-      String apiTimeoutText = (apiTimeoutTextField != null && apiTimeoutTextField.getText() != null)
-          ? apiTimeoutTextField.getText().trim() : DEFAULT_AI_TIMEOUT_MS;
-      
-      // Only set options if keys are not null
-      // Ultra-defensive option setting to prevent ConcurrentHashMap.putVal NPE
-      // CRITICAL: Both key and value must be non-null for ConcurrentHashMap.put()
-      if (KEY_DILA_DAMA_FT_PARSE_MODEL != null && !KEY_DILA_DAMA_FT_PARSE_MODEL.trim().isEmpty() && parseModelText != null) {
-        try {
-          PluginLogger.debug(DAMAOptionPagePluginExtension.class, "Setting parse model: " + parseModelText);
-          pluginWorkspace.getOptionsStorage().setOption(KEY_DILA_DAMA_FT_PARSE_MODEL, parseModelText);
-        } catch (Exception e) {
-          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set parse model option: " + e.getMessage());
-        }
-      }
-      if (KEY_DILA_DAMA_FT_DETECT_MODEL != null && !KEY_DILA_DAMA_FT_DETECT_MODEL.trim().isEmpty() && detectModelText != null) {
-        try {
-          PluginLogger.debug(DAMAOptionPagePluginExtension.class, "Setting detect model: " + detectModelText);
-          pluginWorkspace.getOptionsStorage().setOption(KEY_DILA_DAMA_FT_DETECT_MODEL, detectModelText);
-        } catch (Exception e) {
-          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set detect model option: " + e.getMessage());
-        }
-      }
-      if (KEY_DILA_DAMA_API_KEY != null && !KEY_DILA_DAMA_API_KEY.trim().isEmpty() && apiKeyText != null) {
-        try {
-          PluginLogger.debug(DAMAOptionPagePluginExtension.class, "Setting API key: " + (apiKeyText.isEmpty() ? "[empty]" : "[***]"));
-          pluginWorkspace.getOptionsStorage().setSecretOption(KEY_DILA_DAMA_API_KEY, apiKeyText);
-        } catch (Exception e) {
-          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set API key option: " + e.getMessage());
-        }
-      }
-      if (KEY_DILA_DAMA_API_BASE_URL != null && !KEY_DILA_DAMA_API_BASE_URL.trim().isEmpty()) {
-        try {
-          pluginWorkspace.getOptionsStorage().setOption(KEY_DILA_DAMA_API_BASE_URL, apiBaseUrlText.isEmpty() ? DEFAULT_AI_API_BASE_URL : apiBaseUrlText);
-        } catch (Exception e) {
-          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set AI API base URL option: " + e.getMessage());
-        }
-      }
-      if (KEY_DILA_DAMA_CHAT_COMPLETIONS_PATH != null && !KEY_DILA_DAMA_CHAT_COMPLETIONS_PATH.trim().isEmpty()) {
-        try {
-          pluginWorkspace.getOptionsStorage().setOption(KEY_DILA_DAMA_CHAT_COMPLETIONS_PATH, chatPathText.isEmpty() ? DEFAULT_AI_CHAT_COMPLETIONS_PATH : chatPathText);
-        } catch (Exception e) {
-          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set AI chat completions path option: " + e.getMessage());
-        }
-      }
-      if (KEY_DILA_DAMA_API_TIMEOUT_MS != null && !KEY_DILA_DAMA_API_TIMEOUT_MS.trim().isEmpty()) {
-        try {
-          int parsedTimeout = Integer.parseInt(DEFAULT_AI_TIMEOUT_MS);
-          try {
-            parsedTimeout = Integer.parseInt(apiTimeoutText);
-            if (parsedTimeout <= 0) {
-              parsedTimeout = Integer.parseInt(DEFAULT_AI_TIMEOUT_MS);
-            }
-          } catch (Exception e) {
-            parsedTimeout = Integer.parseInt(DEFAULT_AI_TIMEOUT_MS);
-          }
-          pluginWorkspace.getOptionsStorage().setOption(KEY_DILA_DAMA_API_TIMEOUT_MS, String.valueOf(parsedTimeout));
-        } catch (Exception e) {
-          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set AI timeout option: " + e.getMessage());
-        }
       }
 
       // CBRD options (non-secret)
@@ -255,15 +163,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       if (cbrdReferer == null || cbrdReferer.isEmpty()) {
         cbrdReferer = DEFAULT_CBRD_REFERER_HEADER;
       }
-      int timeoutParsed = Integer.parseInt(DEFAULT_CBRD_TIMEOUT_MS);
-      try {
-        timeoutParsed = Integer.parseInt(cbrdTimeoutMs);
-        if (timeoutParsed <= 0) {
-          timeoutParsed = Integer.parseInt(DEFAULT_CBRD_TIMEOUT_MS);
-        }
-      } catch (Exception e) {
-        timeoutParsed = Integer.parseInt(DEFAULT_CBRD_TIMEOUT_MS);
-      }
+      int timeoutParsed = parsePositiveIntOrDefault(cbrdTimeoutMs, DEFAULT_CBRD_TIMEOUT_MS);
 
       if (KEY_CBRD_API_URL != null && !KEY_CBRD_API_URL.trim().isEmpty()) {
         try {
@@ -286,7 +186,47 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
           PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set CBRD timeout: " + e.getMessage());
         }
       }
-      
+
+      // CBRD Parse options for AI Markup (004-cbrd-parse-endpoint)
+      String cbrdParseApiUrl = (cbrdParseApiUrlTextField.getText() != null)
+          ? cbrdParseApiUrlTextField.getText().trim()
+          : DEFAULT_CBRD_PARSE_API_URL;
+      if (cbrdParseApiUrl.isEmpty()) {
+        cbrdParseApiUrl = DEFAULT_CBRD_PARSE_API_URL;
+      }
+      String cbrdParseToken = (cbrdParseTokenTextField.getPassword() != null)
+          ? new String(cbrdParseTokenTextField.getPassword()).trim()
+          : SAFE_VALUE_FALLBACK;
+      String cbrdParseTimeoutText = (cbrdParseTimeoutTextField.getText() != null)
+          ? cbrdParseTimeoutTextField.getText().trim()
+          : DEFAULT_CBRD_PARSE_TIMEOUT_MS;
+      int cbrdParseTimeoutParsed = parsePositiveIntOrDefault(cbrdParseTimeoutText, DEFAULT_CBRD_PARSE_TIMEOUT_MS);
+
+      if (KEY_CBRD_PARSE_API_URL != null && !KEY_CBRD_PARSE_API_URL.trim().isEmpty()) {
+        try {
+          pluginWorkspace.getOptionsStorage().setOption(KEY_CBRD_PARSE_API_URL, cbrdParseApiUrl);
+        } catch (Exception e) {
+          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set CBRD Parse endpoint URL: " + e.getMessage());
+        }
+      }
+      if (KEY_CBRD_PARSE_TOKEN != null && !KEY_CBRD_PARSE_TOKEN.trim().isEmpty()) {
+        try {
+          // Never log the value itself - only whether one is present (FR-003, NFR-004).
+          PluginLogger.debug(DAMAOptionPagePluginExtension.class,
+              "Setting CBRD Parse token: " + (cbrdParseToken.isEmpty() ? "[empty]" : "[***]"));
+          pluginWorkspace.getOptionsStorage().setSecretOption(KEY_CBRD_PARSE_TOKEN, cbrdParseToken);
+        } catch (Exception e) {
+          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set CBRD Parse token: " + e.getMessage());
+        }
+      }
+      if (KEY_CBRD_PARSE_TIMEOUT_MS != null && !KEY_CBRD_PARSE_TIMEOUT_MS.trim().isEmpty()) {
+        try {
+          pluginWorkspace.getOptionsStorage().setOption(KEY_CBRD_PARSE_TIMEOUT_MS, String.valueOf(cbrdParseTimeoutParsed));
+        } catch (Exception e) {
+          PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to set CBRD Parse timeout: " + e.getMessage());
+        }
+      }
+
       PluginLogger.info(DAMAOptionPagePluginExtension.class, "Options saved successfully");
     } catch (Exception e) {
       // Log the error to prevent crashes during option saving
@@ -301,24 +241,6 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
   public void restoreDefaults() {
     try {
       // Reset the text fields values. Use safe fallback to prevent null issues.
-      if (parseModelTextField != null) {
-        parseModelTextField.setText(SAFE_VALUE_FALLBACK);
-      }
-      if (detectModelTextField != null) {
-        detectModelTextField.setText(SAFE_VALUE_FALLBACK);
-      }
-      if (apiKeyTextField != null) {
-        apiKeyTextField.setText(SAFE_VALUE_FALLBACK);
-      }
-      if (apiBaseUrlTextField != null) {
-        apiBaseUrlTextField.setText(DEFAULT_AI_API_BASE_URL);
-      }
-      if (chatCompletionsPathTextField != null) {
-        chatCompletionsPathTextField.setText(DEFAULT_AI_CHAT_COMPLETIONS_PATH);
-      }
-      if (apiTimeoutTextField != null) {
-        apiTimeoutTextField.setText(DEFAULT_AI_TIMEOUT_MS);
-      }
       if (cbrdApiUrlTextField != null) {
         cbrdApiUrlTextField.setText(DEFAULT_CBRD_API_URL);
       }
@@ -327,6 +249,16 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       }
       if (cbrdTimeoutTextField != null) {
         cbrdTimeoutTextField.setText(DEFAULT_CBRD_TIMEOUT_MS);
+      }
+      if (cbrdParseApiUrlTextField != null) {
+        cbrdParseApiUrlTextField.setText(DEFAULT_CBRD_PARSE_API_URL);
+      }
+      if (cbrdParseTokenTextField != null) {
+        // The token has no default: it is provisioned per team, never revived (FR-005).
+        cbrdParseTokenTextField.setText(SAFE_VALUE_FALLBACK);
+      }
+      if (cbrdParseTimeoutTextField != null) {
+        cbrdParseTimeoutTextField.setText(DEFAULT_CBRD_PARSE_TIMEOUT_MS);
       }
     } catch (Exception e) {
       PluginLogger.error(DAMAOptionPagePluginExtension.class, "Error restoring defaults: " + e.getMessage(), e);
@@ -349,9 +281,6 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
    * This method should be called early to ensure translations are available.
    */
   private void initializeResourceBundle(PluginWorkspace pluginWorkspace) {
-    // Store the workspace reference for later use
-    // this.pluginWorkspace = pluginWorkspace;
-    
     // Store the resource bundle as an instance variable
     // According to Oxygen SDK, cast to StandalonePluginWorkspace to access getResourceBundle()
     try {
@@ -387,13 +316,13 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
     try {
       // Ultra-defensive initialization for system-wide preferences loading
       PluginLogger.info(DAMAOptionPagePluginExtension.class, "Initializing option page...");
-      
+
       // Check for null workspace early
       if (pluginWorkspace == null) {
         PluginLogger.info(DAMAOptionPagePluginExtension.class, "PluginWorkspace is null in init()");
         return createSimplePanel("Plugin workspace not available");
       }
-      
+
       // Check if options storage is available
       if (pluginWorkspace.getOptionsStorage() == null) {
         PluginLogger.info(DAMAOptionPagePluginExtension.class, "OptionsStorage is null in init()");
@@ -406,80 +335,56 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       GridBagConstraints c = new GridBagConstraints();
       JPanel panel = new JPanel(new GridBagLayout());
 
-      JLabel parseModelLabel = new JLabel(getMessage("ft.parse.model.label")); // "Parsing model:"
+      JLabel cbrdRefererLabel = new JLabel(getMessage("cbrd.referer.label"));
       c.gridx = 0;
       c.gridy = 0;
       c.weightx = 0;
       c.weighty = 0;
       c.anchor = GridBagConstraints.WEST;
-      panel.add(parseModelLabel, c);
+      panel.add(cbrdRefererLabel, c);
 
-      parseModelTextField = new JTextField();
+      cbrdRefererTextField = new JTextField();
       c.gridx ++;
       c.weightx = 1;
       c.fill = GridBagConstraints.HORIZONTAL;
       c.insets = new Insets(0, 5, 0, 5);
-      panel.add(parseModelTextField, c);
-      
-      c.gridx = 0;
-      c.gridy ++;
-      JLabel detectModelLabel = new JLabel(getMessage("ft.detect.model.label")); // "Detection model:"
-      panel.add(detectModelLabel, c);
-
-      detectModelTextField = new JTextField();
-      c.gridx ++;
-      c.weightx = 1;
-      c.fill = GridBagConstraints.HORIZONTAL;
-      c.insets = new Insets(0, 5, 0, 5);
-      panel.add(detectModelTextField, c);
-      
-      c.gridx = 0;
-      c.gridy ++;
-      JLabel apiKeyLabel = new JLabel(getMessage("api.key.label")); // "API Key*: "
-      panel.add(apiKeyLabel, c);
-
-      apiKeyTextField = new JPasswordField();
-      c.gridx ++;
-      c.weightx = 1;
-      c.fill = GridBagConstraints.HORIZONTAL;
-      c.insets = new Insets(0, 5, 0, 5);
-      panel.add(apiKeyTextField, c);
+      panel.add(cbrdRefererTextField, c);
 
       c.gridx = 0;
       c.gridy ++;
-      JLabel apiBaseUrlLabel = new JLabel(getMessage("api.base.url.label"));
-      panel.add(apiBaseUrlLabel, c);
+      JLabel cbrdParseTokenLabel = new JLabel(getMessage("cbrd.parse.token.label"));
+      panel.add(cbrdParseTokenLabel, c);
 
-      apiBaseUrlTextField = new JTextField();
+      cbrdParseTokenTextField = new JPasswordField();
       c.gridx ++;
       c.weightx = 1;
       c.fill = GridBagConstraints.HORIZONTAL;
       c.insets = new Insets(0, 5, 0, 5);
-      panel.add(apiBaseUrlTextField, c);
+      panel.add(cbrdParseTokenTextField, c);
 
       c.gridx = 0;
       c.gridy ++;
-      JLabel chatPathLabel = new JLabel(getMessage("api.chat.path.label"));
-      panel.add(chatPathLabel, c);
+      JLabel cbrdParseApiUrlLabel = new JLabel(getMessage("cbrd.parse.api.url.label"));
+      panel.add(cbrdParseApiUrlLabel, c);
 
-      chatCompletionsPathTextField = new JTextField();
+      cbrdParseApiUrlTextField = new JTextField();
       c.gridx ++;
       c.weightx = 1;
       c.fill = GridBagConstraints.HORIZONTAL;
       c.insets = new Insets(0, 5, 0, 5);
-      panel.add(chatCompletionsPathTextField, c);
+      panel.add(cbrdParseApiUrlTextField, c);
 
       c.gridx = 0;
       c.gridy ++;
-      JLabel apiTimeoutLabel = new JLabel(getMessage("api.timeout.ms.label"));
-      panel.add(apiTimeoutLabel, c);
+      JLabel cbrdParseTimeoutLabel = new JLabel(getMessage("cbrd.parse.timeout.ms.label"));
+      panel.add(cbrdParseTimeoutLabel, c);
 
-      apiTimeoutTextField = new JTextField();
+      cbrdParseTimeoutTextField = new JTextField();
       c.gridx ++;
       c.weightx = 1;
       c.fill = GridBagConstraints.HORIZONTAL;
       c.insets = new Insets(0, 5, 0, 5);
-      panel.add(apiTimeoutTextField, c);
+      panel.add(cbrdParseTimeoutTextField, c);
 
       c.gridx = 0;
       c.gridy ++;
@@ -492,18 +397,6 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       c.fill = GridBagConstraints.HORIZONTAL;
       c.insets = new Insets(0, 5, 0, 5);
       panel.add(cbrdApiUrlTextField, c);
-
-      c.gridx = 0;
-      c.gridy ++;
-      JLabel cbrdRefererLabel = new JLabel(getMessage("cbrd.referer.label"));
-      panel.add(cbrdRefererLabel, c);
-
-      cbrdRefererTextField = new JTextField();
-      c.gridx ++;
-      c.weightx = 1;
-      c.fill = GridBagConstraints.HORIZONTAL;
-      c.insets = new Insets(0, 5, 0, 5);
-      panel.add(cbrdRefererTextField, c);
 
       c.gridx = 0;
       c.gridy ++;
@@ -524,74 +417,16 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       c.weighty = 1;
       c.fill = GridBagConstraints.BOTH;
       panel.add(new JPanel(), c);
-      
+
       // Get stored options with extra null safety
-      String ftParseModel = SAFE_VALUE_FALLBACK;
-      String ftDetectModel = SAFE_VALUE_FALLBACK;
-      String apiKey = SAFE_VALUE_FALLBACK;
-      String apiBaseUrl = DEFAULT_AI_API_BASE_URL;
-      String chatPath = DEFAULT_AI_CHAT_COMPLETIONS_PATH;
-      String apiTimeoutMs = DEFAULT_AI_TIMEOUT_MS;
       String cbrdApiUrl = DEFAULT_CBRD_API_URL;
       String cbrdReferer = DEFAULT_CBRD_REFERER_HEADER;
       String cbrdTimeoutMs = DEFAULT_CBRD_TIMEOUT_MS;
-      
-      if (pluginWorkspace != null && pluginWorkspace.getOptionsStorage() != null) {
-        if (KEY_DILA_DAMA_FT_PARSE_MODEL != null && !KEY_DILA_DAMA_FT_PARSE_MODEL.trim().isEmpty()) {
-          try {
-            String value = pluginWorkspace.getOptionsStorage().getOption(KEY_DILA_DAMA_FT_PARSE_MODEL, SAFE_VALUE_FALLBACK);
-            ftParseModel = (value != null) ? value : SAFE_VALUE_FALLBACK;
-          } catch (Exception e) {
-            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get parse model option: " + e.getMessage());
-            ftParseModel = SAFE_VALUE_FALLBACK;
-          }
-        }
-        if (KEY_DILA_DAMA_FT_DETECT_MODEL != null && !KEY_DILA_DAMA_FT_DETECT_MODEL.trim().isEmpty()) {
-          try {
-            String value = pluginWorkspace.getOptionsStorage().getOption(KEY_DILA_DAMA_FT_DETECT_MODEL, SAFE_VALUE_FALLBACK);
-            ftDetectModel = (value != null) ? value : SAFE_VALUE_FALLBACK;
-          } catch (Exception e) {
-            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get detect model option: " + e.getMessage());
-            ftDetectModel = SAFE_VALUE_FALLBACK;
-          }
-        }
-        if (KEY_DILA_DAMA_API_KEY != null && !KEY_DILA_DAMA_API_KEY.trim().isEmpty()) {
-          try {
-            String value = pluginWorkspace.getOptionsStorage().getSecretOption(KEY_DILA_DAMA_API_KEY, SAFE_VALUE_FALLBACK);
-            apiKey = (value != null) ? value : SAFE_VALUE_FALLBACK;
-          } catch (Exception e) {
-            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get API key option: " + e.getMessage());
-            apiKey = SAFE_VALUE_FALLBACK;
-          }
-        }
-        if (KEY_DILA_DAMA_API_BASE_URL != null && !KEY_DILA_DAMA_API_BASE_URL.trim().isEmpty()) {
-          try {
-            String value = pluginWorkspace.getOptionsStorage().getOption(KEY_DILA_DAMA_API_BASE_URL, DEFAULT_AI_API_BASE_URL);
-            apiBaseUrl = (value != null && !value.trim().isEmpty()) ? value.trim() : DEFAULT_AI_API_BASE_URL;
-          } catch (Exception e) {
-            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get AI API base URL: " + e.getMessage());
-            apiBaseUrl = DEFAULT_AI_API_BASE_URL;
-          }
-        }
-        if (KEY_DILA_DAMA_CHAT_COMPLETIONS_PATH != null && !KEY_DILA_DAMA_CHAT_COMPLETIONS_PATH.trim().isEmpty()) {
-          try {
-            String value = pluginWorkspace.getOptionsStorage().getOption(KEY_DILA_DAMA_CHAT_COMPLETIONS_PATH, DEFAULT_AI_CHAT_COMPLETIONS_PATH);
-            chatPath = (value != null && !value.trim().isEmpty()) ? value.trim() : DEFAULT_AI_CHAT_COMPLETIONS_PATH;
-          } catch (Exception e) {
-            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get AI chat completions path: " + e.getMessage());
-            chatPath = DEFAULT_AI_CHAT_COMPLETIONS_PATH;
-          }
-        }
-        if (KEY_DILA_DAMA_API_TIMEOUT_MS != null && !KEY_DILA_DAMA_API_TIMEOUT_MS.trim().isEmpty()) {
-          try {
-            String value = pluginWorkspace.getOptionsStorage().getOption(KEY_DILA_DAMA_API_TIMEOUT_MS, DEFAULT_AI_TIMEOUT_MS);
-            apiTimeoutMs = (value != null && !value.trim().isEmpty()) ? value.trim() : DEFAULT_AI_TIMEOUT_MS;
-          } catch (Exception e) {
-            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get AI timeout: " + e.getMessage());
-            apiTimeoutMs = DEFAULT_AI_TIMEOUT_MS;
-          }
-        }
+      String cbrdParseApiUrl = DEFAULT_CBRD_PARSE_API_URL;
+      String cbrdParseToken = SAFE_VALUE_FALLBACK;
+      String cbrdParseTimeoutMs = DEFAULT_CBRD_PARSE_TIMEOUT_MS;
 
+      if (pluginWorkspace.getOptionsStorage() != null) {
         if (KEY_CBRD_API_URL != null && !KEY_CBRD_API_URL.trim().isEmpty()) {
           try {
             String value = pluginWorkspace.getOptionsStorage().getOption(KEY_CBRD_API_URL, DEFAULT_CBRD_API_URL);
@@ -621,27 +456,39 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
             cbrdTimeoutMs = DEFAULT_CBRD_TIMEOUT_MS;
           }
         }
+
+        if (KEY_CBRD_PARSE_API_URL != null && !KEY_CBRD_PARSE_API_URL.trim().isEmpty()) {
+          try {
+            String value = pluginWorkspace.getOptionsStorage().getOption(KEY_CBRD_PARSE_API_URL, DEFAULT_CBRD_PARSE_API_URL);
+            cbrdParseApiUrl = (value != null && !value.trim().isEmpty()) ? value.trim() : DEFAULT_CBRD_PARSE_API_URL;
+          } catch (Exception e) {
+            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get CBRD Parse endpoint URL: " + e.getMessage());
+            cbrdParseApiUrl = DEFAULT_CBRD_PARSE_API_URL;
+          }
+        }
+
+        if (KEY_CBRD_PARSE_TOKEN != null && !KEY_CBRD_PARSE_TOKEN.trim().isEmpty()) {
+          try {
+            String value = pluginWorkspace.getOptionsStorage().getSecretOption(KEY_CBRD_PARSE_TOKEN, SAFE_VALUE_FALLBACK);
+            cbrdParseToken = (value != null) ? value : SAFE_VALUE_FALLBACK;
+          } catch (Exception e) {
+            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get CBRD Parse token: " + e.getMessage());
+            cbrdParseToken = SAFE_VALUE_FALLBACK;
+          }
+        }
+
+        if (KEY_CBRD_PARSE_TIMEOUT_MS != null && !KEY_CBRD_PARSE_TIMEOUT_MS.trim().isEmpty()) {
+          try {
+            String value = pluginWorkspace.getOptionsStorage().getOption(KEY_CBRD_PARSE_TIMEOUT_MS, DEFAULT_CBRD_PARSE_TIMEOUT_MS);
+            cbrdParseTimeoutMs = (value != null && !value.trim().isEmpty()) ? value.trim() : DEFAULT_CBRD_PARSE_TIMEOUT_MS;
+          } catch (Exception e) {
+            PluginLogger.error(DAMAOptionPagePluginExtension.class, "Failed to get CBRD Parse timeout: " + e.getMessage());
+            cbrdParseTimeoutMs = DEFAULT_CBRD_PARSE_TIMEOUT_MS;
+          }
+        }
       }
-      
+
       // Initialize the text fields with the stored options (guaranteed non-null)
-      if (parseModelTextField != null) {
-        parseModelTextField.setText((ftParseModel != null) ? ftParseModel : SAFE_VALUE_FALLBACK);
-      }
-      if (detectModelTextField != null) {
-        detectModelTextField.setText((ftDetectModel != null) ? ftDetectModel : SAFE_VALUE_FALLBACK);
-      }
-      if (apiKeyTextField != null) {
-        apiKeyTextField.setText((apiKey != null) ? apiKey : SAFE_VALUE_FALLBACK);
-      }
-      if (apiBaseUrlTextField != null) {
-        apiBaseUrlTextField.setText(apiBaseUrl);
-      }
-      if (chatCompletionsPathTextField != null) {
-        chatCompletionsPathTextField.setText(chatPath);
-      }
-      if (apiTimeoutTextField != null) {
-        apiTimeoutTextField.setText(apiTimeoutMs);
-      }
       if (cbrdApiUrlTextField != null) {
         cbrdApiUrlTextField.setText(cbrdApiUrl);
       }
@@ -651,12 +498,38 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       if (cbrdTimeoutTextField != null) {
         cbrdTimeoutTextField.setText(cbrdTimeoutMs);
       }
-      
+      if (cbrdParseApiUrlTextField != null) {
+        cbrdParseApiUrlTextField.setText(cbrdParseApiUrl);
+      }
+      if (cbrdParseTokenTextField != null) {
+        cbrdParseTokenTextField.setText(cbrdParseToken);
+      }
+      if (cbrdParseTimeoutTextField != null) {
+        cbrdParseTimeoutTextField.setText(cbrdParseTimeoutMs);
+      }
+
       return panel;
     } catch (Exception e) {
       // Log the error and return a simple panel to prevent crashes
       PluginLogger.error(DAMAOptionPagePluginExtension.class, "Error initializing options page: " + e.getMessage(), e);
       return new JPanel(); // Return empty panel as fallback
+    }
+  }
+
+  /**
+   * Parses a timeout preference, falling back to the supplied default when the value is
+   * missing, unparseable, or non-positive.
+   */
+  private int parsePositiveIntOrDefault(String value, String defaultValue) {
+    int fallback = Integer.parseInt(defaultValue);
+    if (value == null || value.trim().isEmpty()) {
+      return fallback;
+    }
+    try {
+      int parsed = Integer.parseInt(value.trim());
+      return parsed > 0 ? parsed : fallback;
+    } catch (Exception e) {
+      return fallback;
     }
   }
 
@@ -692,27 +565,21 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
         PluginLogger.error(DAMAOptionPagePluginExtension.class, "Error getting message for key '" + key + "': " + e.getMessage(), e);
       }
     }
-    
+
     // Fallback translations matching the keys in our i18n/translation.xml
     switch (key) {
-      case "ft.parse.model.label":
-        return "Parsing model:";
-      case "ft.detect.model.label":
-        return "Detection model:";
-      case "api.key.label":
-        return "API Key*: ";
-      case "api.base.url.label":
-        return "AI API base URL:";
-      case "api.chat.path.label":
-        return "AI chat path:";
-      case "api.timeout.ms.label":
-        return "AI timeout (ms):";
       case "cbrd.api.url.label":
-        return "CBRD API URL:";
+        return "CBRD Link Endpoint:";
       case "cbrd.referer.label":
         return "CBRD Referer header:";
       case "cbrd.timeout.ms.label":
-        return "CBRD timeout (ms):";
+        return "CBRD Link timeout (ms):";
+      case "cbrd.parse.api.url.label":
+        return "CBRD Parse endpoint URL:";
+      case "cbrd.parse.token.label":
+        return "CBRD bearer token*:";
+      case "cbrd.parse.timeout.ms.label":
+        return "CBRD Parse timeout (ms):";
       case "preferences.page.title":
         return "(Fallback)DILA AI Markup Assistant Options";
       default:

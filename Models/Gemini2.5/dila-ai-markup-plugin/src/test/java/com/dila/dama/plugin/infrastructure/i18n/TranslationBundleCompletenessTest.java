@@ -39,4 +39,144 @@ public class TranslationBundleCompletenessTest {
                 .containsExactlyInAnyOrderElementsOf(languages);
         }
     }
+
+    /**
+     * T052 — every key this feature introduces ships in all three languages (NFR-001, FR-018,
+     * US4 scenario 10). Listed explicitly so a missing translation fails the build rather than
+     * falling back to the raw key at runtime.
+     */
+    @Test
+    public void cbrdParseKeysShipInEverySupportedLanguage() throws Exception {
+        String[] requiredKeys = {
+            // Preference labels
+            "cbrd.parse.api.url.label",
+            "cbrd.parse.token.label",
+            "cbrd.parse.timeout.ms.label",
+            // The nine service-enumerated causes
+            "ai.markup.error.text_is_required",
+            "ai.markup.error.text_is_too_long",
+            "ai.markup.error.unsupported_language",
+            "ai.markup.error.unauthorized",
+            "ai.markup.error.parse_api_not_configured",
+            "ai.markup.error.openai_credentials_unavailable",
+            "ai.markup.error.openai_rate_limited",
+            "ai.markup.error.openai_unavailable",
+            "ai.markup.error.invalid_model_output",
+            // Generic fallback, connectivity, and the two local guards
+            "ai.markup.error.unexpected",
+            "ai.markup.error.connectivity",
+            "ai.markup.error.token_not_configured",
+            "ai.markup.error.endpoint_url_invalid"
+        };
+
+        Document document = parseBundle();
+        Set<String> languages = languagesIn(document);
+        NodeList keyNodes = document.getElementsByTagName("key");
+
+        for (String requiredKey : requiredKeys) {
+            Element key = null;
+            for (int i = 0; i < keyNodes.getLength(); i++) {
+                if (requiredKey.equals(((Element) keyNodes.item(i)).getAttribute("value"))) {
+                    key = (Element) keyNodes.item(i);
+                    break;
+                }
+            }
+            assertThat(key).as("Translation key %s must exist", requiredKey).isNotNull();
+
+            Set<String> keyLanguages = new HashSet<String>();
+            NodeList values = key.getElementsByTagName("val");
+            for (int j = 0; j < values.getLength(); j++) {
+                Element value = (Element) values.item(j);
+                keyLanguages.add(value.getAttribute("lang"));
+                assertThat(value.getTextContent().trim())
+                    .as("Translation key %s must not be empty in %s", requiredKey, value.getAttribute("lang"))
+                    .isNotEmpty();
+            }
+            assertThat(keyLanguages)
+                .as("Translation key %s must ship in every supported language", requiredKey)
+                .containsExactlyInAnyOrderElementsOf(languages);
+        }
+    }
+
+    /**
+     * Session 2026-08-02 (Phase 9 follow-up 4) — all six preference labels are renamed/kept
+     * identical to English in every shipped language: "Bearer", "Token", "URL", "Endpoint",
+     * "Referer", and the "CBRD Parse"/"CBRD Link" prefixes are untranslated protocol terms.
+     * The zh_CN/zh_TW value of each label must equal its en_US value exactly.
+     */
+    @Test
+    public void preferenceLabelsAreIdenticalToEnglishInEveryLanguage() throws Exception {
+        String[] preferenceLabels = {
+            "cbrd.referer.label",
+            "cbrd.parse.token.label",
+            "cbrd.parse.api.url.label",
+            "cbrd.parse.timeout.ms.label",
+            "cbrd.api.url.label",
+            "cbrd.timeout.ms.label"
+        };
+
+        NodeList keyNodes = parseBundle().getElementsByTagName("key");
+        for (String requiredKey : preferenceLabels) {
+            Element key = null;
+            for (int i = 0; i < keyNodes.getLength(); i++) {
+                if (requiredKey.equals(((Element) keyNodes.item(i)).getAttribute("value"))) {
+                    key = (Element) keyNodes.item(i);
+                    break;
+                }
+            }
+            assertThat(key).as("Translation key %s must exist", requiredKey).isNotNull();
+
+            String enUs = null;
+            for (int j = 0; j < key.getElementsByTagName("val").getLength(); j++) {
+                Element value = (Element) key.getElementsByTagName("val").item(j);
+                if ("en_US".equals(value.getAttribute("lang"))) {
+                    enUs = value.getTextContent().trim();
+                }
+            }
+            assertThat(enUs).as("Translation key %s must have an en_US value", requiredKey).isNotNull();
+
+            for (int j = 0; j < key.getElementsByTagName("val").getLength(); j++) {
+                Element value = (Element) key.getElementsByTagName("val").item(j);
+                assertThat(value.getTextContent().trim())
+                    .as("%s in %s must be identical to the English text", requiredKey, value.getAttribute("lang"))
+                    .isEqualTo(enUs);
+            }
+        }
+    }
+
+    /**
+     * The OpenAI-era keys retired with the client-side call path must be gone, so nothing can
+     * quietly keep depending on them (FR-004).
+     */
+    @Test
+    public void retiredOpenAiKeysAreGone() throws Exception {
+        String[] retiredKeys = {
+            "system.prompt.ai.markup", "error.no.APIKey", "error.no.parse.model", "http.error", "llm.error"
+        };
+
+        NodeList keyNodes = parseBundle().getElementsByTagName("key");
+        Set<String> present = new HashSet<String>();
+        for (int i = 0; i < keyNodes.getLength(); i++) {
+            present.add(((Element) keyNodes.item(i)).getAttribute("value"));
+        }
+
+        for (String retired : retiredKeys) {
+            assertThat(present).as("Retired key %s should no longer ship", retired).doesNotContain(retired);
+        }
+    }
+
+    private Document parseBundle() throws Exception {
+        return DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(new File("src/main/resources/i18n/translation.xml"));
+    }
+
+    private Set<String> languagesIn(Document document) {
+        Set<String> languages = new HashSet<String>();
+        NodeList languageNodes = document.getElementsByTagName("language");
+        for (int i = 0; i < languageNodes.getLength(); i++) {
+            languages.add(((Element) languageNodes.item(i)).getAttribute("lang"));
+        }
+        return languages;
+    }
 }
