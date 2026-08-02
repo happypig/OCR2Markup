@@ -569,11 +569,11 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
     // Fallback translations matching the keys in our i18n/translation.xml
     switch (key) {
       case "cbrd.api.url.label":
-        return "CBRD API URL:";
+        return "CBRD Link Endpoint:";
       case "cbrd.referer.label":
         return "CBRD Referer header:";
       case "cbrd.timeout.ms.label":
-        return "CBRD timeout (ms):";
+        return "CBRD Link timeout (ms):";
       case "cbrd.parse.api.url.label":
         return "CBRD Parse endpoint URL:";
       case "cbrd.parse.token.label":

@@ -23,9 +23,9 @@ public class PreferencePageLayoutOrderTest {
         List<String> labels = UpgradePreferencesTest.labelsOf(initialisedPage());
 
         assertThat(labels).containsExactly(
-            "CBRD API URL:",
+            "CBRD Link Endpoint:",
             "CBRD Referer header:",
-            "CBRD timeout (ms):",
+            "CBRD Link timeout (ms):",
             "CBRD Parse endpoint URL:",
             "CBRD Parse token*:",
             "CBRD Parse timeout (ms):"
@@ -48,9 +48,9 @@ public class PreferencePageLayoutOrderTest {
         List<String> labels = UpgradePreferencesTest.labelsOf(initialisedPage());
 
         assertThat(labels.subList(0, 3)).containsExactly(
-            "CBRD API URL:",
+            "CBRD Link Endpoint:",
             "CBRD Referer header:",
-            "CBRD timeout (ms):"
+            "CBRD Link timeout (ms):"
         );
     }
 

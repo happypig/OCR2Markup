@@ -163,6 +163,47 @@ public class CbrdParseApiClientTest {
         assertThat(response.getException()).isInstanceOf(SocketTimeoutException.class);
     }
 
+    // T080 — Java-17 getErrorStream() quirk: S10 was mis-routed to FR-013 (connectivity) under
+    // Oxygen's bundled Java 17 even though the live endpoint returned a clean 401 with the
+    // contract-correct body. See spec.md Clarifications 2026-08-02, US4 scenario 12, Edge Cases;
+    // plan.md "Java-17 getErrorStream() Quirk"; tasks.md Phase 8 (T080 - T084).
+
+    @Test
+    public void unauthorizedOnJava17GetErrorStreamThrow() {
+        // Java 17 reproduces the canonical "Server returned HTTP response code: 401 for URL: ..."
+        // message from sun.net.www.protocol.http.HttpURLConnection.getInputStream() on 4xx.
+        CapturingConnectionFactory factory = CapturingConnectionFactory.respondingButErrorStreamThrows(
+            401,
+            new IOException(
+                "Server returned HTTP response code: 401 for URL: " + ENDPOINT
+            )
+        );
+
+        CbrdParseResponse response = new CbrdParseApiClient(factory).execute(configuration(), request());
+
+        // Per FR-011 (spec.md): a 401 with the canonical Bearer-realm header and unauthorized
+        // body MUST classify as UNAUTHORIZED — never as CONNECTIVITY_FAILURE.
+        assertThat(response.isSuccess()).isFalse();
+        assertThat(response.getError()).isEqualTo(ParseError.UNAUTHORIZED);
+        assertThat(response.getHttpStatus()).isEqualTo(401);
+        // The diagnostics export's serviceErrorBody MUST stay non-empty so the export carries a
+        // meaningful cause string rather than "" (which would defeat FR-022 in this scenario).
+        assertThat(response.getErrorBody()).isNotEmpty();
+    }
+
+    @Test
+    public void unknownHostExceptionRemainsConnectivityFailureEvenAfterJava17QuirkFix() {
+        // T082: no-status transport failures MUST still classify as connectivity under FR-013.
+        CapturingConnectionFactory factory = CapturingConnectionFactory.throwing(
+            new java.net.UnknownHostException("cbss.dila.edu.tw")
+        );
+
+        CbrdParseResponse response = new CbrdParseApiClient(factory).execute(configuration(), request());
+
+        assertThat(response.getError()).isEqualTo(ParseError.CONNECTIVITY_FAILURE);
+        assertThat(response.getHttpStatus()).isNull();
+    }
+
     @Test
     public void malformedEndpointUrlIsReportedRatherThanThrown() {
         CapturingConnectionFactory factory = CapturingConnectionFactory.respondingWith(200, MARKUP);

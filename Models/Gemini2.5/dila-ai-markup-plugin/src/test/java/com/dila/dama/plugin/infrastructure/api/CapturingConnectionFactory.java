@@ -25,6 +25,7 @@ public final class CapturingConnectionFactory extends HttpUrlConnectionFactory {
     private final String stubResponseBody;
     private final String stubErrorBody;
     private final IOException stubFailure;
+    private final IOException getErrorStreamFailure;
 
     private URL lastUrl;
     private String lastMethod;
@@ -34,26 +35,50 @@ public final class CapturingConnectionFactory extends HttpUrlConnectionFactory {
     private int lastReadTimeout = -1;
     private boolean disconnected;
 
-    private CapturingConnectionFactory(int responseCode, String responseBody, String errorBody, IOException failure) {
+    private CapturingConnectionFactory(
+        int responseCode,
+        String responseBody,
+        String errorBody,
+        IOException failure,
+        IOException getErrorStreamFailure
+    ) {
         this.stubResponseCode = responseCode;
         this.stubResponseBody = responseBody;
         this.stubErrorBody = errorBody;
         this.stubFailure = failure;
+        this.getErrorStreamFailure = getErrorStreamFailure;
     }
 
     /** HTTP 200 with an XML success body. */
     public static CapturingConnectionFactory respondingWith(int responseCode, String responseBody) {
-        return new CapturingConnectionFactory(responseCode, responseBody, null, null);
+        return new CapturingConnectionFactory(responseCode, responseBody, null, null, null);
     }
 
     /** Non-2xx status with a JSON ParseError body on the error stream. */
     public static CapturingConnectionFactory failingWith(int responseCode, String errorBody) {
-        return new CapturingConnectionFactory(responseCode, "", errorBody, null);
+        return new CapturingConnectionFactory(responseCode, "", errorBody, null, null);
     }
 
     /** Transport-level failure (connection refused, read timeout, DNS failure). */
     public static CapturingConnectionFactory throwing(IOException failure) {
-        return new CapturingConnectionFactory(0, "", null, failure);
+        return new CapturingConnectionFactory(0, "", null, failure, null);
+    }
+
+    /**
+     * Reproduces the Java-17 quirk observed hitting the live CBRD Parse endpoint with a wrong
+     * bearer token during 2026-08-02 S10 validation: {@code getResponseCode()} returns the real
+     * status cleanly, but {@code getErrorStream()} throws the canonical
+     * {@code IOException("Server returned HTTP response code: NNN for URL: ...")} that
+     * {@code sun.net.www.protocol.http.HttpURLConnection.getInputStream()} emits on a 4xx
+     * response. {@code HttpURLConnection.getErrorStream()} declares no {@code throws} clause,
+     * so the failure is delivered as an unchecked {@link RuntimeException} that the production
+     * {@code catch (Exception e)} in {@link CbrdParseApiClient#execute} still catches.
+     */
+    public static CapturingConnectionFactory respondingButErrorStreamThrows(
+        int responseCode,
+        IOException getErrorStreamFailure
+    ) {
+        return new CapturingConnectionFactory(responseCode, "", null, null, getErrorStreamFailure);
     }
 
     @Override
@@ -144,6 +169,13 @@ public final class CapturingConnectionFactory extends HttpUrlConnectionFactory {
 
         @Override
         public InputStream getErrorStream() {
+            if (getErrorStreamFailure != null) {
+                // HttpURLConnection.getErrorStream() declares no checked throws, so the production
+                // catch (Exception e) in CbrdParseApiClient sees this wrapped as RuntimeException
+                // — exactly matching the observable behaviour of Java 17 where the underlying
+                // getInputStream() itself throws the IOException up through HttpURLConnection.
+                throw new RuntimeException(getErrorStreamFailure);
+            }
             if (stubErrorBody == null) {
                 return null;
             }

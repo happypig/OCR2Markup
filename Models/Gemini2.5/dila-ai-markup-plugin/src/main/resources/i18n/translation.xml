@@ -514,9 +514,9 @@
   <!-- CBRD preferences -->
   <key value="cbrd.api.url.label">
     <comment>Preferences label</comment>
-    <val lang="en_US">CBRD API Endpoint:</val>
-    <val lang="zh_CN">CBRD API 接口位址(Endpoint)：</val>
-    <val lang="zh_TW">CBRD API 接口位址(Endpoint)：</val>
+    <val lang="en_US">CBRD Link Endpoint:</val>
+    <val lang="zh_CN">CBRD 連結端點：</val>
+    <val lang="zh_TW">CBRD 連結端點：</val>
   </key>
   <key value="cbrd.referer.label">
     <comment>Preferences label</comment>
@@ -526,9 +526,9 @@
   </key>
   <key value="cbrd.timeout.ms.label">
     <comment>Preferences label</comment>
-    <val lang="en_US">CBRD timeout (ms):</val>
-    <val lang="zh_CN">CBRD 逾時（毫秒）：</val>
-    <val lang="zh_TW">CBRD 逾時（毫秒）：</val>
+    <val lang="en_US">CBRD Link timeout (ms):</val>
+    <val lang="zh_CN">CBRD 連結逾時 (毫秒)：</val>
+    <val lang="zh_TW">CBRD 連結逾時 (毫秒)：</val>
   </key>
   <key value="cbrd.parse.api.url.label">
     <comment>Preferences label (004-cbrd-parse-endpoint)</comment>
