@@ -92,15 +92,12 @@ the goal is backlog item 5. Until that lands the floor is stated but unenforced.
 
 ## Next up
 
-1. **Re-run 005's Constitution Check and delete its deviation table.** The
-   amendment landed 2026-08-03 (v1.1.0, Remote Read category), which is what that
-   table was waiting for. Per its own expiry clause it should be **deleted rather
-   than honoured** — `specs/005-cbrd-link-v11/plan.md` → Complexity Tracking.
-   Principle VI then passes cleanly and 005 carries no deviation into history.
-2. **Merge `005`.** Branch `005-cbrd-link-v11`, complete and validated. Do this
-   after step 1, which is the whole reason the amendment was scheduled before the
-   merge rather than after it.
-3. **`006` — single-source plugin version.** `src/main/java` is not
+1. **Merge `005`.** Branch `005-cbrd-link-v11`, 6 commits ahead of `origin`:
+   complete, Oxygen-validated, and **constitution-clean** — all 10 principles
+   pass, no deviations. The v1.1.0 amendment landed first precisely so the
+   Principle VI deviation could be discharged (`8e3e45f`) rather than merged into
+   history. Nothing blocks this.
+2. **`006` — single-source plugin version.** `src/main/java` is not
    resource-filtered, so `${project.version}` cannot reach it. Two hardcoded
    `User-Agent` literals drift as a result; `CBRDAPIClient`'s still reads
    `DILA-AI-Markup/0.4.2`, three releases stale. Marked `TODO(005)` in
