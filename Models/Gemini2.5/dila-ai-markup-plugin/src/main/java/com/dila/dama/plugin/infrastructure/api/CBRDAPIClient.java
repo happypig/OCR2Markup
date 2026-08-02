@@ -3,19 +3,33 @@ package com.dila.dama.plugin.infrastructure.api;
 import com.dila.dama.plugin.domain.model.TransformedComponents;
 import com.dila.dama.plugin.util.PluginLogger;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 public class CBRDAPIClient {
 
     private static final int MAX_ATTEMPTS = 3;
     private static final long BASE_BACKOFF_MS = 250L;
+
+    /**
+     * The CBRD contract version this client's request shape is built against.
+     *
+     * <p>v1.0.0 served {@code GET /link?q=<xml>}; v1.1.0 routes only {@code POST /link} with a
+     * JSON body. The plugin issued the GET against a v1.1.0 server for weeks, and every
+     * conversion failed with a routing 404. {@code CBRDContractConformanceTest} asserts this
+     * constant against {@code info.version} in the vendored contract so that the next such
+     * divergence fails the build instead of production.
+     */
+    static final String CONTRACT_VERSION = "1.1.0";
 
     private final String apiUrl;
     private final String refererHeaderValue;
@@ -47,13 +61,13 @@ public class CBRDAPIClient {
 
     private String convertToFirstLinkWithQuery(String queryXml) throws CBRDAPIException {
         try {
-            String encoded = URLEncoder.encode(queryXml, "UTF-8");
-            String separator = apiUrl.contains("?")
-                ? (apiUrl.endsWith("?") || apiUrl.endsWith("&") ? "" : "&")
-                : "?";
-            URL url = new URL(apiUrl + separator + "q=" + encoded);
+            // CBRD v1.1.0: the citation travels in a JSON request body, not the query string.
+            // JSONObject rather than hand-rolled escaping (research D1) — the payload is <ref> XML
+            // carrying quoted attributes and CJK, exactly the input naive escapers corrupt.
+            String payload = new JSONObject().put("q", queryXml).toString();
+            URL url = new URL(apiUrl);
 
-            return executeWithRetries(url);
+            return executeWithRetries(url, payload);
         } catch (CBRDAPIException e) {
             throw e;
         } catch (Exception e) {
@@ -62,7 +76,7 @@ public class CBRDAPIClient {
         }
     }
 
-    private String executeWithRetries(URL url) throws Exception {
+    private String executeWithRetries(URL url, String payload) throws Exception {
         Throwable lastTimeout = null;
         for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
             int attemptTimeoutMs = computeAttemptTimeoutMs(attempt);
@@ -70,7 +84,7 @@ public class CBRDAPIClient {
             PluginLogger.debug("[CBRDAPIClient]Request start (attempt " + attempt + "/" + MAX_ATTEMPTS
                 + ", timeout=" + attemptTimeoutMs + "ms): " + url);
             try {
-                String result = executeOnce(url, attemptTimeoutMs);
+                String result = executeOnce(url, payload, attemptTimeoutMs);
                 long elapsedMs = (System.nanoTime() - startNs) / 1_000_000L;
                 PluginLogger.debug("[CBRDAPIClient]Request success (attempt " + attempt + "/" + MAX_ATTEMPTS
                     + ", elapsed=" + elapsedMs + "ms).");
@@ -104,17 +118,26 @@ public class CBRDAPIClient {
         throw new CBRDAPIException("error.api.timeout", lastTimeout);
     }
 
-    private String executeOnce(URL url, int attemptTimeoutMs) throws Exception {
+    private String executeOnce(URL url, String payload, int attemptTimeoutMs) throws Exception {
         HttpURLConnection conn = connectionFactory.openConnection(url);
-        conn.setRequestMethod("GET");
+        conn.setRequestMethod("POST");
         conn.setConnectTimeout(attemptTimeoutMs);
         conn.setReadTimeout(attemptTimeoutMs);
         conn.setInstanceFollowRedirects(true);
+        conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        // v1.1.0 declares no security on /link, so Referer is no longer required. It is retained
+        // deliberately (research D2): removing it widens the blast radius of an outage fix, and
+        // the service still accepts it.
         conn.setRequestProperty("Referer", refererHeaderValue);
         conn.setRequestProperty("Accept", "application/json");
         conn.setRequestProperty("Accept-Charset", "UTF-8");
         conn.setRequestProperty("User-Agent", "DILA-AI-Markup/0.4.2");
+        conn.setDoOutput(true);
         logRequestHeaders(url, conn);
+
+        try (OutputStream out = conn.getOutputStream()) {
+            out.write(payload.getBytes(StandardCharsets.UTF_8));
+        }
 
         int status = conn.getResponseCode();
         String body = readAll(status >= 200 && status < 300 ? conn.getInputStream() : conn.getErrorStream());
