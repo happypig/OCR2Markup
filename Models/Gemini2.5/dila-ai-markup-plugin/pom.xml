@@ -21,6 +21,22 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <oxygen.sdk.version>27.1.0.3</oxygen.sdk.version>
+
+    <!--
+      Reproducible builds. Without this, every `mvn install` rewrites the jar and
+      dilaAIMarkupPlugin.zip with fresh internal timestamps, so the tracked artifacts show as
+      modified after a build even when nothing in the source changed. With it, identical source
+      produces byte-identical archives - which turns a zip diff into a real signal.
+      Bump the date when cutting a release.
+    -->
+    <project.build.outputTimestamp>2026-08-02T00:00:00Z</project.build.outputTimestamp>
+
+    <!--
+      Filled in by JaCoCo's prepare-agent goal; empty by default so the build still works when
+      coverage is skipped. Surefire declares its own argLine, which would otherwise discard the
+      agent, so it references this property explicitly.
+    -->
+    <jacocoArgLine></jacocoArgLine>
     <javac.path>${env.JAVA_HOME}/bin/javac</javac.path>
     <!-- Force Java 8 compatibility -->
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -172,8 +188,40 @@
           <threadCount>4</threadCount>
           <forkCount>1</forkCount>
           <reuseForks>true</reuseForks>
-          <argLine>-Xmx512m</argLine>
+          <!-- @{...} is late replacement: jacocoArgLine is set during the build, not at parse time. -->
+          <argLine>@{jacocoArgLine} -Xmx512m</argLine>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.12</version>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+            <configuration>
+              <propertyName>jacocoArgLine</propertyName>
+            </configuration>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+        <!--
+          MEASURE ONLY - deliberately no `check` goal yet. The constitution mandates coverage
+          >= 80% but nothing has ever measured it, so the real figure is unknown. Wiring an
+          enforcing threshold before seeing the number risks failing the build on day one, which
+          is how a rule gets disabled and becomes decorative. Add `check` once the baseline is
+          known and the threshold is a deliberate decision.
+          Report: target/site/jacoco/index.html
+        -->
       </plugin>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>

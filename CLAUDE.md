@@ -44,14 +44,34 @@ root (the assembly is bound to `install`, not `package`).
 
 ## Current state — 2026-08-02
 
-Plugin **0.5.0**. Feature `004-cbrd-parse-endpoint` is complete and committed:
-AI Markup now calls the DILA CBRD Parse endpoint instead of an OpenAI-compatible
-endpoint on the editor's machine. 365 tests, 0 failures.
+Plugin **0.5.0**. Feature `004-cbrd-parse-endpoint` is complete, manually
+validated in Oxygen, and merged to `main`: AI Markup now calls the DILA CBRD
+Parse endpoint instead of an OpenAI-compatible endpoint on the editor's machine.
+**365 tests, 0 failures**, all 86 tasks signed off.
 
-Two items remain open on 004, both recorded in
-`specs/004-cbrd-parse-endpoint/tasks.md` under "Implementation Progress":
-T055 (quickstart scenarios need a live Oxygen and a real token) and T057
-(coverage ≥ 80% is unmeasurable — no coverage plugin in the build).
+**Coverage baseline (first ever measured, 2026-08-02): 59.5% instructions,
+45.1% branches.** The constitution's Enforcement section mandates ≥ 80%, so the
+project is well short of its own rule and always has been — nothing measured it
+until now. `mvn test` writes `target/site/jacoco/index.html`.
+
+Where the gap is, and why it matters architecturally:
+
+```
+infrastructure.export  100%     application.command   90%     domain.service   85%
+application.query       96%     infrastructure.api    90%     domain.model     68%
+preferences             69%     util                  69%
+workspace            35.4%   ← DAMAWorkspaceAccessPluginExtension, ~1800 lines
+infrastructure.release  8.3%
+```
+
+The domain/application/infrastructure layers 004 built sit at 85-100%. The
+number is dragged down almost entirely by `workspace`, the Swing/Oxygen UI
+class. That is evidence for Principle III rather than against it: logic that
+stays out of the UI gets tested, logic that leaks into it does not.
+
+JaCoCo is deliberately **measure-only** — no `check` goal. Wiring an 80%
+threshold today would fail the build immediately. Decide the threshold once
+someone has looked at the number.
 
 ## Next up
 
@@ -67,6 +87,29 @@ T055 (quickstart scenarios need a live Oxygen and a real token) and T057
 
 If both run on one branch, Phase A (005) must **merge** before Phase B (006)
 starts — otherwise an outage fix waits on hygiene work.
+
+## Backlog — real, unscheduled, attached to no feature
+
+Kept here because a note in a closed document or a commit message does not get
+acted on. None of these block 005 or 006.
+
+1. **Decide the coverage threshold.** Measuring is done (59.5%); enforcing is
+   not. Either add JaCoCo's `check` goal at a threshold the project actually
+   meets and raise it over time, or amend the constitution's ≥ 80% Enforcement
+   line via `/speckit.constitution`. The current state — a mandated figure the
+   build never checks — is the thing to fix, in whichever direction.
+2. **Split `RunAiMarkupDiagnosticsCommand` into a query + command pair.** It
+   returns domain data, which Principle VI forbids of a Command, and it mutates
+   nothing. Recorded as an approved, time-boxed deviation in
+   `specs/004-cbrd-parse-endpoint/plan.md` → Complexity Tracking. The class name
+   is also now misleading: it is the primary AI Markup path, not a diagnostic.
+3. **Give Principle VI a category for a non-cacheable remote read.** `/cbrd/parse`
+   is a POST that spends server-side model budget and cannot be cached, so it
+   fits neither Command nor Query as the constitution defines them. Item 2 cannot
+   be resolved cleanly until this is.
+4. **`CBRDAPIClientTest:39` pins a stale literal** (`DILA-AI-Markup/0.4.2`) and
+   will resist a correct version bump. 006 removes the literal; if 006 slips,
+   this test still needs fixing.
 
 ## Standing rules this codebase earned the hard way
 
