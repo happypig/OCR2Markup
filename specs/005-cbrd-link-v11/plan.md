@@ -2,7 +2,7 @@
 
 **Branch**: `005-cbrd-link-v11` | **Date**: 2026-08-03 | **Spec**: [spec.md](./spec.md)
 
-**Status**: Complete — implemented and validated 2026-08-03. 376 tests, 0 failures, 2 skipped (opt-in live probe); `infrastructure.api` coverage 90.0% → 91.5%; one production file changed (+34/-11). Execution notes, including four deviations from this plan, are in [tasks.md](./tasks.md) → Notes.
+**Status**: Complete — implemented and validated 2026-08-03. 376 tests, 0 failures, 2 skipped (opt-in live probe); `infrastructure.api` coverage 90.0% → 91.5%; one production file changed (+34/-11). Execution notes, including five deviations from this plan, are in [tasks.md](./tasks.md) → Notes.
 
 **Input**: Feature specification from `/specs/005-cbrd-link-v11/spec.md`
 
@@ -16,7 +16,7 @@ citation problem.
 
 The fix is small and confined: inside `CBRDAPIClient.executeOnce`, stop
 assembling a query string and start writing a JSON body. Response handling,
-the response DTO, the three i18n keys, the retry policy, the Replace rewrite,
+the response DTO, the seven i18n keys the client raises, the retry policy, the Replace rewrite,
 and the URL preference are all unchanged — verified against the live service,
 which returns HTTP 200 for every documented outcome.
 
@@ -76,18 +76,24 @@ to the domain or application layers.
 | III. Clean Architecture | The change is entirely in the Infrastructure layer. Domain and Application layers are untouched; no new dependency points outward. | **PASS** |
 | IV. TDD (BDD + TDD) | All 14 FRs carry BDD criteria (spec.md). Task ordering must follow RED → TEST GATE → GREEN → COMPLETION GATE. The RED phase is unusually literal here: the existing assertions must be seen failing against the new client before they are rewritten. | **PASS** (enforced in tasks.md) |
 | V. DDD | Ubiquitous language preserved — 參考文獻/Reference, 典籍/Canon, Hyperlink. No generic `Request`/`Response` names introduced; the contract's own `LinkRequest`/`LinkResponse` terms stay confined to the contract artifact. | **PASS** |
-| VI. CQRS | **VIOLATION — pre-existing, documented.** `ConvertReferenceCommand.execute` returns domain data (`ConvertReferenceResult.getUrl()`), which Principle VI forbids of a Command; but Query requires "read-only, no side effects, **cacheable**", and a remote citation lookup is not cacheable. Neither category fits. See Complexity Tracking. | **DEVIATION** |
+| VI. Command / Query / Remote Read | `ConvertReferenceCommand.execute` performs a **Remote Read**: it returns data from an external system (`POST /cbrd/link`), changes no local state, and is not cached. It satisfies that category's rules, including the requirement that a Remote Read distinguish "the external system answered negatively" from "could not be reached" — which is User Story 2 of this feature. The `…Command` suffix is a SHOULD, not a violation. | **PASS** |
 | VII. Defensive Programming | Preserved and slightly extended: the output stream is written in try-with-resources; null/blank citation handling is unchanged; the payload is built through `JSONObject` rather than string concatenation. | **PASS** |
 | VIII. Async-First | Unchanged. The conversion already runs off the EDT and reports back via `SwingUtilities.invokeLater`. This feature does not touch threading. | **PASS** |
-| IX. Comprehensive i18n | No new user-facing strings expected. The three existing keys (`error.api.http`, `error.no.results`, `error.api.failed`) keep their semantics. Service-supplied text (e.g. `經號或頁碼 至少要有一個`) is passed through as data, not translated. If any key is added, all three languages ship in the same change. | **PASS** |
+| IX. Comprehensive i18n | No new user-facing strings expected. All seven keys the client raises keep their semantics (`error.api.http` narrows: it is no longer reachable for outcomes the service returns normally). Service-supplied text (e.g. `經號或頁碼 至少要有一個`) is passed through as data, not translated. If any key is added, all three languages ship in the same change. | **PASS** |
 | X. Continuous Verification | `mvn test` after every change; the feature is not complete until the suite is green **and** the behaviour is confirmed in a live Oxygen session (FR-014, SC-008). | **PASS** |
 
 **Technology Standards**: no Java baseline change, no new runtime dependency, no
 JavaScript bridge, UTF-8 throughout. **PASS**
 
-**Post-Phase 1 re-check**: no new violations. The design adds no project, no
-layer, and no dependency; the single deviation is the pre-existing Principle VI
-categorisation issue, unchanged in nature by this feature.
+**Post-Phase 1 re-check**: no violations. The design adds no project, no layer,
+and no dependency.
+
+**Re-checked 2026-08-03 against constitution v1.1.0**: the single deviation this
+plan originally recorded — Principle VI having no category for a non-cacheable
+remote read — no longer exists. The amendment added **Remote Read**, and
+`ConvertReferenceCommand` classifies cleanly as one. **All 10 principles pass.**
+The Complexity Tracking table was deleted rather than honoured, per its own
+expiry clause.
 
 ## Project Structure
 
@@ -145,32 +151,22 @@ defect this feature exists to remove.
 
 ## Complexity Tracking
 
-> Filled because the Constitution Check records one deviation.
+> **Empty — no deviations.** All 10 principles pass under constitution v1.1.0.
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| **Principle VI (CQRS)** — `ConvertReferenceCommand.execute` returns domain data (a URL), which a Command "MUST NOT" do | The operation is a remote read that changes no local state. Principle VI offers only two categories: Command ("MUST NOT return domain data") and Query ("read-only, no side effects, **cacheable**"). A citation lookup against a third-party service is not cacheable, so neither category applies. The code is not wrong; the taxonomy has no slot for a non-cacheable remote read. | Restructuring into a query/command pair was rejected **for this feature**: (a) it cannot be classified correctly until the missing category exists, so the split would encode a guess; (b) this is an outage fix — widening it to an application-layer refactor delays the restoration of a broken production feature; (c) the work is already tracked as backlog item 2, blocked on the constitution amendment that adds the category. |
+This plan originally carried one deviation: `ConvertReferenceCommand.execute`
+returns domain data, which Principle VI forbade of a Command, while Query
+required cacheability that a remote citation lookup cannot offer. Neither
+category fitted.
 
-**Approval** (required by Governance → Complexity Justification, which says a
-violation MUST be justified "with architect approval" — justification without a
-recorded approver only half-satisfies the clause):
+That table is gone because the gap was closed, not because it was waived.
+Constitution **v1.1.0** (2026-08-03,
+`specs/constitution-amendment-2026-08-03.md`) added the **Remote Read**
+category, and the operation now classifies correctly.
 
-| Field | Value |
-|---|---|
-| Approved by | jeffwu@dila.edu.tw (project owner) |
-| Date | 2026-08-03 |
-| Scope of approval | This feature (005) only. Not transferable to 006 or later. |
-| Basis | Reviewed in session: the deviation was explained in full — Command forbids returning domain data, Query requires cacheability, a remote citation lookup satisfies neither — alongside the alternative of landing the constitution amendment first. The owner directed implementing 005 first, on the grounds that governance work must not sit in front of an outage fix. |
-| Superseded when | The amendment lands. **Scheduled before this branch merges, not after** (decided 2026-08-03): implementation goes first, the amendment lands while 005 is in review, and this Constitution Check is then re-run clean. If that happens as planned, this whole table is deleted rather than honoured. |
-
-> If that attribution is wrong, correct this table before implementation — an
-> approval recorded against the wrong person is worse than an absent one.
-
-**Provenance and expiry**: This is the **second** recorded instance of the same
-gap — 004 recorded the first for `RunAiMarkupDiagnosticsCommand.execute`, also
-in `plan.md` → Complexity Tracking → Follow-up. Two of two commands violating a
-principle is evidence the categories are wrong rather than the code. `CLAUDE.md`
-tracks the fix as a pending constitution amendment (backlog items 1 and 3, to be
-done in a single amendment pass). This deviation expires when that amendment
-lands; it MUST NOT be renewed a third time without the amendment, because a
-principle that is deviated from by default has quietly become optional.
+Recorded here because the sequence is the point. The deviation was written with
+an expiry clause stating it must not be renewed a third time — this was the
+second instance, after 004's for `RunAiMarkupDiagnosticsCommand`. The amendment
+was then deliberately scheduled **before this branch merges rather than after**,
+so the clause could be discharged instead of inherited. Two of two operations
+violating a principle was evidence the categories were wrong; the fix belonged
+in the constitution, and 005 merges carrying no deviation at all.
