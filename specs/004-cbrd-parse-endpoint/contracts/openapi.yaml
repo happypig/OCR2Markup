@@ -1,0 +1,142 @@
+openapi: 3.1.0
+info:
+  title: CBRD Parse API
+  version: "1.1.0"
+  description: >
+    Server-hosted DILA endpoint that parses unmarked CBETA reference text into TEI P5
+    marked-up XML. Consumed by the AI Markup action in the DILA AI Markup Assistant plugin
+    (feature 004-cbrd-parse-endpoint). Source: https://cbss.dila.edu.tw/cbrd/openapi.json
+servers:
+  - url: https://cbss.dila.edu.tw/cbrd
+    description: Production CBRD server
+tags:
+  - name: Parse
+    description: Parse unmarked canon reference text into XML
+paths:
+  /parse:
+    post:
+      tags: [Parse]
+      operationId: parseReference
+      summary: Parse one canon reference
+      description: >
+        Requires a Bearer token. On success returns marked-up `<ref>` XML.
+        Input text is limited to 4,000 characters.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ParseRequest"
+            example:
+              text: "(T 1442)，大正23，頁869中一頁871 中"
+              lang: zh
+      responses:
+        "200":
+          description: Parse completed
+          content:
+            application/xml:
+              schema:
+                type: string
+              example: "<ref>(<canon>T</canon> <w>1442</w>)，大正<v>23</v>，頁<p>869</p><c>中</c>一頁<p>871</p> <c>中</c></ref>"
+        "400":
+          description: Missing input, input too long, or unsupported language
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParseError"
+              examples:
+                textIsRequired:
+                  value: { success: false, error: text_is_required }
+                textIsTooLong:
+                  value: { success: false, error: text_is_too_long }
+                unsupportedLanguage:
+                  value: { success: false, error: unsupported_language }
+        "401":
+          description: Bearer token invalid or missing
+          headers:
+            WWW-Authenticate:
+              schema:
+                type: string
+              example: Bearer realm="parse"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParseError"
+              example:
+                success: false
+                error: unauthorized
+        "422":
+          description: Model output failed XML or semantic validation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParseError"
+              example:
+                success: false
+                error: invalid_model_output
+        "502":
+          description: Upstream OpenAI service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParseError"
+              example:
+                success: false
+                error: openai_unavailable
+        "503":
+          description: API not configured, credentials unavailable, or rate limited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParseError"
+              examples:
+                notConfigured:
+                  value: { success: false, error: parse_api_not_configured }
+                credentialsUnavailable:
+                  value: { success: false, error: openai_credentials_unavailable }
+                rateLimited:
+                  value: { success: false, error: openai_rate_limited }
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: Shared DILA parse token provisioned by the administrator.
+  schemas:
+    ParseRequest:
+      type: object
+      required: [text]
+      additionalProperties: false
+      properties:
+        text:
+          type: string
+          minLength: 1
+          maxLength: 4000
+          description: Unmarked canon reference text.
+        lang:
+          type: string
+          enum: [zh, jp]
+          default: zh
+          description: Source language.
+    ParseError:
+      type: object
+      required: [success, error]
+      additionalProperties: false
+      properties:
+        success:
+          type: boolean
+          const: false
+        error:
+          type: string
+          enum:
+            - text_is_required
+            - text_is_too_long
+            - unsupported_language
+            - unauthorized
+            - parse_api_not_configured
+            - openai_credentials_unavailable
+            - openai_rate_limited
+            - openai_unavailable
+            - invalid_model_output
