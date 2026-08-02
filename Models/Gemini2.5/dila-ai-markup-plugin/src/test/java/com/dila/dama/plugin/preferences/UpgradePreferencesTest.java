@@ -62,12 +62,12 @@ public class UpgradePreferencesTest {
         JComponent panel = PreferencePageLayoutOrderTest.initialisedPage();
         List<JTextField> fields = textFieldsOf(panel);
 
-        // Rows: CBRD url, referer, timeout, parse url, parse token, parse timeout.
+        // Rows: referer, bearer token, parse url, parse timeout, link url, link timeout.
         assertThat(fields).hasSize(6);
-        assertThat(fields.get(3).getText()).isEqualTo("https://cbss.dila.edu.tw/cbrd/parse");
-        assertThat(fields.get(4)).isInstanceOf(JPasswordField.class);
-        assertThat(fields.get(4).getText()).isEmpty();
-        assertThat(fields.get(5).getText()).isEqualTo("30000");
+        assertThat(fields.get(1)).isInstanceOf(JPasswordField.class);
+        assertThat(fields.get(1).getText()).isEmpty();
+        assertThat(fields.get(2).getText()).isEqualTo("https://cbss.dila.edu.tw/cbrd/parse");
+        assertThat(fields.get(3).getText()).isEqualTo("30000");
     }
 
     static List<String> labelsOf(Container container) {

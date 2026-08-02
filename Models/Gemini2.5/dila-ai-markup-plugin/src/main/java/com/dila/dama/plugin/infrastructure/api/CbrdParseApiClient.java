@@ -42,6 +42,19 @@ public class CbrdParseApiClient {
     private static final Pattern STATUS_FROM_EXCEPTION_MESSAGE =
         Pattern.compile("Server returned HTTP response code: (\\d{3}) for URL:");
 
+    /**
+     * Matches the message of Oxygen's own HTTP protocol handler,
+     * {@code ro.sync.net.protocol.http.HttpExceptionWithDetails}, which Oxygen installs as the
+     * default URL stream handler. On a non-2xx response it throws
+     * {@code "NNN Reason for: <url>"} (observed live: {@code "401 Unauthorized for:
+     * https://cbss.dila.edu.tw/cbrd/parse"} in the 2026-08-02 S11 diagnostics export) instead of
+     * letting {@code getResponseCode()} return cleanly, so {@link #recoverStatusFromException}
+     * must recover the status from this message text too — otherwise a 401 would be downgraded
+     * to FR-013 connectivity.
+     */
+    private static final Pattern OXYGEN_HTTP_STATUS_FROM_EXCEPTION_MESSAGE =
+        Pattern.compile("(\\d{3})\\s+[A-Za-z][A-Za-z ]*\\s+for:");
+
     private final HttpUrlConnectionFactory connectionFactory;
     private final SecretRedactor redactor;
 
@@ -110,6 +123,14 @@ public class CbrdParseApiClient {
                         + " recovered from prior getResponseCode()";
                 return classifyStatusKnownFailure(status, causeBody, trace, unwrapCause(e));
             }
+            if (errorBody == null || errorBody.trim().isEmpty()) {
+                // FR-011: a known HTTP status MUST still win even when no body arrives (for
+                // example a gateway or proxy returning 401 with an empty body), so the cause is
+                // classified from the status — a 401 is a credential rejection, never a
+                // connectivity failure and never the generic UNEXPECTED_RESPONSE.
+                String causeBody = "No error body; classified from status " + status;
+                return classifyStatusKnownFailure(status, causeBody, trace, null);
+            }
             ParseError error = parseErrorCode(errorBody);
             PluginLogger.warn("[CbrdParseApiClient]Parse failed: status=" + status + ", error=" + error);
             return CbrdParseResponse.failure(status, error, redactor.redact(errorBody), trace, null);
@@ -118,7 +139,7 @@ public class CbrdParseApiClient {
             int recovered = recoverStatusFromException(e, priorStatus);
             if (recovered >= 0) {
                 String causeBody =
-                    "Java-17 getErrorStream threw IOException; status " + recovered
+                    "No readable response body; status " + recovered
                         + " recovered from exception message";
                 return classifyStatusKnownFailure(recovered, causeBody, trace, unwrapCause(e));
             }
@@ -173,10 +194,11 @@ public class CbrdParseApiClient {
     /**
      * Returns the HTTP status when one is recoverable. Prefers a status already captured from
      * {@code getResponseCode()} (the {@code priorStatus} argument), and otherwise parses it out
-     * of the canonical {@code "Server returned HTTP response code: NNN for URL: ..."} message
-     * that {@code sun.net.www.protocol.http.HttpURLConnection.getInputStream()} emits on a
-     * non-2xx response. Returns a negative value when no status is recoverable, signalling a
-     * genuine transport-level failure (DNS / TLS / timeout) that should route to FR-013.
+     * of the message on the exception chain. Both the canonical JDK message
+     * ({@code "Server returned HTTP response code: NNN for URL: ..."}) and Oxygen's protocol
+     * handler message ({@code "NNN Reason for: <url>"}) are recognised. Returns a negative value
+     * when no status is recoverable, signalling a genuine transport-level failure (DNS / TLS /
+     * timeout) that should route to FR-013.
      */
     private int recoverStatusFromException(Throwable throwable, int priorStatus) {
         if (priorStatus > 0) {
@@ -184,18 +206,29 @@ public class CbrdParseApiClient {
         }
         Throwable current = throwable;
         while (current != null) {
-            String message = current.getMessage();
-            if (message != null) {
-                Matcher matcher = STATUS_FROM_EXCEPTION_MESSAGE.matcher(message);
-                if (matcher.find()) {
-                    try {
-                        return Integer.parseInt(matcher.group(1));
-                    } catch (NumberFormatException ignored) {
-                        // fall through and keep unwrapping
-                    }
-                }
+            int status = parseStatusFromMessage(current.getMessage(), STATUS_FROM_EXCEPTION_MESSAGE);
+            if (status < 0) {
+                status = parseStatusFromMessage(current.getMessage(), OXYGEN_HTTP_STATUS_FROM_EXCEPTION_MESSAGE);
+            }
+            if (status > 0) {
+                return status;
             }
             current = current.getCause();
+        }
+        return -1;
+    }
+
+    private int parseStatusFromMessage(String message, Pattern pattern) {
+        if (message == null) {
+            return -1;
+        }
+        Matcher matcher = pattern.matcher(message);
+        if (matcher.find()) {
+            try {
+                return Integer.parseInt(matcher.group(1));
+            } catch (NumberFormatException ignored) {
+                // fall through and keep unwrapping
+            }
         }
         return -1;
     }

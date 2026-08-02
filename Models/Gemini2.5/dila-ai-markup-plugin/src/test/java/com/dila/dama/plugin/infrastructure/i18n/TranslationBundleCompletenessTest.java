@@ -99,6 +99,52 @@ public class TranslationBundleCompletenessTest {
     }
 
     /**
+     * Session 2026-08-02 (Phase 9 follow-up 4) — all six preference labels are renamed/kept
+     * identical to English in every shipped language: "Bearer", "Token", "URL", "Endpoint",
+     * "Referer", and the "CBRD Parse"/"CBRD Link" prefixes are untranslated protocol terms.
+     * The zh_CN/zh_TW value of each label must equal its en_US value exactly.
+     */
+    @Test
+    public void preferenceLabelsAreIdenticalToEnglishInEveryLanguage() throws Exception {
+        String[] preferenceLabels = {
+            "cbrd.referer.label",
+            "cbrd.parse.token.label",
+            "cbrd.parse.api.url.label",
+            "cbrd.parse.timeout.ms.label",
+            "cbrd.api.url.label",
+            "cbrd.timeout.ms.label"
+        };
+
+        NodeList keyNodes = parseBundle().getElementsByTagName("key");
+        for (String requiredKey : preferenceLabels) {
+            Element key = null;
+            for (int i = 0; i < keyNodes.getLength(); i++) {
+                if (requiredKey.equals(((Element) keyNodes.item(i)).getAttribute("value"))) {
+                    key = (Element) keyNodes.item(i);
+                    break;
+                }
+            }
+            assertThat(key).as("Translation key %s must exist", requiredKey).isNotNull();
+
+            String enUs = null;
+            for (int j = 0; j < key.getElementsByTagName("val").getLength(); j++) {
+                Element value = (Element) key.getElementsByTagName("val").item(j);
+                if ("en_US".equals(value.getAttribute("lang"))) {
+                    enUs = value.getTextContent().trim();
+                }
+            }
+            assertThat(enUs).as("Translation key %s must have an en_US value", requiredKey).isNotNull();
+
+            for (int j = 0; j < key.getElementsByTagName("val").getLength(); j++) {
+                Element value = (Element) key.getElementsByTagName("val").item(j);
+                assertThat(value.getTextContent().trim())
+                    .as("%s in %s must be identical to the English text", requiredKey, value.getAttribute("lang"))
+                    .isEqualTo(enUs);
+            }
+        }
+    }
+
+    /**
      * The OpenAI-era keys retired with the client-side call path must be gone, so nothing can
      * quietly keep depending on them (FR-004).
      */

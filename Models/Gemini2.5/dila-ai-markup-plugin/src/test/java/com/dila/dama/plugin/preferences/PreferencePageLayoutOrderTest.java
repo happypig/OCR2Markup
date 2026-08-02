@@ -13,22 +13,23 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * T035a — the surviving preference rows keep their order after the six OpenAI rows are removed
- * (NFR-005): CBRD Link first, then CBRD Parse.
+ * T035a — the surviving preference rows keep the documented order after the six OpenAI rows are
+ * removed (NFR-005): CBRD Referer header first, then the three CBRD Parse rows, then the CBRD
+ * Link endpoint and timeout rows.
  */
 public class PreferencePageLayoutOrderTest {
 
     @Test
-    public void remainingRowsAreCbrdLinkThenCbrdParse() {
+    public void rowsFollowTheDocumentedOrder() {
         List<String> labels = UpgradePreferencesTest.labelsOf(initialisedPage());
 
         assertThat(labels).containsExactly(
-            "CBRD Link Endpoint:",
             "CBRD Referer header:",
-            "CBRD Link timeout (ms):",
+            "CBRD bearer token*:",
             "CBRD Parse endpoint URL:",
-            "CBRD Parse token*:",
-            "CBRD Parse timeout (ms):"
+            "CBRD Parse timeout (ms):",
+            "CBRD Link Endpoint:",
+            "CBRD Link timeout (ms):"
         );
     }
 
@@ -41,15 +42,16 @@ public class PreferencePageLayoutOrderTest {
     /**
      * FR-017 — the Ref-to-Link surface is preserved unchanged by this feature. Its behaviour is
      * additionally guarded by its own suites (CBRDAPIClientTest, RefToLinkReplaceFlowTest,
-     * ConvertReferenceCommandTest, ReferenceParserTest), which run untouched.
+     * ConvertReferenceCommandTest, ReferenceParserTest), which run untouched. The three rows
+     * still exist with the same keys and defaults; only their on-page positions changed.
      */
     @Test
     public void refToLinkRowsAreUntouchedByThisFeature() {
         List<String> labels = UpgradePreferencesTest.labelsOf(initialisedPage());
 
-        assertThat(labels.subList(0, 3)).containsExactly(
-            "CBRD Link Endpoint:",
+        assertThat(labels).contains(
             "CBRD Referer header:",
+            "CBRD Link Endpoint:",
             "CBRD Link timeout (ms):"
         );
     }
@@ -61,10 +63,11 @@ public class PreferencePageLayoutOrderTest {
         assertThat(DAMAOptionPagePluginExtension.KEY_CBRD_REFERER_HEADER).isEqualTo("cbrd.referer.header");
         assertThat(DAMAOptionPagePluginExtension.KEY_CBRD_TIMEOUT_MS).isEqualTo("cbrd.timeout");
 
+        // Row order: referer(0), bearer token(1), parse url(2), parse timeout(3), link url(4), link timeout(5).
         List<javax.swing.JTextField> fields = UpgradePreferencesTest.textFieldsOf(initialisedPage());
-        assertThat(fields.get(0).getText()).isEqualTo("https://cbss.dila.edu.tw/cbrd/link");
-        assertThat(fields.get(1).getText()).isEqualTo("CBRD@dila.edu.tw");
-        assertThat(fields.get(2).getText()).isEqualTo("10000");
+        assertThat(fields.get(0).getText()).isEqualTo("CBRD@dila.edu.tw");
+        assertThat(fields.get(4).getText()).isEqualTo("https://cbss.dila.edu.tw/cbrd/link");
+        assertThat(fields.get(5).getText()).isEqualTo("10000");
     }
 
     @Test
@@ -72,8 +75,8 @@ public class PreferencePageLayoutOrderTest {
         // FR-016/FR-017: the two timeouts are deliberately different values on different keys.
         List<javax.swing.JTextField> fields = UpgradePreferencesTest.textFieldsOf(initialisedPage());
 
-        assertThat(fields.get(2).getText()).isEqualTo("10000");
-        assertThat(fields.get(5).getText()).isEqualTo("30000");
+        assertThat(fields.get(5).getText()).isEqualTo("10000");
+        assertThat(fields.get(3).getText()).isEqualTo("30000");
     }
 
     @Test

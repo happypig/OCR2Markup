@@ -513,40 +513,40 @@
 
   <!-- CBRD preferences -->
   <key value="cbrd.api.url.label">
-    <comment>Preferences label</comment>
+    <comment>Preferences label; zh_CN/zh_TW deliberately identical to English (Session 2026-08-02 Phase 9 follow-up 4)</comment>
     <val lang="en_US">CBRD Link Endpoint:</val>
-    <val lang="zh_CN">CBRD 連結端點：</val>
-    <val lang="zh_TW">CBRD 連結端點：</val>
+    <val lang="zh_CN">CBRD Link Endpoint:</val>
+    <val lang="zh_TW">CBRD Link Endpoint:</val>
   </key>
   <key value="cbrd.referer.label">
-    <comment>Preferences label</comment>
+    <comment>Preferences label; zh_CN/zh_TW deliberately identical to English (Session 2026-08-02 Phase 9 follow-up 4)</comment>
     <val lang="en_US">CBRD Referer header:</val>
-    <val lang="zh_CN">CBRD Referer 來源標頭：</val>
-    <val lang="zh_TW">CBRD Referer 來源標頭：</val>
+    <val lang="zh_CN">CBRD Referer header:</val>
+    <val lang="zh_TW">CBRD Referer header:</val>
   </key>
   <key value="cbrd.timeout.ms.label">
-    <comment>Preferences label</comment>
+    <comment>Preferences label; zh_CN/zh_TW deliberately identical to English (Session 2026-08-02 Phase 9 follow-up 4)</comment>
     <val lang="en_US">CBRD Link timeout (ms):</val>
-    <val lang="zh_CN">CBRD 連結逾時 (毫秒)：</val>
-    <val lang="zh_TW">CBRD 連結逾時 (毫秒)：</val>
+    <val lang="zh_CN">CBRD Link timeout (ms):</val>
+    <val lang="zh_TW">CBRD Link timeout (ms):</val>
   </key>
   <key value="cbrd.parse.api.url.label">
-    <comment>Preferences label (004-cbrd-parse-endpoint)</comment>
+    <comment>Preferences label (004-cbrd-parse-endpoint); zh_CN/zh_TW deliberately identical to English (Session 2026-08-02 Phase 9 follow-up 4)</comment>
     <val lang="en_US">CBRD Parse endpoint URL:</val>
-    <val lang="zh_CN">CBRD Parse 端點網址：</val>
-    <val lang="zh_TW">CBRD Parse 端點網址：</val>
+    <val lang="zh_CN">CBRD Parse endpoint URL:</val>
+    <val lang="zh_TW">CBRD Parse endpoint URL:</val>
   </key>
   <key value="cbrd.parse.token.label">
-    <comment>Preferences label (004-cbrd-parse-endpoint)</comment>
-    <val lang="en_US">CBRD Parse token*:</val>
-    <val lang="zh_CN">CBRD Parse 存取權杖＊：</val>
-    <val lang="zh_TW">CBRD Parse 存取權杖＊：</val>
+    <comment>Preferences label (004-cbrd-parse-endpoint); zh_CN/zh_TW deliberately identical to English - "Bearer"/"Token" are untranslated protocol terms (RFC 6750)</comment>
+    <val lang="en_US">CBRD bearer token*:</val>
+    <val lang="zh_CN">CBRD bearer token*:</val>
+    <val lang="zh_TW">CBRD bearer token*:</val>
   </key>
   <key value="cbrd.parse.timeout.ms.label">
-    <comment>Preferences label (004-cbrd-parse-endpoint)</comment>
+    <comment>Preferences label (004-cbrd-parse-endpoint); zh_CN/zh_TW deliberately identical to English (Session 2026-08-02 Phase 9 follow-up 4)</comment>
     <val lang="en_US">CBRD Parse timeout (ms):</val>
-    <val lang="zh_CN">CBRD Parse 逾時（毫秒）：</val>
-    <val lang="zh_TW">CBRD Parse 逾時（毫秒）：</val>
+    <val lang="zh_CN">CBRD Parse timeout (ms):</val>
+    <val lang="zh_TW">CBRD Parse timeout (ms):</val>
   </key>
   <key value="ai.markup.error.text_is_required">
     <comment>CBRD Parse failure guidance - service code text_is_required (FR-011/FR-019)</comment>

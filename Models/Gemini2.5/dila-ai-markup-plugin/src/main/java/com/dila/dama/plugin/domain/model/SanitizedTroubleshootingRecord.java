@@ -14,6 +14,7 @@ public final class SanitizedTroubleshootingRecord {
     private final String guidanceMessageKey;
     private final long capturedAtEpochMs;
     private final boolean redactionApplied;
+    private final String transportError;
 
     public SanitizedTroubleshootingRecord(
         String requestId,
@@ -27,6 +28,23 @@ public final class SanitizedTroubleshootingRecord {
         long capturedAtEpochMs,
         boolean redactionApplied
     ) {
+        this(requestId, platform, endpointSummary, requestSnapshot, httpStatus, serviceErrorBody,
+            failureCategory, guidanceMessageKey, capturedAtEpochMs, redactionApplied, null);
+    }
+
+    public SanitizedTroubleshootingRecord(
+        String requestId,
+        String platform,
+        String endpointSummary,
+        String requestSnapshot,
+        Integer httpStatus,
+        String serviceErrorBody,
+        DiagnosticFailureCategory failureCategory,
+        String guidanceMessageKey,
+        long capturedAtEpochMs,
+        boolean redactionApplied,
+        String transportError
+    ) {
         this.requestId = requestId;
         this.platform = platform;
         this.endpointSummary = endpointSummary;
@@ -37,6 +55,7 @@ public final class SanitizedTroubleshootingRecord {
         this.guidanceMessageKey = guidanceMessageKey;
         this.capturedAtEpochMs = capturedAtEpochMs;
         this.redactionApplied = redactionApplied;
+        this.transportError = transportError;
     }
 
     public String getRequestId() {
@@ -79,6 +98,11 @@ public final class SanitizedTroubleshootingRecord {
         return redactionApplied;
     }
 
+    /** Null when the failure carried no transport-level exception (e.g. a known HTTP status). */
+    public String getTransportError() {
+        return transportError;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -93,11 +117,12 @@ public final class SanitizedTroubleshootingRecord {
             && Objects.equals(httpStatus, that.httpStatus)
             && Objects.equals(serviceErrorBody, that.serviceErrorBody)
             && failureCategory == that.failureCategory
-            && Objects.equals(guidanceMessageKey, that.guidanceMessageKey);
+            && Objects.equals(guidanceMessageKey, that.guidanceMessageKey)
+            && Objects.equals(transportError, that.transportError);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(requestId, platform, endpointSummary, requestSnapshot, httpStatus, serviceErrorBody, failureCategory, guidanceMessageKey, capturedAtEpochMs, redactionApplied);
+        return Objects.hash(requestId, platform, endpointSummary, requestSnapshot, httpStatus, serviceErrorBody, failureCategory, guidanceMessageKey, capturedAtEpochMs, redactionApplied, transportError);
     }
 }

@@ -121,6 +121,7 @@ public class RunAiMarkupDiagnosticsCommand {
                     validationResult.getDetail(),
                     classification.getCategory(),
                     classification.getGuidanceMessageKey(),
+                    null,
                     null
                 );
                 session.classifiedFailure(classification.getCategory(), classification.getGuidanceMessageKey(), record);
@@ -147,7 +148,8 @@ public class RunAiMarkupDiagnosticsCommand {
                 response.getErrorBody(),
                 classification.getCategory(),
                 classification.getGuidanceMessageKey(),
-                response.getTrace()
+                response.getTrace(),
+                sanitizeTransportError(response.getException())
             );
             session.classifiedFailure(classification.getCategory(), classification.getGuidanceMessageKey(), record);
             session.exportReady();
@@ -165,7 +167,8 @@ public class RunAiMarkupDiagnosticsCommand {
         String serviceErrorBody,
         DiagnosticFailureCategory category,
         String guidanceKey,
-        RequestTraceSnapshot traceSnapshot
+        RequestTraceSnapshot traceSnapshot,
+        String transportError
     ) {
         String requestId = traceSnapshot == null ? session.getSessionId() : traceSnapshot.getRequestId();
         String endpointSummary = traceSnapshot == null ? session.getEndpointSummary() : traceSnapshot.getEndpointSummary();
@@ -182,7 +185,35 @@ public class RunAiMarkupDiagnosticsCommand {
             category,
             guidanceKey,
             System.currentTimeMillis(),
-            true
+            true,
+            transportError
         );
+    }
+
+    /**
+     * Renders a transport exception as a compact, redacted {@code Class: message} chain so the
+     * diagnostics export (FR-022) names the real cause — e.g. {@code SocketTimeoutException:
+     * connect timed out} — instead of an opaque {@code CONNECTIVITY_OR_PROXY} category. Returns
+     * null when the failure carried no exception (a known HTTP status, for instance).
+     */
+    private String sanitizeTransportError(Exception exception) {
+        if (exception == null) {
+            return null;
+        }
+        StringBuilder builder = new StringBuilder();
+        Throwable current = exception;
+        while (current != null) {
+            if (builder.length() > 0) {
+                builder.append(" -> ");
+            }
+            builder.append(current.getClass().getSimpleName());
+            String message = current.getMessage();
+            if (message != null) {
+                builder.append(": ").append(redactor.redact(message.trim()));
+            }
+            current = current.getCause();
+        }
+        String rendered = builder.toString();
+        return rendered.length() > 1000 ? rendered.substring(0, 1000) : rendered;
     }
 }

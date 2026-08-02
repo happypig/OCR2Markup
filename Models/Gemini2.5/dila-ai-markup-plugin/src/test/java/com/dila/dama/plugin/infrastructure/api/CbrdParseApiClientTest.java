@@ -192,6 +192,68 @@ public class CbrdParseApiClientTest {
     }
 
     @Test
+    public void unauthorizedWhenResponseCodeItselfThrowsTheCanonicalIOException() {
+        // Some JDK builds surface the 401 from getResponseCode() itself rather than from a later
+        // getErrorStream() call. priorStatus is still -1 at that point, so the status MUST be
+        // recovered from the exception message (spec.md Clarifications 2026-08-02, US4 scenario 12).
+        CapturingConnectionFactory factory = CapturingConnectionFactory.throwing(
+            new IOException("Server returned HTTP response code: 401 for URL: " + ENDPOINT)
+        );
+
+        CbrdParseResponse response = new CbrdParseApiClient(factory).execute(configuration(), request());
+
+        assertThat(response.isSuccess()).isFalse();
+        assertThat(response.getError()).isEqualTo(ParseError.UNAUTHORIZED);
+        assertThat(response.getHttpStatus()).isEqualTo(401);
+    }
+
+    @Test
+    public void unauthorizedWhenOxygenHttpProtocolThrowsFromGetResponseCode() {
+        // Oxygen installs its own URL stream handler, so inside Oxygen a non-2xx surfaces as
+        // ro.sync.net.protocol.http.HttpExceptionWithDetails with message "NNN Reason for: <url>"
+        // (observed live: "401 Unauthorized for: https://cbss.dila.edu.tw/cbrd/parse" in the
+        // 2026-08-02 S11 export) instead of the JDK canonical message. getResponseCode() throws
+        // it, priorStatus stays -1, so the status MUST be recovered from this message text.
+        CapturingConnectionFactory factory = CapturingConnectionFactory.throwing(
+            new IOException("401 Unauthorized for: " + ENDPOINT)
+        );
+
+        CbrdParseResponse response = new CbrdParseApiClient(factory).execute(configuration(), request());
+
+        assertThat(response.isSuccess()).isFalse();
+        assertThat(response.getError()).isEqualTo(ParseError.UNAUTHORIZED);
+        assertThat(response.getHttpStatus()).isEqualTo(401);
+    }
+
+    @Test
+    public void multiWordReasonInOxygenHttpExceptionStillRecoversTheStatus() {
+        // The reason phrase after the status can be multi-word (e.g. "Service Unavailable"),
+        // proving the recovery is not 401-specific.
+        CapturingConnectionFactory factory = CapturingConnectionFactory.throwing(
+            new IOException("503 Service Unavailable for: " + ENDPOINT)
+        );
+
+        CbrdParseResponse response = new CbrdParseApiClient(factory).execute(configuration(), request());
+
+        assertThat(response.getHttpStatus()).isEqualTo(503);
+        assertThat(response.getError()).isNotEqualTo(ParseError.CONNECTIVITY_FAILURE);
+    }
+
+    @Test
+    public void unauthorizedWhenTheErrorBodyIsMissing() {
+        // FR-011: a 401 is a credential rejection regardless of whether the body arrives. A
+        // gateway or proxy that returns 401 with no body must not downgrade the cause to
+        // UNEXPECTED_RESPONSE — and never to CONNECTIVITY_FAILURE.
+        CapturingConnectionFactory factory = CapturingConnectionFactory.respondingWith(401, "");
+
+        CbrdParseResponse response = new CbrdParseApiClient(factory).execute(configuration(), request());
+
+        assertThat(response.isSuccess()).isFalse();
+        assertThat(response.getError()).isEqualTo(ParseError.UNAUTHORIZED);
+        assertThat(response.getHttpStatus()).isEqualTo(401);
+    }
+
+    @Test
     public void unknownHostExceptionRemainsConnectivityFailureEvenAfterJava17QuirkFix() {
         // T082: no-status transport failures MUST still classify as connectivity under FR-013.
         CapturingConnectionFactory factory = CapturingConnectionFactory.throwing(

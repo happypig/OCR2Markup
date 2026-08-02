@@ -335,24 +335,12 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       GridBagConstraints c = new GridBagConstraints();
       JPanel panel = new JPanel(new GridBagLayout());
 
-      JLabel cbrdApiUrlLabel = new JLabel(getMessage("cbrd.api.url.label"));
+      JLabel cbrdRefererLabel = new JLabel(getMessage("cbrd.referer.label"));
       c.gridx = 0;
       c.gridy = 0;
       c.weightx = 0;
       c.weighty = 0;
       c.anchor = GridBagConstraints.WEST;
-      panel.add(cbrdApiUrlLabel, c);
-
-      cbrdApiUrlTextField = new JTextField();
-      c.gridx ++;
-      c.weightx = 1;
-      c.fill = GridBagConstraints.HORIZONTAL;
-      c.insets = new Insets(0, 5, 0, 5);
-      panel.add(cbrdApiUrlTextField, c);
-
-      c.gridx = 0;
-      c.gridy ++;
-      JLabel cbrdRefererLabel = new JLabel(getMessage("cbrd.referer.label"));
       panel.add(cbrdRefererLabel, c);
 
       cbrdRefererTextField = new JTextField();
@@ -361,30 +349,6 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       c.fill = GridBagConstraints.HORIZONTAL;
       c.insets = new Insets(0, 5, 0, 5);
       panel.add(cbrdRefererTextField, c);
-
-      c.gridx = 0;
-      c.gridy ++;
-      JLabel cbrdTimeoutLabel = new JLabel(getMessage("cbrd.timeout.ms.label"));
-      panel.add(cbrdTimeoutLabel, c);
-
-      cbrdTimeoutTextField = new JTextField();
-      c.gridx ++;
-      c.weightx = 1;
-      c.fill = GridBagConstraints.HORIZONTAL;
-      c.insets = new Insets(0, 5, 0, 5);
-      panel.add(cbrdTimeoutTextField, c);
-
-      c.gridx = 0;
-      c.gridy ++;
-      JLabel cbrdParseApiUrlLabel = new JLabel(getMessage("cbrd.parse.api.url.label"));
-      panel.add(cbrdParseApiUrlLabel, c);
-
-      cbrdParseApiUrlTextField = new JTextField();
-      c.gridx ++;
-      c.weightx = 1;
-      c.fill = GridBagConstraints.HORIZONTAL;
-      c.insets = new Insets(0, 5, 0, 5);
-      panel.add(cbrdParseApiUrlTextField, c);
 
       c.gridx = 0;
       c.gridy ++;
@@ -400,6 +364,18 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
 
       c.gridx = 0;
       c.gridy ++;
+      JLabel cbrdParseApiUrlLabel = new JLabel(getMessage("cbrd.parse.api.url.label"));
+      panel.add(cbrdParseApiUrlLabel, c);
+
+      cbrdParseApiUrlTextField = new JTextField();
+      c.gridx ++;
+      c.weightx = 1;
+      c.fill = GridBagConstraints.HORIZONTAL;
+      c.insets = new Insets(0, 5, 0, 5);
+      panel.add(cbrdParseApiUrlTextField, c);
+
+      c.gridx = 0;
+      c.gridy ++;
       JLabel cbrdParseTimeoutLabel = new JLabel(getMessage("cbrd.parse.timeout.ms.label"));
       panel.add(cbrdParseTimeoutLabel, c);
 
@@ -409,6 +385,30 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       c.fill = GridBagConstraints.HORIZONTAL;
       c.insets = new Insets(0, 5, 0, 5);
       panel.add(cbrdParseTimeoutTextField, c);
+
+      c.gridx = 0;
+      c.gridy ++;
+      JLabel cbrdApiUrlLabel = new JLabel(getMessage("cbrd.api.url.label"));
+      panel.add(cbrdApiUrlLabel, c);
+
+      cbrdApiUrlTextField = new JTextField();
+      c.gridx ++;
+      c.weightx = 1;
+      c.fill = GridBagConstraints.HORIZONTAL;
+      c.insets = new Insets(0, 5, 0, 5);
+      panel.add(cbrdApiUrlTextField, c);
+
+      c.gridx = 0;
+      c.gridy ++;
+      JLabel cbrdTimeoutLabel = new JLabel(getMessage("cbrd.timeout.ms.label"));
+      panel.add(cbrdTimeoutLabel, c);
+
+      cbrdTimeoutTextField = new JTextField();
+      c.gridx ++;
+      c.weightx = 1;
+      c.fill = GridBagConstraints.HORIZONTAL;
+      c.insets = new Insets(0, 5, 0, 5);
+      panel.add(cbrdTimeoutTextField, c);
 
       c.gridx = 0;
       c.gridy ++;
@@ -577,7 +577,7 @@ public class DAMAOptionPagePluginExtension extends OptionPagePluginExtension {
       case "cbrd.parse.api.url.label":
         return "CBRD Parse endpoint URL:";
       case "cbrd.parse.token.label":
-        return "CBRD Parse token*:";
+        return "CBRD bearer token*:";
       case "cbrd.parse.timeout.ms.label":
         return "CBRD Parse timeout (ms):";
       case "preferences.page.title":

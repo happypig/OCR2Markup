@@ -116,6 +116,40 @@ public class RunAiMarkupDiagnosticsCommandTest {
     }
 
     @Test
+    public void connectivityFailureNamesTheSanitizedTransportErrorInTheRecord() {
+        RunAiMarkupDiagnosticsCommand command =
+            commandBackedBy(CapturingConnectionFactory.throwing(new IOException("connect timed out")));
+
+        RunAiMarkupDiagnosticsCommand.Result result = command.execute(request(), configuration(), "windows");
+
+        assertThat(result.getTroubleshootingRecord()).isNotNull();
+        assertThat(result.getTroubleshootingRecord().getTransportError())
+            .isEqualTo("IOException: connect timed out");
+    }
+
+    @Test
+    public void knownHttpStatusFailureCarriesNoTransportError() {
+        RunAiMarkupDiagnosticsCommand command = commandBackedBy(
+            CapturingConnectionFactory.failingWith(401, "{\"success\":false,\"error\":\"unauthorized\"}"));
+
+        RunAiMarkupDiagnosticsCommand.Result result = command.execute(request(), configuration(), "windows");
+
+        assertThat(result.getTroubleshootingRecord().getTransportError()).isNull();
+    }
+
+    @Test
+    public void transportErrorChainIsRedactedAgainstKnownSecrets() {
+        RunAiMarkupDiagnosticsCommand command = commandBackedBy(CapturingConnectionFactory.throwing(
+            new IOException("Bearer shared-token-9876 leaked in message")));
+
+        RunAiMarkupDiagnosticsCommand.Result result = command.execute(request(), configuration(), "windows");
+
+        String transportError = result.getTroubleshootingRecord().getTransportError();
+        assertThat(transportError).isEqualTo("IOException: Bearer **** leaked in message");
+        assertThat(transportError).doesNotContain("shared-token-9876");
+    }
+
+    @Test
     public void unenumeratedResponseYieldsTheGenericGuidance() {
         RunAiMarkupDiagnosticsCommand command =
             commandBackedBy(CapturingConnectionFactory.failingWith(418, "<html>teapot</html>"));

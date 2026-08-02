@@ -17,6 +17,21 @@ import java.nio.file.Paths;
  */
 public class TranslationXmlValidatorTest {
 
+    /**
+     * Preference labels deliberately kept identical to English in every language
+     * (Session 2026-08-02 Phase 9 follow-up 4): "Bearer", "Token", "URL", "Endpoint",
+     * "Referer", and the "CBRD Parse"/"CBRD Link" prefixes are untranslated protocol
+     * terms, so these keys are exempt from the Chinese-character check below.
+     */
+    private static final Set<String> UNTRANSLATED_PREFERENCE_LABELS = new HashSet<>(Arrays.asList(
+        "cbrd.api.url.label",
+        "cbrd.referer.label",
+        "cbrd.timeout.ms.label",
+        "cbrd.parse.api.url.label",
+        "cbrd.parse.token.label",
+        "cbrd.parse.timeout.ms.label"
+    ));
+
     private Document translationDoc;
     private Set<String> supportedLanguages;
     private Set<String> allKeys;
@@ -144,6 +159,9 @@ public class TranslationXmlValidatorTest {
         if (translationDoc == null) return;
         
         for (String key : allKeys) {
+            if (UNTRANSLATED_PREFERENCE_LABELS.contains(key)) {
+                continue;
+            }
             Element keyElement = findKeyElement(key);
             
             // Check Chinese translations contain Chinese characters

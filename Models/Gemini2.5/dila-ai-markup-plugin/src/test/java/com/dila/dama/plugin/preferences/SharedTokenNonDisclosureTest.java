@@ -32,8 +32,8 @@ public class SharedTokenNonDisclosureTest {
     public void tokenFieldIsMasked() {
         List<JTextField> fields = UpgradePreferencesTest.textFieldsOf(PreferencePageLayoutOrderTest.initialisedPage());
 
-        assertThat(fields.get(4)).isInstanceOf(JPasswordField.class);
-        assertThat(((JPasswordField) fields.get(4)).getEchoChar()).isNotEqualTo('\0');
+        assertThat(fields.get(1)).isInstanceOf(JPasswordField.class);
+        assertThat(((JPasswordField) fields.get(1)).getEchoChar()).isNotEqualTo('\0');
     }
 
     @Test
@@ -42,7 +42,7 @@ public class SharedTokenNonDisclosureTest {
         PluginWorkspace workspace = workspaceOver(storage);
         DAMAOptionPagePluginExtension page = new DAMAOptionPagePluginExtension();
         JComponent panel = page.init(workspace);
-        UpgradePreferencesTest.textFieldsOf(panel).get(4).setText(TOKEN);
+        UpgradePreferencesTest.textFieldsOf(panel).get(1).setText(TOKEN);
 
         page.apply(workspace);
 
@@ -56,7 +56,7 @@ public class SharedTokenNonDisclosureTest {
         PluginWorkspace workspace = workspaceOver(storage);
         DAMAOptionPagePluginExtension page = new DAMAOptionPagePluginExtension();
         JComponent panel = page.init(workspace);
-        UpgradePreferencesTest.textFieldsOf(panel).get(4).setText(TOKEN);
+        UpgradePreferencesTest.textFieldsOf(panel).get(1).setText(TOKEN);
 
         page.apply(workspace);
 
