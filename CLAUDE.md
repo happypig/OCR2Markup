@@ -42,14 +42,30 @@ Build from that directory. `mvn clean test` runs the suite; `mvn clean install`
 also produces `dilaAIMarkupPlugin.zip` + `dilaAIMarkupPlugin.xml` at the module
 root (the assembly is bound to `install`, not `package`).
 
-## Current state — 2026-08-02
+## Current state — 2026-08-03
 
-Plugin **0.5.0**. Feature `004-cbrd-parse-endpoint` is complete, manually
-validated in Oxygen, and merged to `main`: AI Markup now calls the DILA CBRD
-Parse endpoint instead of an OpenAI-compatible endpoint on the editor's machine.
-**365 tests, 0 failures**, all 86 tasks signed off.
+Plugin **0.5.0, not yet released**. Two features are in it.
 
-**Coverage baseline (first ever measured, 2026-08-02): 59.5% instructions,
+`004-cbrd-parse-endpoint` — complete, manually validated in Oxygen, merged to
+`main`: AI Markup calls the DILA CBRD Parse endpoint instead of an
+OpenAI-compatible endpoint on the editor's machine.
+
+`005-cbrd-link-v11` — complete on branch `005-cbrd-link-v11`, all 38 tasks
+signed off including the Oxygen gate. Ref-to-Link had been failing for **every**
+reference with `CBRD API error: HTTP 404` because CBRD moved `/link` from
+`GET ?q=` to `POST` + JSON body and the plugin still issued the GET. The client
+now POSTs `{"q":"<ref>…</ref>"}`. One production file changed (+34/-11); the
+response DTO, i18n keys, retry policy, Replace rewrite and URL preference are
+untouched. Because 0.5.0 is unreleased, 005 folded into its release notes rather
+than taking a version of its own — **there is no 0.5.1**.
+
+**376 tests, 0 failures, 2 skipped** (the 2 are `CBRDLiveContractProbeTest`,
+opt-in behind `CBRD_LIVE_CONTRACT_CHECK`; without the flag they report as
+*skipped*, never passed, so `mvn test` stays offline and deterministic).
+
+Coverage **59.6% instructions** (`infrastructure.api` 90.0% → **91.5%**).
+
+**Coverage baseline (first measured 2026-08-02): 59.5% instructions,
 45.1% branches.** The constitution's Enforcement section mandates ≥ 80%, so the
 project is well short of its own rule and always has been — nothing measured it
 until now. `mvn test` writes `target/site/jacoco/index.html`.
@@ -75,27 +91,29 @@ someone has looked at the number.
 
 ## Next up
 
-1. **`005` — Ref-to-Link v1.1.0 drift (urgent).** Ref-to-Link is broken in
-   production: CBRD moved `/link` from GET to POST+JSON, the plugin still issues
-   GET, and editors see `CBRD API error: HTTP 404`. Full investigation, with a
-   verified-corrections section, is in `exploration/ref2link_drift.md` — read §9
-   before implementing §6.
-2. **`006` — single-source plugin version.** `src/main/java` is not
+1. **Constitution amendment — due before `005` merges, not after.** Backlog items
+   1 and 3 in a single `/speckit-constitution` pass. 005's Constitution Check
+   recorded the *second* Principle VI deviation (see Backlog 3), scoped to 005
+   only and carrying an expiry. Landing the amendment while 005 is in review lets
+   that Check be re-run clean and the deviation table deleted rather than
+   honoured. Parked behind the merge instead, it slips behind 006.
+2. **Merge `005`.** Branch `005-cbrd-link-v11`, complete and validated.
+3. **`006` — single-source plugin version.** `src/main/java` is not
    resource-filtered, so `${project.version}` cannot reach it. Two hardcoded
-   `User-Agent` literals drift as a result; `CBRDAPIClient`'s has been stale
-   since 0.4.3. Marked `TODO(005)` in `CbrdParseApiClient`.
-
-If both run on one branch, Phase A (005) must **merge** before Phase B (006)
-starts — otherwise an outage fix waits on hygiene work.
+   `User-Agent` literals drift as a result; `CBRDAPIClient`'s still reads
+   `DILA-AI-Markup/0.4.2`, three releases stale. Marked `TODO(005)` in
+   `CbrdParseApiClient`. 005 already converted the *test* assertion to invariant
+   form, so this bump will not turn the suite red.
 
 ## Backlog
 
-Four open items. Each names where it gets done and what closes it — **delete the
+Three open items. Each names where it gets done and what closes it — **delete the
 entry when its closing condition is met.** A stale backlog is worse than none:
 this file once claimed T055/T057 were open for an hour after they were signed
 off, and anyone reading it went looking for finished work.
 
-None of these block 005 or 006. Kept here rather than in a commit message or a
+Item 3 now gates the `005` **merge** (see Next up); 1 rides along with it in the
+same amendment pass. Kept here rather than in a commit message or a
 closed document, because those are where the previous round of these rotted. If
 this list ever exceeds ~5 items, move it to GitHub Issues (`gh` is authenticated,
 `/speckit-taskstoissues` converts) — an always-loaded file has a real cost per
@@ -106,7 +124,6 @@ session.
 | 1 | Coverage threshold | `/speckit-constitution` | amendment lands |
 | 2 | Command/query split | `/speckit-specify` (blocked on 3) | feature merges |
 | 3 | Principle VI category | `/speckit-constitution` (with 1) | amendment lands |
-| 4 | Stale User-Agent literal | 005 `tasks.md` | 005 merges |
 
 **1 and 3 are one conversation — do them in a single amendment pass.** Both are
 cases where the constitution asserts something the project does not do, so the
@@ -157,22 +174,19 @@ template propagation; expect MINOR (1.1.0) since both are additive/clarifying.
    The name is misleading too: it is the primary AI Markup path, not a
    diagnostic. `ConvertReferenceCommand` needs the same treatment.
 
-4. **`CBRDAPIClientTest:39` pins `"DILA-AI-Markup/0.4.2"`.** A correct version
-   bump turns that test red, so the suite currently defends the bug. 005 rewrites
-   lines 36-39 of that exact block anyway (`?q=` → JSON body), so fix it there as
-   the invariant form, not another frozen string. If 005 somehow skips it, 006
-   removes the literal entirely.
-
 ## Standing rules this codebase earned the hard way
 
 - **Retire additively.** Introduce the replacement, migrate every call site,
   delete last. 004 had 12 files referencing 3 classes; deleting first would have
   left the module uncompilable for four phases with `mvn test` unrunnable
   (violating Principle X).
-- **Assert invariants, not literals.** `CBRDAPIClientTest:39` pins
-  `"DILA-AI-Markup/0.4.2"`. When someone bumps the version correctly, that test
-  goes red — so the suite now defends the bug. Prefer
-  `isEqualTo("DILA-AI-Markup/" + version)`.
+- **Assert invariants, not literals.** `CBRDAPIClientTest` used to pin
+  `"DILA-AI-Markup/0.4.2"` exactly, so a correct version bump would turn it red —
+  the suite defended the stale header. 005 replaced it with a shape assertion
+  (`startsWith("DILA-AI-Markup/")` plus a semver pattern). The wider case is the
+  same feature's `/link` tests, which asserted `contains("?q=")`: a positive
+  assertion of a vendor's current shape cannot fail when the vendor drifts, only
+  when you fix the client. Assert the rule, not the current output.
 - **Fakes cannot see host behaviour.** Every HTTP test injects a fake
   connection. Oxygen installs its own URL stream handler, so a non-2xx response
   throws `HttpExceptionWithDetails` instead of returning a status — all 354

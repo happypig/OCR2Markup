@@ -4,7 +4,7 @@
 
 **Created**: 2026-08-03
 
-**Status**: Draft
+**Status**: Complete — implemented and validated 2026-08-03 (all 38 tasks in [tasks.md](./tasks.md) signed off, including the Oxygen gate)
 
 **Input**: User description: "Restore the Ref-to-Link action against CBRD API v1.1.0. The vendored contract is pinned to v1.0.0 (`GET /cbrd/link?q=…`); the live server is v1.1.0 and defines `POST /cbrd/link` only, taking a JSON body `{"q": "<ref>…</ref>"}`. The plugin still issues the GET, no route matches, and editors see `CBRD API error: HTTP 404`."
 

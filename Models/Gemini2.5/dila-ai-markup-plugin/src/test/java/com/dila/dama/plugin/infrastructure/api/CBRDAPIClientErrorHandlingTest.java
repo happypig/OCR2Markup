@@ -3,22 +3,31 @@ package com.dila.dama.plugin.infrastructure.api;
 import com.dila.dama.plugin.domain.model.TransformedComponents;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+/**
+ * Outcome-mapping tests for {@code /cbrd/link}.
+ *
+ * <p>Migrated in feature 005 from a file-local fake onto the shared
+ * {@link CapturingConnectionFactory}. The old fake overrode neither {@code setRequestMethod} nor
+ * {@code getOutputStream}, so it was structurally blind to both dimensions the vendor changed —
+ * and once the client began writing a request body it could not even accept one.
+ *
+ * <p>The distinction these tests defend is the substance of User Story 2: CBRD returns every
+ * documented outcome as HTTP 200 and signals the result in the payload. Reporting any of them as
+ * a transport error is the bug this feature exists to remove.
+ */
 public class CBRDAPIClientErrorHandlingTest {
 
     @Test
     public void convertToFirstLink_non200_reportsHttpErrorKey() {
-        CBRDAPIClient client = newClient(new FakeConnectionFactory(500, "{\"error\":\"boom\"}", false));
+        CBRDAPIClient client = newClient(CapturingConnectionFactory.failingWith(500, "{\"error\":\"boom\"}"));
 
         assertThatThrownBy(() -> client.convertToFirstLink(sampleComponents()))
             .isInstanceOf(CBRDAPIException.class)
@@ -31,7 +40,7 @@ public class CBRDAPIClientErrorHandlingTest {
 
     @Test
     public void convertToFirstLink_invalidJson_reportsResponseKey() {
-        CBRDAPIClient client = newClient(new FakeConnectionFactory(200, "not-json", false));
+        CBRDAPIClient client = newClient(CapturingConnectionFactory.respondingWith(200, "not-json"));
 
         assertThatThrownBy(() -> client.convertToFirstLink(sampleComponents()))
             .isInstanceOf(CBRDAPIException.class)
@@ -39,10 +48,11 @@ public class CBRDAPIClientErrorHandlingTest {
                 .isEqualTo("error.api.response"));
     }
 
+    /** T017 — LinkFailure carrying "msg". This is what the live service returns for an incomplete citation. */
     @Test
     public void convertToFirstLink_successFalseWithMsgField_reportsFailedKeyWithMessage() {
-        // Actual CBETA API returns error message in "msg" field instead of "error" field
-        CBRDAPIClient client = newClient(new FakeConnectionFactory(200, "{\"success\":false,\"msg\":\"冊號不存在\"}", false));
+        CBRDAPIClient client = newClient(
+            CapturingConnectionFactory.respondingWith(200, "{\"success\":false,\"msg\":\"冊號不存在\"}"));
 
         assertThatThrownBy(() -> client.convertToFirstLink(sampleComponents()))
             .isInstanceOf(CBRDAPIException.class)
@@ -53,9 +63,26 @@ public class CBRDAPIClientErrorHandlingTest {
             });
     }
 
+    /** T018 — the other half of LinkFailure's anyOf: an "error" member instead of "msg". */
+    @Test
+    public void convertToFirstLink_successFalseWithErrorField_reportsFailedKey() {
+        CBRDAPIClient client = newClient(
+            CapturingConnectionFactory.respondingWith(200, "{\"success\":false,\"error\":\"no matching reference\"}"));
+
+        assertThatThrownBy(() -> client.convertToFirstLink(sampleComponents()))
+            .isInstanceOf(CBRDAPIException.class)
+            .satisfies(ex -> {
+                CBRDAPIException apiEx = (CBRDAPIException) ex;
+                assertThat(apiEx.getMessageKey()).isEqualTo("error.api.failed");
+                assertThat(apiEx.getParams()).containsExactly("no matching reference");
+            });
+    }
+
+    /** T016 — LinkSuccess with an empty found array is "no match", not a failure and not a transport error. */
     @Test
     public void convertToFirstLink_emptyFound_reportsNoResultsKey() {
-        CBRDAPIClient client = newClient(new FakeConnectionFactory(200, "{\"success\":true,\"found\":[]}", false));
+        CBRDAPIClient client = newClient(
+            CapturingConnectionFactory.respondingWith(200, "{\"success\":true,\"found\":[]}"));
 
         assertThatThrownBy(() -> client.convertToFirstLink(sampleComponents()))
             .isInstanceOf(CBRDAPIException.class)
@@ -63,9 +90,36 @@ public class CBRDAPIClientErrorHandlingTest {
                 .isEqualTo("error.no.results"));
     }
 
+    /**
+     * T019 / FR-005 — the transport-error key must be unreachable for anything the service
+     * returns normally. Every documented non-resolving outcome arrives as HTTP 200; if any of
+     * them surfaces as {@code error.api.http}, the editor is told the network failed when in fact
+     * the citation was the problem. That confusion is precisely what this feature removes.
+     */
+    @Test
+    public void convertToFirstLink_documentedOutcomesNeverReportTransportError() {
+        String[] documented200Bodies = {
+            "{\"success\":true,\"found\":[]}",
+            "{\"success\":false,\"msg\":\"經號或頁碼 至少要有一個\"}",
+            "{\"success\":false,\"error\":\"no matching reference\"}"
+        };
+
+        for (String body : documented200Bodies) {
+            CBRDAPIClient client = newClient(CapturingConnectionFactory.respondingWith(200, body));
+
+            assertThatThrownBy(() -> client.convertToFirstLink(sampleComponents()))
+                .isInstanceOf(CBRDAPIException.class)
+                .satisfies(ex -> assertThat(((CBRDAPIException) ex).getMessageKey())
+                    .as("body %s must not be reported as a transport error", body)
+                    .isNotEqualTo("error.api.http"));
+        }
+    }
+
+    /** Retry policy is unchanged: timeouts retry, everything else propagates immediately. */
     @Test
     public void convertToFirstLink_timeout_reportsTimeoutKey() {
-        CBRDAPIClient client = newClient(new FakeConnectionFactory(200, "", true));
+        CBRDAPIClient client = newClient(
+            CapturingConnectionFactory.throwing(new SocketTimeoutException("timeout")));
 
         assertThatThrownBy(() -> client.convertToFirstLink(sampleComponents()))
             .isInstanceOf(CBRDAPIException.class)
@@ -99,66 +153,5 @@ public class CBRDAPIClientErrorHandlingTest {
 
     private TransformedComponents sampleComponents() {
         return new TransformedComponents("T", "25", null, "917", null, null);
-    }
-
-    private static final class FakeConnectionFactory extends HttpUrlConnectionFactory {
-        private final int responseCode;
-        private final String responseBody;
-        private final boolean timeout;
-
-        private FakeConnectionFactory(int responseCode, String responseBody, boolean timeout) {
-            this.responseCode = responseCode;
-            this.responseBody = responseBody;
-            this.timeout = timeout;
-        }
-
-        @Override
-        public HttpURLConnection openConnection(URL url) {
-            return new FakeHttpURLConnection(url, responseCode, responseBody, timeout);
-        }
-    }
-
-    private static final class FakeHttpURLConnection extends HttpURLConnection {
-        private final int responseCode;
-        private final byte[] responseBytes;
-        private final boolean timeout;
-
-        FakeHttpURLConnection(URL url, int responseCode, String responseBody, boolean timeout) {
-            super(url);
-            this.responseCode = responseCode;
-            this.responseBytes = responseBody.getBytes(StandardCharsets.UTF_8);
-            this.timeout = timeout;
-        }
-
-        @Override
-        public int getResponseCode() throws IOException {
-            if (timeout) {
-                throw new SocketTimeoutException("timeout");
-            }
-            return responseCode;
-        }
-
-        @Override
-        public InputStream getInputStream() {
-            return new ByteArrayInputStream(responseBytes);
-        }
-
-        @Override
-        public InputStream getErrorStream() {
-            return new ByteArrayInputStream(responseBytes);
-        }
-
-        @Override
-        public void disconnect() {
-        }
-
-        @Override
-        public boolean usingProxy() {
-            return false;
-        }
-
-        @Override
-        public void connect() throws IOException {
-        }
     }
 }

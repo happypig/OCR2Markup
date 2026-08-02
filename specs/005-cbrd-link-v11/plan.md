@@ -2,6 +2,8 @@
 
 **Branch**: `005-cbrd-link-v11` | **Date**: 2026-08-03 | **Spec**: [spec.md](./spec.md)
 
+**Status**: Complete — implemented and validated 2026-08-03. 376 tests, 0 failures, 2 skipped (opt-in live probe); `infrastructure.api` coverage 90.0% → 91.5%; one production file changed (+34/-11). Execution notes, including four deviations from this plan, are in [tasks.md](./tasks.md) → Notes.
+
 **Input**: Feature specification from `/specs/005-cbrd-link-v11/spec.md`
 
 ## Summary

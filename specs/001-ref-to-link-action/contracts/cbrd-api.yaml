@@ -1,13 +1,22 @@
-openapi: 3.0.3
+openapi: 3.1.0
 info:
-  title: CBRD (CBETA Reference Detection) API
+  title: CBRD API
   description: |
-    External API provided by CBETA/DILA for converting Tripitaka references to CBETA online URLs.
+    External API provided by CBETA/DILA for converting Tripitaka references to CBETA Online URLs.
 
-    **Authentication**: Requires HTTP Referer header set to `CBRD@dila.edu.tw`
+    **Vendored copy.** This file is the repository's record of the contract the plugin is built
+    against. It is not documentation-only: `CBRDContractConformanceTest` reads `info.version` here
+    and asserts it against `CBRDAPIClient.CONTRACT_VERSION`, so a divergence fails the build.
 
-    **Purpose**: This contract documents the external CBRD API that the plugin will integrate with.
-  version: 1.0.0
+    **History.** Until 2026-08-03 this file declared v1.0.0 with `GET /link?q=<xml>`. The live
+    service had moved to v1.1.0 (`POST /link` with a JSON body) and no longer routed the GET, so
+    every Ref-to-Link conversion failed with a routing 404 while the test suite stayed green —
+    the suite asserted the v1.0.0 shape. See `exploration/ref2link_drift.md` and
+    `specs/005-cbrd-link-v11/`.
+
+    **Authentication**: none for `/link` in v1.1.0. The `Referer: CBRD@dila.edu.tw` header that
+    v1.0.0 required is still sent by the plugin and still accepted, but is no longer mandatory.
+  version: 1.1.0
   contact:
     name: DILA (Dharma Drum Institute of Liberal Arts)
     url: https://cbss.dila.edu.tw
@@ -18,238 +27,151 @@ servers:
 
 paths:
   /link:
-    get:
-      summary: Convert Tripitaka reference to CBETA link
+    post:
+      summary: Generate CBETA link(s) from <ref> XML in the request body
       description: |
-        Accepts an XML-formatted Tripitaka reference and returns corresponding CBETA online URLs.
+        Accepts an XML-formatted Tripitaka reference in a JSON request body and returns the
+        corresponding CBETA Online URLs.
 
-        **Request Requirements**:
-        - Query parameter `q` must contain XML-formatted reference
-        - HTTP header `Referer` must be set to `CBRD@dila.edu.tw`
-        - XML must follow the specified reference structure
+        **Request requirements**:
+        - Body member `q` contains the raw `<ref>` XML. It is NOT URL-encoded — quotes, CJK
+          characters and full-width punctuation are content and must survive verbatim.
+        - `Content-Type: application/json` (or `application/x-www-form-urlencoded`).
 
-        **Response Behavior**:
-        - Returns `success: true` with array of URLs if references found
-        - Returns `success: true` with empty array if no matches
-        - Returns `success: false` with error message if processing failed
+        **Response behaviour**: the endpoint always answers HTTP 200 for anything that reaches
+        the handler. The outcome is carried in the payload, never in the transport status:
+        - `success: true` with a non-empty `found` — resolved.
+        - `success: true` with an empty `found` — no match.
+        - `success: false` with `msg` or `error` — the service could not process the citation.
 
-      operationId: convertReferenceToLink
+        A non-2xx from this path therefore indicates a transport, routing or infrastructure
+        fault, not a citation-level result.
+
+      operationId: postCbetaLink
       tags:
         - Reference Conversion
 
-      parameters:
-        - name: q
-          in: query
-          required: true
-          description: XML-formatted Tripitaka reference
-          schema:
-            type: string
-            format: xml
-            example: '<ref><canon>T</canon><v>25</v>.<w>1514</w></ref>'
-          examples:
-            minimal:
-              summary: Minimal reference (canon and volume only)
-              value: '<ref><canon>T</canon><v>25</v></ref>'
-            with_work:
-              summary: Reference with work number
-              value: '<ref><canon>T</canon><v>25</v>.<w>1514</w></ref>'
-            complete:
-              summary: Complete reference with all components
-              value: '<ref><canon>X</canon><v>1.16</v>.<w>268</w><p>180</p><c>a</c><l>01</l></ref>'
-
-        - name: Referer
-          in: header
-          required: true
-          description: Client identifier for API authentication/tracking
-          schema:
-            type: string
-            enum:
-              - CBRD@dila.edu.tw
-          example: 'CBRD@dila.edu.tw'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkRequest'
+            examples:
+              minimal:
+                summary: Minimal reference (canon and volume only)
+                value:
+                  q: '<ref><canon>T</canon><v>25</v></ref>'
+              complete:
+                summary: Complete reference, resolves to a single URL
+                value:
+                  q: '<ref><canon>T</canon><v>4</v><w>202</w><p>376</p><c>b</c><l>4</l></ref>'
+              cjk_with_attribute:
+                summary: Traditional Chinese canon name with a quoted attribute and a column range
+                value:
+                  q: '<ref xml:id="r26"><canon>大正</canon><v>二九</v>、<p>一</p><c>下</c>―<p>二</p><c>上</c></ref>'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LinkRequest'
 
       responses:
         '200':
-          description: Successful API call
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CBRDResponse'
-              examples:
-                success_with_results:
-                  summary: Success with one URL found
-                  value:
-                    success: true
-                    found:
-                      - 'https://cbetaonline.dila.edu.tw/T1514'
-                success_multiple_results:
-                  summary: Success with multiple URLs found
-                  value:
-                    success: true
-                    found:
-                      - 'https://cbetaonline.dila.edu.tw/T25n1514_p0001a01'
-                      - 'https://cbetaonline.dila.edu.tw/T25n1514'
-                success_no_results:
-                  summary: Success but no matching URLs
-                  value:
-                    success: true
-                    found: []
-                error_response:
-                  summary: Processing error (error field)
-                  value:
-                    success: false
-                    error: 'Invalid reference format'
-                error_response_msg:
-                  summary: Processing error (msg field - actual API format)
-                  value:
-                    success: false
-                    msg: '冊號不存在'
-                    found: []
-
-        '400':
-          description: Bad request - missing or invalid parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                error: 'Missing required parameter: q'
-
-        '401':
-          description: Unauthorized - missing or invalid Referer header
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                error: 'Invalid or missing Referer header'
-
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                error: 'Internal server error processing reference'
-
-        '504':
-          description: Gateway timeout - API did not respond within time limit
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                error: 'Request timeout'
+          $ref: '#/components/responses/LinkResponse'
 
 components:
   schemas:
-    CBRDResponse:
+    LinkRequest:
       type: object
-      description: Response from CBRD API
+      description: One citation submitted for resolution.
+      required:
+        - q
+      properties:
+        q:
+          type: string
+          description: Raw <ref> XML string, transmitted verbatim.
+          example: '<ref><canon>T</canon><v>25</v></ref>'
+      additionalProperties: false
+
+    LinkSuccess:
+      type: object
+      description: The service processed the citation. `found` may be empty, meaning no match.
       required:
         - success
         - found
       properties:
         success:
           type: boolean
-          description: Indicates if the API call succeeded
-          example: true
+          const: true
         found:
           type: array
-          description: Array of CBETA URLs (may be empty if no matches)
+          description: CBETA Online URLs. Empty array means no matching reference.
           items:
             type: string
             format: uri
-            pattern: '^https://cbetaonline\.dila\.edu\.tw/'
           example:
-            - 'https://cbetaonline.dila.edu.tw/T1514'
-        error:
-          type: string
-          description: Error message (only present when success is false). Note - actual API may return this in "msg" field instead.
-          nullable: true
-          example: null
+            - 'https://cbetaonline.dila.edu.tw/T04n0202_p0376b04'
+      additionalProperties: false
+
+    LinkFailure:
+      type: object
+      description: The service could not process the citation. Still returned as HTTP 200.
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          const: false
         msg:
           type: string
-          description: Alternative error message field used by actual API (only present when success is false)
-          nullable: true
-          example: '冊號不存在'
-
-    ErrorResponse:
-      type: object
-      description: Error response for HTTP error status codes
-      required:
-        - error
-      properties:
+          example: '經號或頁碼 至少要有一個'
         error:
           type: string
-          description: Human-readable error message
-          example: 'Invalid reference format'
+          example: 'no matching reference'
+      anyOf:
+        - required: [msg]
+        - required: [error]
+      additionalProperties: false
 
-    ReferenceXML:
-      type: object
-      description: Structure of XML reference (for documentation)
-      xml:
-        name: ref
-      properties:
-        canon:
-          type: string
-          description: Canon code (T, X, etc.)
-          example: 'T'
-          xml:
-            name: canon
-        v:
-          type: string
-          description: Volume number (may contain punctuation)
-          example: '25'
-          xml:
-            name: v
-        w:
-          type: string
-          description: Work number (optional)
-          nullable: true
-          example: '1514'
-          xml:
-            name: w
-        p:
-          type: string
-          description: Page number (optional)
-          nullable: true
-          example: '917'
-          xml:
-            name: p
-        c:
-          type: string
-          description: Column code (a/b/c) (optional)
-          nullable: true
-          enum: [a, b, c]
-          example: 'a'
-          xml:
-            name: c
-        l:
-          type: string
-          description: Line number (optional)
-          nullable: true
-          example: '01'
-          xml:
-            name: l
-      xml:
-        name: ref
+    LinkResponse:
+      oneOf:
+        - $ref: '#/components/schemas/LinkSuccess'
+        - $ref: '#/components/schemas/LinkFailure'
 
-  securitySchemes:
-    RefererHeader:
-      type: apiKey
-      in: header
-      name: Referer
+  responses:
+    LinkResponse:
       description: |
-        API authentication via Referer header.
-        Must be set to: `CBRD@dila.edu.tw`
-
-security:
-  - RefererHeader: []
+        Always returns HTTP 200 regardless of internal processing result; consult the `success`
+        field.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LinkResponse'
+          examples:
+            resolved:
+              summary: Resolved to a CBETA Online URL
+              value:
+                success: true
+                found:
+                  - 'https://cbetaonline.dila.edu.tw/T04n0202_p0376b04'
+            no_match:
+              summary: Processed, but nothing matched
+              value:
+                success: true
+                found: []
+            failure_msg:
+              summary: Could not process the citation (msg variant)
+              value:
+                success: false
+                msg: '經號或頁碼 至少要有一個'
+            failure_error:
+              summary: Could not process the citation (error variant)
+              value:
+                success: false
+                error: 'no matching reference'
 
 tags:
   - name: Reference Conversion
-    description: Convert Tripitaka references to CBETA online URLs
+    description: Convert Tripitaka references to CBETA Online URLs
 
 externalDocs:
   description: CBETA Online
