@@ -114,7 +114,7 @@ A maintainer changes or releases the plugin. If the CBRD service has changed its
 ### Measurable Outcomes
 
 - **SC-001**: Ref-to-Link conversions that today fail with `CBRD API error: HTTP 404` succeed or return an accurate citation-level message — 0% of conversions produce a transport error for a citation the service can process.
-- **SC-002**: An editor selecting a complete citation receives a CBETA Online URL without leaving the editor, in a single action, within the existing timeout budget.
+- **SC-002**: An editor selecting a complete citation receives a CBETA Online URL without leaving the editor, in a single action, within the existing timeout budget — unchanged at **10 s per attempt** (connect and read) with **at most 3 attempts**, retried on timeout only.
 - **SC-003**: Each of the three documented service outcomes produces a distinct, correct message; an editor can tell "the service is unreachable" from "this citation has no match" without reading logs.
 - **SC-004**: A reference containing Traditional Chinese text and quoted attributes round-trips without corruption.
 - **SC-005**: Reintroducing the superseded request shape causes at least one automated test to fail — verified by attempting it.

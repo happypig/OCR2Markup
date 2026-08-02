@@ -98,14 +98,14 @@ off, and anyone reading it went looking for finished work.
 None of these block 005 or 006. Kept here rather than in a commit message or a
 closed document, because those are where the previous round of these rotted. If
 this list ever exceeds ~5 items, move it to GitHub Issues (`gh` is authenticated,
-`/speckit.taskstoissues` converts) — an always-loaded file has a real cost per
+`/speckit-taskstoissues` converts) — an always-loaded file has a real cost per
 session.
 
 | # | Item | Where | Closes when |
 |---|------|-------|-------------|
-| 1 | Coverage threshold | `/speckit.constitution` | amendment lands |
-| 2 | Command/query split | `/speckit.specify` (blocked on 3) | feature merges |
-| 3 | Principle VI category | `/speckit.constitution` (with 1) | amendment lands |
+| 1 | Coverage threshold | `/speckit-constitution` | amendment lands |
+| 2 | Command/query split | `/speckit-specify` (blocked on 3) | feature merges |
+| 3 | Principle VI category | `/speckit-constitution` (with 1) | amendment lands |
 | 4 | Stale User-Agent literal | 005 `tasks.md` | 005 merges |
 
 **1 and 3 are one conversation — do them in a single amendment pass.** Both are
@@ -128,9 +128,27 @@ template propagation; expect MINOR (1.1.0) since both are additive/clarifying.
    This is **2 of 2**, not a one-off: `RunAiMarkupDiagnosticsCommand.execute`
    returns markup, and `ConvertReferenceCommand.execute` returns
    `ConvertReferenceResult.getUrl()`. Two of two commands violating a principle
-   is evidence the categories are wrong, not the code. Until it is fixed, 005's
-   Constitution Check will hit the same wall and record a *second* deviation for
-   the same cause — which is how a principle quietly becomes optional.
+   is evidence the categories are wrong, not the code.
+
+   **This has now happened.** 2026-08-03: 005's Constitution Check hit the same
+   wall and recorded the predicted *second* deviation, in
+   `specs/005-cbrd-link-v11/plan.md` → Complexity Tracking. That plan carries an
+   **expiry clause**: the deviation MUST NOT be renewed a third time without this
+   amendment landing, because a principle deviated from by default has quietly
+   become optional.
+
+   **Scheduled: before `005` merges, while the branch is in review** (decided
+   2026-08-03). Not after. Two reasons the later slot was rejected: an amendment
+   parked behind a merge slips behind 006, and 005 would land in permanent
+   history carrying a deviation it did not need to. Implementation of 005 goes
+   first — an outage fix does not wait on governance — but the amendment lands
+   before the branch does, and 005's Constitution Check is then re-run clean.
+
+   Concrete shape when it is written: add a third category alongside Command and
+   Query — *Remote Read: returns data from an external system, changes no local
+   state, cannot be assumed cacheable. MUST NOT modify local state; MAY return
+   domain data; MUST NOT be cached without an explicit documented policy.* That
+   one addition covers both existing offenders and unblocks item 2.
 
 2. **Split `RunAiMarkupDiagnosticsCommand` into a query + command pair.**
    Blocked on 3 — it cannot be classified correctly until the category exists.
@@ -172,5 +190,5 @@ template propagation; expect MINOR (1.1.0) since both are additive/clarifying.
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
-at specs/004-cbrd-parse-endpoint/plan.md
+at specs/005-cbrd-link-v11/plan.md
 <!-- SPECKIT END -->
