@@ -1,4 +1,4 @@
-﻿# OCR2Markup Development Guidelines
+# OCR2Markup Development Guidelines
 
 Auto-generated from all feature plans. Last updated: 2026-01-05
 
@@ -27,3 +27,9 @@ Java 8 (1.8+) - compatible with Oxygen XML SDK 27.1.0.3+: Follow standard conven
 
 <!-- MANUAL ADDITIONS START -->
 <!-- MANUAL ADDITIONS END -->
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+at specs/004-cbrd-parse-endpoint/plan.md
+<!-- SPECKIT END -->

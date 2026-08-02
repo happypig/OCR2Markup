@@ -16,7 +16,16 @@ Thumbs.db
 .vscode/
 .idea/
 .tools/
-Models/Gemini2.5/dila-ai-markup-plugin/dilaAIMarkupPlugin.xml
-Models/Gemini2.5/dila-ai-markup-plugin/dilaAIMarkupPlugin.zip
-Models/Gemini2.5/dila-ai-markup-plugin/extension.xml
-Models/Gemini2.5/dila-ai-markup-plugin/release-notes.xhtml
+
+# Spec Kit per-session state: rewritten on every feature switch, and overridden
+# by the SPECIFY_FEATURE_DIRECTORY env var. Committing it makes parallel feature
+# branches conflict on a pointer rather than on content.
+.specify/feature.json
+
+# NOTE: dilaAIMarkupPlugin.xml and dilaAIMarkupPlugin.zip are deliberately NOT
+# ignored. They are build outputs (regenerated at the `install` phase), but git
+# is this project's only publication channel for the Oxygen add-on - there is no
+# CI or release host - and the descriptor's <xt:location href="..."> is relative,
+# so the pair must travel together. They have been committed at every release
+# since 0.2.3. Entries ignoring them used to sit here and never took effect,
+# because .gitignore does not apply to already-tracked files.
