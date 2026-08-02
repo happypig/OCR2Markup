@@ -88,28 +88,62 @@ someone has looked at the number.
 If both run on one branch, Phase A (005) must **merge** before Phase B (006)
 starts — otherwise an outage fix waits on hygiene work.
 
-## Backlog — real, unscheduled, attached to no feature
+## Backlog
 
-Kept here because a note in a closed document or a commit message does not get
-acted on. None of these block 005 or 006.
+Four open items. Each names where it gets done and what closes it — **delete the
+entry when its closing condition is met.** A stale backlog is worse than none:
+this file once claimed T055/T057 were open for an hour after they were signed
+off, and anyone reading it went looking for finished work.
 
-1. **Decide the coverage threshold.** Measuring is done (59.5%); enforcing is
-   not. Either add JaCoCo's `check` goal at a threshold the project actually
-   meets and raise it over time, or amend the constitution's ≥ 80% Enforcement
-   line via `/speckit.constitution`. The current state — a mandated figure the
-   build never checks — is the thing to fix, in whichever direction.
-2. **Split `RunAiMarkupDiagnosticsCommand` into a query + command pair.** It
-   returns domain data, which Principle VI forbids of a Command, and it mutates
-   nothing. Recorded as an approved, time-boxed deviation in
-   `specs/004-cbrd-parse-endpoint/plan.md` → Complexity Tracking. The class name
-   is also now misleading: it is the primary AI Markup path, not a diagnostic.
-3. **Give Principle VI a category for a non-cacheable remote read.** `/cbrd/parse`
-   is a POST that spends server-side model budget and cannot be cached, so it
-   fits neither Command nor Query as the constitution defines them. Item 2 cannot
-   be resolved cleanly until this is.
-4. **`CBRDAPIClientTest:39` pins a stale literal** (`DILA-AI-Markup/0.4.2`) and
-   will resist a correct version bump. 006 removes the literal; if 006 slips,
-   this test still needs fixing.
+None of these block 005 or 006. Kept here rather than in a commit message or a
+closed document, because those are where the previous round of these rotted. If
+this list ever exceeds ~5 items, move it to GitHub Issues (`gh` is authenticated,
+`/speckit.taskstoissues` converts) — an always-loaded file has a real cost per
+session.
+
+| # | Item | Where | Closes when |
+|---|------|-------|-------------|
+| 1 | Coverage threshold | `/speckit.constitution` | amendment lands |
+| 2 | Command/query split | `/speckit.specify` (blocked on 3) | feature merges |
+| 3 | Principle VI category | `/speckit.constitution` (with 1) | amendment lands |
+| 4 | Stale User-Agent literal | 005 `tasks.md` | 005 merges |
+
+**1 and 3 are one conversation — do them in a single amendment pass.** Both are
+cases where the constitution asserts something the project does not do, so the
+fix is the constitution, not a workaround. Governance requires
+`specs/constitution-amendment-[date].md`, impact analysis, a version bump, and
+template propagation; expect MINOR (1.1.0) since both are additive/clarifying.
+
+1. **Coverage threshold.** Measuring is done — 59.5% instructions, 45.1%
+   branches. Enforcing is not: JaCoCo has no `check` goal. Either lower the
+   Enforcement line to a figure that is true today and ratchet it up, or drop it.
+   A mandated number the build never checks is the defect, in whichever
+   direction it gets resolved. Wiring 80% as-is fails the build immediately.
+
+3. **Principle VI needs a category for a non-cacheable remote read.** Both
+   `/cbrd/parse` and `/cbrd/link` are POSTs that return data, change no local
+   state, and cannot be cached — neither Command ("MUST NOT return domain data")
+   nor Query ("read-only, no side effects, cacheable") fits.
+
+   This is **2 of 2**, not a one-off: `RunAiMarkupDiagnosticsCommand.execute`
+   returns markup, and `ConvertReferenceCommand.execute` returns
+   `ConvertReferenceResult.getUrl()`. Two of two commands violating a principle
+   is evidence the categories are wrong, not the code. Until it is fixed, 005's
+   Constitution Check will hit the same wall and record a *second* deviation for
+   the same cause — which is how a principle quietly becomes optional.
+
+2. **Split `RunAiMarkupDiagnosticsCommand` into a query + command pair.**
+   Blocked on 3 — it cannot be classified correctly until the category exists.
+   Already recorded as an approved, time-boxed deviation in
+   `specs/004-cbrd-parse-endpoint/plan.md` → Complexity Tracking → Follow-up.
+   The name is misleading too: it is the primary AI Markup path, not a
+   diagnostic. `ConvertReferenceCommand` needs the same treatment.
+
+4. **`CBRDAPIClientTest:39` pins `"DILA-AI-Markup/0.4.2"`.** A correct version
+   bump turns that test red, so the suite currently defends the bug. 005 rewrites
+   lines 36-39 of that exact block anyway (`?q=` → JSON body), so fix it there as
+   the invariant form, not another frozen string. If 005 somehow skips it, 006
+   removes the literal entirely.
 
 ## Standing rules this codebase earned the hard way
 
