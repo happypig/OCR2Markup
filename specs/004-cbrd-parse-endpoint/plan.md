@@ -245,13 +245,20 @@ US5 (scenarios 1-4), FR-023, and a new Edge Cases entry.
    resource bundle is absent — so both must agree; (b) no key renames, so
    `translation.xml` key→locale completeness (NFR-001) and
    `TranslationBundleCompletenessTest` are untouched; (c) no storage-key or
-   layout change, so `PreferencePageLayoutOrderTest` keeps asserting the same
-   six-row order and the same keys, with only the two expected label strings
-   updated.
-2. *Rejected — rename the storage keys* (`cbrd.api.url` etc.): changes the
+   default change, so `PreferencePageLayoutOrderTest` keeps asserting the same
+   keys and defaults, with the six-row order and the two expected label strings
+   updated to the documented layout (Session 2026-08-02 Phase 9 — row order).
+2. **Reorder the six rows in `init()`** so the Referer header comes first,
+   then the three CBRD Parse rows (endpoint URL, token, timeout), then the CBRD
+   Link endpoint and timeout rows. Chosen per feature owner 2026-08-02: the
+   shared Referer header is action-independent and the CBRD Parse surface is
+   the feature's own, so both lead before the two remaining Link rows. Pure
+   layout change — storage keys, defaults, and both actions' behavior are
+   untouched (FR-017, NFR-005).
+3. *Rejected — rename the storage keys* (`cbrd.api.url` etc.): changes the
    persistence contract, orphans existing stored values, and violates the
    FR-017 "Ref-to-Link unchanged" guarantee for no user-visible benefit.
-3. *Rejected — rename the internal log/exception strings* ("Failed to set CBRD
+4. *Rejected — rename the internal log/exception strings* ("Failed to set CBRD
    API URL…"): diagnostic messages, not displayed labels; out of scope
    (spec.md Clarifications 2026-08-02 Phase 9).
 
@@ -263,13 +270,165 @@ exercised entirely by the fallback strings; the `translation.xml` values are
 covered by the same label assertions under the real Oxygen resource bundle
 (enforced by US5 scenario 3 + FR-023 wording) and are set in the same commit.
 
-**Out of scope for this renovation**: renaming storage keys; reordering the
-six rows; adding/removing rows; changing defaults or the Referer row; editing
-diagnostic log strings; bumping the version (stays `0.5.0`).
+**Out of scope for this renovation**: renaming storage keys; adding/removing
+rows; changing defaults or the Referer row; editing diagnostic log strings;
+bumping the version (stays `0.5.0`). Row order IS in scope: the 2026-08-02
+row-order clarification supersedes the earlier "no reordering" decision and
+amends the US5/FR-023 order contract (spec.md Session 2026-08-02 Phase 9 — row
+order).
 
 **Gate**: `mvn test` green at the end, with `PreferencePageLayoutOrderTest`
 RED→GREEN first. Version stays `0.5.0`; `VersionConsistencyTest` stays green
 (release-notes 0.5.0 entry is edited in place, not bumped).
+
+### Phase 9 follow-up 2: Transport-error capture in the diagnostics export
+
+**Trigger**: 2026-08-02 — even after the Phase 8/9 401-classification fixes were
+shipped and verified on disk, a live Oxygen instance still surfaced
+"cannot reach the DILA parse service" (`CONNECTIVITY_OR_PROXY`). A direct probe
+from the same machine (curl, plus a harness on Oxygen's bundled Temurin 21.0.9
+and on JDK 25, with and without `-Djavax.net.ssl.trustStoreType=Windows-ROOT`)
+returns a clean HTTP 401 with a readable `unauthorized` body, and no proxy is
+configured anywhere. The exported diagnostic could not resolve the discrepancy
+because it carried only the category — the underlying exception message was
+dropped before `SanitizedTroubleshootingRecord` was built.
+
+**Decision** (2026-08-02): capture the transport cause in the export. The
+record gains a sanitized, redacted `transportError` field — exception simple
+class name plus message, walking the cause chain, capped at 1000 chars —
+populated from `CbrdParseResponse.getException()` for genuine transport-level
+failures only (no recoverable HTTP status). A known HTTP status failure leaves
+it empty. The export schema is bumped `1.0.0` → `1.1.0`. Secrets are passed
+through the existing `SecretRedactor` like every other exported field.
+
+**Implementation approach** (chosen over alternatives):
+
+1. **Thread the exception through the command into the record** —
+   `CbrdParseResponse` already carried it; `RunAiMarkupDiagnosticsCommand`
+   dropped it. Chosen because it is the smallest change that reaches the
+   existing export path and keeps the redaction in one place.
+2. *Rejected — write a separate on-disk log file in the plugin*: adds
+   user-visible file litter and a second redaction surface; the export is the
+   designed support-sharing channel (FR-022).
+3. *Rejected — surface the exception text in the result-area message*: the
+   connectivity guidance is intentionally user-friendly (FR-013); raw exception
+   text belongs in the support export, not the editor message.
+
+**Test strategy**: unit tests for the record round-trip, the writer, and the
+command's record building (transport error present on a thrown `IOException`,
+absent for a known 401, token redacted when it leaks into an exception message).
+Full suite green at 362 tests.
+
+**Out of scope**: changing the guidance message text, changing the client's
+classification logic, bumping the plugin version (stays `0.5.0`).
+
+**Gate**: `mvn test` fully green at 362 tests; `VersionConsistencyTest` green.
+
+### Phase 9 follow-up 3: Oxygen HTTP protocol handler status recovery
+
+**Trigger**: 2026-08-02 — the S11 diagnostics export (schema `1.1.0`, the
+follow-up 2 `transportError` field) finally named the real cause of the
+persistent "cannot reach the DILA parse service" message:
+`HttpExceptionWithDetails: 401 Unauthorized for: https://cbss.dila.edu.tw/cbrd/parse`.
+`ro.sync.net.protocol.http.HttpExceptionWithDetails` is thrown by Oxygen's own
+URL stream handler, which Oxygen installs as the default handler, so inside
+Oxygen a non-2xx response throws `"NNN Reason for: <url>"` instead of the JDK's
+`IOException("Server returned HTTP response code: NNN for URL: ...")`. The
+client's `recoverStatusFromException` only matched the JDK message, so the 401
+was never recovered and the failure was mis-routed to FR-013 connectivity —
+even though the request reached the server and returned a clean 401.
+
+**Decision** (2026-08-02): recover the HTTP status from Oxygen's message format
+too. Add a second status pattern (`(\d{3})\s+[A-Za-z][A-Za-z ]*\s+for:`) to
+`recoverStatusFromException`, refactoring the per-message match into a small
+helper. A 401 recovered from `HttpExceptionWithDetails` classifies exactly like
+the JDK-message case (FR-011 → `UNAUTHORIZED`); only exceptions whose whole
+cause chain carries no status remain FR-013.
+
+**Implementation approach** (chosen over alternatives):
+
+1. **Parse the status out of the message text** (second pattern), SDK-agnostic,
+   mirroring how the JDK message is already parsed. Chosen because it needs no
+   reference to Oxygen SDK classes in the client, survives Oxygen changing the
+   class name or message variant, and keeps `CbrdParseApiClient` unit-testable
+   through the existing `CapturingConnectionFactory` seam (an `IOException` with
+   the same message text is a faithful stand-in, and a real
+   `HttpExceptionWithDetails` is available at test compile time via the
+   `provided` `oxygen-sdk` dependency).
+2. *Rejected — branch on `instanceof HttpExceptionWithDetails` / `getStatusCode()`*:
+   couples the recovery logic to a specific Oxygen SDK class, adds a compile-time
+   dependency into domain/infrastructure code that is deliberately SDK-free, and
+   breaks if Oxygen renames the class. Message parsing is more robust.
+
+**BDD/TDD**: RED first — write US4 scenario 13 as failing unit tests
+(`unauthorizedWhenOxygenHttpProtocolThrowsFromGetResponseCode`,
+`multiWordReasonInOxygenHttpExceptionStillRecoversTheStatus`) against the
+current client, confirm they FAIL RED, then add the pattern (GREEN). The cause
+string on the recovered response is generalized to
+`"No readable response body; status NNN recovered from exception message"` so it
+is accurate for both the JDK and Oxygen messages.
+
+**Out of scope**: changing guidance text, changing FR-013's classification rule,
+bumping the plugin version (stays `0.5.0`).
+
+**Gate**: `CbrdParseApiClientTest` green at 24 tests; full `mvn test` green at
+364 tests; `VersionConsistencyTest` green.
+
+### Phase 9 follow-up 4: Token label renamed to "CBRD bearer token*:" and row order swapped
+
+**Trigger**: 2026-08-02 — the second CBRD Parse row was labelled "CBRD Parse
+token*:" and sat third on the page. The token is actually sent as an HTTP
+`Authorization: Bearer` header, so the label did not say what it was, and the
+token row sat below the endpoint URL row even though the token is the primary
+thing an editor configures. The editor asked to (a) rename the label to surface
+the bearer scheme and (b) move the token row above the endpoint URL row.
+
+**Decision** (2026-08-02): rename `cbrd.parse.token.label` to "CBRD bearer
+token*:" and keep ALL six preference labels identical to their English text in
+every shipped language — the zh_CN/zh_TW value of each label equals its en_US
+value exactly ("Bearer", "Token", "URL", "Endpoint", "Referer", and the "CBRD
+Parse"/"CBRD Link" prefixes are untranslated protocol/UI terms on this page).
+Swap the token row to second, giving the order: "CBRD Referer header:",
+"CBRD bearer token*:", "CBRD Parse endpoint URL:", "CBRD Parse timeout (ms):",
+"CBRD Link Endpoint:", "CBRD Link timeout (ms):". Purely display-only: storage
+keys (`cbrd.parse.api.url`, `cbrd.parse.token`, `cbrd.parse.timeout`), defaults,
+and behavior are untouched (FR-017, NFR-005); version stays `0.5.0`.
+
+**Implementation approach** (chosen over alternatives):
+
+1. **Change the label values + swap the two panel row blocks in place** — update
+   the six `cbrd.*.label` keys in `i18n/translation.xml` (all three languages
+   identical to English) and the `cbrd.parse.token.label` fallback string in
+   `DAMAOptionPagePluginExtension`, and move the token row block (label +
+   `JPasswordField`) above the endpoint URL row block in `buildPage`. Chosen
+   because the row layout is driven by the order the components are added to the
+   `GridBagLayout`; no key, default, or persistence change is involved.
+2. *Rejected — translate the labels to zh_CN/zh_TW*: would break the editor's
+   explicit requirement that the translations stay exactly identical to English;
+   "bearer" has no natural everyday Chinese equivalent (RFC 6750 term).
+3. *Rejected — reorder by adding a sort key / data-driven order*: over-engineering
+   for six statically built rows; the block-swap is the smallest display-only
+   change and keeps the `UpgradePreferencesTest`/`PreferencePageLayoutOrderTest`
+   field-index contract obvious.
+
+**BDD/TDD**: RED first — update the expected label/order in
+`PreferencePageLayoutOrderTest.rowsFollowTheDocumentedOrder` ("CBRD bearer
+token*:" second, "CBRD Parse endpoint URL:" third) and the field-index
+assertions in `UpgradePreferencesTest.endpointUrlIsPrefilledAndTheTokenIsEmpty`
+(token is now field index 1, endpoint URL index 2), plus a new test asserting
+the zh_CN/zh_TW value of every one of the six `cbrd.*.label` keys equals its
+en_US value. Confirm these FAIL RED against the current client, then apply the
+translation + fallback + row-swap changes (GREEN). The pre-existing
+`TranslationXmlValidatorTest` Chinese-character guard and
+`SharedTokenNonDisclosureTest` field-index assumptions are updated to match the
+deliberate untranslated labels and the new token row position.
+
+**Out of scope**: changing the storage keys, defaults, guidance text, or any
+request behavior; bumping the plugin version (stays `0.5.0`).
+
+**Gate**: `PreferencePageLayoutOrderTest`, `UpgradePreferencesTest`, and the
+token-translation test green; full `mvn test` green; `VersionConsistencyTest`
+green.
 
 ## Complexity Tracking
 

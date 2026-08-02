@@ -48,7 +48,7 @@ assembly and the descriptor generation are bound to the `install` phase in `pom.
    - Parsing model, Detection model, AI API key, AI API base URL, AI chat path, AI timeout
 4. Verify the CBRD Parse section exists with defaults:
    - **CBRD Parse endpoint URL**: `https://cbss.dila.edu.tw/cbrd/parse`
-   - **CBRD Parse token**: (empty)
+   - **CBRD bearer token**: (empty)
    - **CBRD Parse timeout (ms)**: `30000`
 5. Enter the shared DILA parse token.
 6. Click **Apply**.
